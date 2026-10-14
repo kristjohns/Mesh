@@ -263,7 +263,7 @@ export default async function families(ctx) {
         }
       });
       // object-specific annotations
-      const bA = env(t, at('e2', 'with a cross-section'), e3 - 0.3, 0.5, 0.5);
+      const bA = env(t, Math.max(at('e2', 'with a cross-section'), e2 + 4.8), e3 - 0.3, 0.5, 0.5);
       if (bA > 0) {
         const [px, py] = toScreen([X[0] + 0.5, 4.55, 0], cam);
         d2.text('cross-section', px + 70, py - 10, { size: 24, weight: 650, color: PAL.amber, alpha: bA, shadow: true });
@@ -281,10 +281,10 @@ export default async function families(ctx) {
       const xA = env(t, at('e5', 'axisymmetric element'), ctx.duration - 2.6, 0.5, 0.5);
       if (xA > 0) {
         const [px, py] = toScreen([X[3], 3.15 * 1.45 - 0.5 * 1.45, 0], cam);
-        d2.text('axis of symmetry', px + 14, py, { size: 26, weight: 650, color: PAL.amber, alpha: xA, shadow: true });
+        d2.text('axis of symmetry', px - 14, py, { size: 26, weight: 650, color: PAL.amber, align: 'right', alpha: xA, shadow: true });
         const [qx, qy] = toScreen([X[3] + 0.42 * 1.45, 2.0 * 1.45 - 0.5 * 1.45, 0], cam);
-        d2.text('2D section', px - 30, qy - 20, { size: 28, weight: 700, color: PAL.violet, align: 'right', alpha: xA, shadow: true });
-        d2.text('quadrilateral mesh', px - 30, qy + 12, { size: 22, weight: 500, color: PAL.ink2, align: 'right', alpha: xA, shadow: true });
+        d2.text('2D section', qx + 60, qy - 20, { size: 28, weight: 700, color: PAL.violet, alpha: xA, shadow: true });
+        d2.text('quadrilateral mesh', qx + 60, qy + 12, { size: 22, weight: 500, color: PAL.ink2, alpha: xA, shadow: true });
         d2.text('r', qx + 40, qy + 40, { size: 1, alpha: 0 });
       }
       chapterCard(d2, t, 1, 'Choosing the element type', 'Beam · Shell · Solid · Axisymmetric', { t0: 0, hold: 2.2 });

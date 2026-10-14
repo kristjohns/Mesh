@@ -232,8 +232,8 @@ export default async function solids(ctx) {
         };
         lab('TET4', 520, 520, 'TET4', '4 corner nodes');
         lab('HEX8', 1400, 520, 'HEX8', '8 corner nodes');
-        lab('TET10', 520, 925, 'TET10', '+ mid-side nodes');
-        lab('HEX20', 1400, 925, 'HEX20', '+ mid-side nodes');
+        lab('TET10', 520, 985, 'TET10', '+ mid-side nodes');
+        lab('HEX20', 1400, 985, 'HEX20', '+ mid-side nodes');
       }
       // ---------------- cantilever views: t2..t4 and t6..end
       const cA = Math.max(env(t, t2 - 0.1, t4 + 0.4, 0.6, 0.6), env(t, t6 + 0.2, ctx.duration, 0.6, 0.6));
