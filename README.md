@@ -1,6 +1,6 @@
 # Meshing with Purpose — FEA best practice, subsea wellhead & template case study
 
-An animated, narrated explainer video (≈17 min, 1080p30) on finite element best practice for
+An animated, narrated explainer video (17 min, 1080p30) on finite element best practice for
 structural analysis: element types, mesh size, soil springs and boundary conditions, worked
 through on a subsea template with conductor, surface casing, conductor housing (LPWH) and
 high-pressure wellhead housing (HPWHH).
@@ -11,7 +11,7 @@ Every result shown in the video was computed for it with the models in `compute/
 
 | Path | What |
 |---|---|
-| `output/` | Final video (`.mp4`, soft English subtitles) and `.srt` |
+| `output/` | Subtitles (`.srt`); the rendered `.mp4` (soft English subtitles) is written here by `assemble.py` but is git-ignored because it exceeds GitHub's file size limit |
 | `compute/` | Python FE models that produce all the data in `video/data/` |
 | `video/narration/` | Narration script (`script.json`) and TTS generator |
 | `video/src/` | Animation engine (Three.js + Canvas 2D + KaTeX) and the 14 scenes |

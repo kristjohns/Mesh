@@ -29,6 +29,8 @@ for k in range(1, len(ids)):
 vf = f"[{prev}]" + ("scale=1280:720:flags=lanczos," if scale == "720" else "") + "format=yuv420p[vout]"
 filt.append(vf)
 n = len(ids)
+# explicit length: -shortest would stop at the last subtitle cue and cut the end card
+total = offsets[-1] + edl["durations"][-1]
 cmd = ["ffmpeg", "-y", "-loglevel", "error", "-stats", *inputs,
        "-i", os.path.join(ROOT, "build", "audio", "mix.wav"),
        "-i", os.path.join(ROOT, "build", "subtitles.srt"),
@@ -36,7 +38,7 @@ cmd = ["ffmpeg", "-y", "-loglevel", "error", "-stats", *inputs,
        "-c:v", "libx264", "-preset", "slow", "-crf", crf, "-tune", "animation", "-r", "30",
        "-c:a", "aac", "-b:a", "192k", "-c:s", "mov_text", "-metadata:s:s:0", "language=eng",
        "-metadata", "title=Meshing with Purpose - FEA best practice, subsea wellhead & template case study",
-       "-movflags", "+faststart", "-shortest", out]
+       "-movflags", "+faststart", "-t", f"{total:.3f}", out]
 print(" ".join(cmd[:8]), "...")
 subprocess.run(cmd, check=True)
 print("wrote", out)
