@@ -426,7 +426,7 @@
   },
   {
    "id": "s11_wellhead",
-   "duration": 90.778,
+   "duration": 93.723,
    "offset": 812.274,
    "lines": [
     {
@@ -468,15 +468,15 @@
     {
      "id": "c7",
      "start": 76.217,
-     "dur": 13.161,
-     "text": "Notice the hottest spots in this model, at the sharp corners of the lock ring groove. Those are singularities. The model is fine for load transfer, but fatigue at the groove needs the real radius and a converged mesh."
+     "dur": 16.107,
+     "text": "The hottest spots in this model sit around the lock ring groove, which has sharp corners. Stress at a sharp corner is a singularity: refine, and it keeps rising. The model is fine for load transfer, but fatigue at the groove needs the real radius and a converged mesh."
     }
    ]
   },
   {
    "id": "s12_soilbc",
    "duration": 62.794,
-   "offset": 903.052,
+   "offset": 905.997,
    "lines": [
     {
      "id": "d1",
@@ -507,7 +507,7 @@
   {
    "id": "s13_verify",
    "duration": 40.044,
-   "offset": 965.846,
+   "offset": 968.791,
    "lines": [
     {
      "id": "v1",
@@ -538,7 +538,7 @@
   {
    "id": "s14_outro",
    "duration": 19.375,
-   "offset": 1005.89,
+   "offset": 1008.836,
    "lines": [
     {
      "id": "o1",
@@ -556,5 +556,5 @@
   }
  ],
  "sr": 24000,
- "total": 1025.265
+ "total": 1028.211
 }

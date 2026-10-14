@@ -74,7 +74,7 @@ export default async function wellheadScene(ctx) {
             const [px, py] = toScreen(p3, cam);
             d2.callout(px, py, px + off[0], py + off[1], s, '', { alpha: pa * clamp(q * 2), progress: q, color: col, size: 28 });
           });
-          d2.tag('SURFACE-TO-SURFACE CONTACT PAIRS', 960, 100, { size: 22, alpha: pa, align: 'center', color: PAL.cyan });
+          d2.tag('SURFACE-TO-SURFACE CONTACT PAIRS', 960, 100, { size: 22, alpha: pa, align: 'center', color: PAL.cyan, fill: 'rgba(5,14,26,0.9)' });
         }
       }
       // ------------------------------------------------ c2 second half: slave / master densities
@@ -94,6 +94,8 @@ export default async function wellheadScene(ctx) {
         }
         d2.line(X0 + 0.356 * s, Y0 - 2.2 * s + 3, X0 + 0.405 * s, Y0 - 2.2 * s + 3, { color: PAL.cyan, width: 6, alpha: sA });
         g.restore();
+        d2.rect(zx + 2, zy + 2, zw - 4, 62, { fill: 'rgba(6,14,24,0.92)', alpha: sA });
+        d2.rect(zx + 2, zy + zh - 90, zw - 4, 88, { fill: 'rgba(6,14,24,0.92)', alpha: sA });
         d2.text('Landing shoulder, contact pair', zx + 24, zy + 40, { size: 24, weight: 700, alpha: sA });
         d2.text('● slave nodes: finer HP-housing side', zx + 24, zy + zh - 50, { size: 22, weight: 650, color: PAL.amber, alpha: sA });
         d2.text('━ master surface: conductor housing', zx + 24, zy + zh - 18, { size: 22, weight: 650, color: PAL.cyan, alpha: sA });
@@ -193,10 +195,11 @@ export default async function wellheadScene(ctx) {
         d2.rect(X0 + 0.372 * s, Y0 - 2.517 * s, 0.056 * s, 0.067 * s, { fill: 'rgba(120,135,145,0.9)', stroke: '#0a1622', width: 1, alpha: wA });
         const pulse = 18 + 4 * Math.sin(t * 6);
         for (const [r, z] of [[0.43, 2.52], [0.43, 2.45]]) d2.circle(X0 + r * s, Y0 - z * s, pulse, { stroke: PAL.red, width: 3.5, alpha: wA * seg(t, at('c7', 'sharp corners') - 0.2, 0.5) });
+        d2.rect(zx + 2, zy + 2, zw - 4, 62, { fill: 'rgba(6,14,24,0.92)', alpha: wA });
         d2.text('lock-ring groove (sharp corners)', zx + 24, zy + 42, { size: 24, weight: 700, alpha: wA });
         d2.text('lock ring', X0 + 0.40 * s, Y0 - 2.483 * s + 8, { size: 20, weight: 650, color: '#0a1622', align: 'center', alpha: wA });
         colorBar(d2, zx + zw + 30, 600, 20, 260, 0, 120, 'MPa', { alpha: wA });
-        const n1 = seg(t, at('c7', 'singularities'), 0.6), n2 = seg(t, at('c7', 'fine for load transfer'), 0.6), n3 = seg(t, at('c7', 'fatigue at the groove'), 0.6);
+        const n1 = seg(t, at('c7', 'singularity'), 0.6), n2 = seg(t, at('c7', 'fine for load transfer'), 0.6), n3 = seg(t, at('c7', 'fatigue at the groove'), 0.6);
         d2.panel(1160, 300, 680, 520, { alpha: wA * n1, accent: PAL.red });
         d2.warn(1210, 370, 16, { alpha: wA * n1 });
         d2.text('Singularities, not results', 1250, 380, { size: 32, weight: 800, color: PAL.red, alpha: wA * n1 });

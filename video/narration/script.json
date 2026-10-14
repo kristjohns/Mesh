@@ -404,7 +404,7 @@
         },
         {
           "id": "c7",
-          "text": "Notice the hottest spots in this model, at the sharp corners of the lock ring groove. Those are singularities. The model is fine for load transfer, but fatigue at the groove needs the real radius and a converged mesh.",
+          "text": "The hottest spots in this model sit around the lock ring groove, which has sharp corners. Stress at a sharp corner is a singularity: refine, and it keeps rising. The model is fine for load transfer, but fatigue at the groove needs the real radius and a converged mesh.",
           "pause": 0.4
         }
       ]
