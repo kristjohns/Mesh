@@ -5,3 +5,5 @@ video/build_tts.log
 video/bench_tmp.mjs
 video/prof_tmp.mjs
 __pycache__/
+# rendered video exceeds GitHub file size limit; delivered separately
+output/*.mp4

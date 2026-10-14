@@ -174,8 +174,8 @@ export default async function system(ctx) {
         const b3 = p0.clone().addScaledVector(u, -2.2).setY(-60).toArray();
         const [ax2, ay2] = S(a3), [bx2, by2] = S(b3);
         d2.dim(ax2, ay2, bx2, by2, '', { alpha: dimA, color: PAL.amber });
-        d2.text('≈ 60 m', ax2 - 20, (ay2 + by2) / 2, { size: 30, weight: 700, color: PAL.amber, align: 'right', alpha: dimA, shadow: true });
-        d2.text('penetration', ax2 - 20, (ay2 + by2) / 2 + 30, { size: 22, color: PAL.ink2, align: 'right', alpha: dimA, shadow: true });
+        d2.text('≈ 60 m', ax2 + 18, (ay2 + by2) / 2, { size: 30, weight: 700, color: PAL.amber, align: 'left', alpha: dimA, shadow: true });
+        d2.text('penetration', ax2 + 18, (ay2 + by2) / 2 + 30, { size: 22, color: PAL.ink2, align: 'left', alpha: dimA, shadow: true });
         const [sx2, sy2] = S(p0.clone().addScaledVector(u, 16).setY(-30).toArray());
         d2.text('Seabed soil', sx2, sy2, { size: 30, weight: 700, color: PAL.ink, alpha: dimA * 0.9, shadow: true });
         d2.text('soft clay', sx2, sy2 + 32, { size: 22, color: PAL.ink2, alpha: dimA * 0.9, shadow: true });
