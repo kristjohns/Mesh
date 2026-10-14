@@ -18,7 +18,7 @@ Every result shown in the video was computed for it with the models in `compute/
 | `video/render.mjs` | Deterministic frame renderer (headless Chromium → ffmpeg) |
 | `video/audio.py` | Soundtrack: narration, procedural score, SFX, ducking; subtitles |
 | `video/assemble.py` | Cross-fades the scene chunks and muxes audio + subtitles |
-| `video/web/`, `video/tools_webparts.py` | Web player page; splits the final video into < 15 MB parts at narration pauses (`web/cuts.json`) for hosting as a claude.ai artifact |
+| `video/web/`, `video/tools_webparts.py` | Web player page for hosting as a claude.ai artifact (15 MB file limit): the final video as one continuous HLS stream of fMP4 segments (hls.js or the system player), with a 540p fallback in three parts |
 
 ## The computations (`compute/`)
 

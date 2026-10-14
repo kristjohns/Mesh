@@ -2,6 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.20/dist/hls.min.js"></script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
 /* Layout: one centred column; the screen first, then the chapter index and the model results it cites.
@@ -45,8 +46,8 @@ h1 {
 /* ---------- player ---------- */
 .player { display: grid; gap: 0; background: #000; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
 .stage { position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: #000; container-type: inline-size; cursor: pointer; }
-.stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; background: #000; }
-.stage video.on { opacity: 1; }
+.stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.stage video::cue { font-family: var(--body); background: rgba(0, 0, 0, .62); }
 .cap {
   position: absolute; left: 50%; bottom: 5.5%; transform: translateX(-50%); max-width: 86%;
   font-family: var(--body); font-weight: 500; font-size: clamp(13px, 2.25cqw, 34px); line-height: 1.3;
@@ -97,7 +98,8 @@ h1 {
 .scrub .tip span { font-family: var(--mono); color: var(--accent); margin-right: 6px; }
 .scrub:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
 .btn:focus-visible, .big:focus-visible, .ch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.now { padding: 10px 14px; background: var(--surface); border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.now { display: flex; justify-content: space-between; gap: 12px; padding: 10px 14px; background: var(--surface); border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.now .q { font-family: var(--mono); font-size: 12.5px; letter-spacing: .06em; white-space: nowrap; }
 .now b { color: var(--fg); font-weight: 600; }
 .player:fullscreen { border: 0; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
 .player:fullscreen .stage { flex: 1; aspect-ratio: auto; }
@@ -149,8 +151,7 @@ footer a { color: var(--accent); }
 
   <div class="player" id="player">
     <div class="stage" id="stage">
-      <video id="va" class="on" playsinline preload="auto" poster="poster.jpg"></video>
-      <video id="vb" playsinline preload="auto"></video>
+      <video id="vid" playsinline preload="auto" poster="poster.jpg"></video>
       <div class="cap" id="cap"></div>
       <div class="spin" id="spin" hidden></div>
       <div class="msg" id="msg" hidden></div>
@@ -175,7 +176,7 @@ footer a { color: var(--accent); }
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
       </button>
     </div>
-    <div class="now" id="now">Chapter: <b>Introduction</b></div>
+    <div class="now"><span id="now">Chapter: <b>Introduction</b></span><span class="q" id="q"></span></div>
   </div>
 
   <section aria-labelledby="chh">
@@ -201,27 +202,99 @@ footer a { color: var(--accent); }
   </footer>
 </div>
 
+
 <script>
 const M = /*MANIFEST*/null;
 (function () {
   const $ = (id) => document.getElementById(id);
-  const vids = [$('va'), $('vb')];
-  const P = M.parts, N = P.length, TOTAL = M.total;
-  let cur = 0, act = 0, playing = false, swapping = false, swapTok = 0, muted = false, blessed = false, dragT = null;
-  let showCC = true;
+  const video = $('vid'), TOTAL = M.total;
+  // the page draws captions itself; this track only shows them in the iPhone's system full screen
+  let track = null;
+  try {
+    track = video.addTextTrack('captions', 'English', 'en');
+    M.cues.forEach(([a, b, txt]) => track.addCue(new VTTCue(a, b, txt)));
+    track.mode = 'hidden';
+  } catch (e) { track = null; }
+  let engine = null, playing = false, muted = false, dragT = null, showCC = true, switching = false;
   try { const v = localStorage.getItem('mwp-cc'); if (v !== null) showCC = v === '1'; } catch (e) {}
 
   const fmt = (s) => { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
-  const partAt = (T) => { let i = 0; while (i < N - 1 && P[i + 1].start <= T + 1e-6) i++; return i; };
-  const once = (el, ev) => new Promise((res) => el.addEventListener(ev, res, { once: true }));
-  const ready = (el) => el.readyState >= 1 ? Promise.resolve() : once(el, 'loadedmetadata');
-  function load(el, i) {
-    if (el.dataset.part === String(i)) return;
-    el.dataset.part = String(i);
-    el.src = P[i].src;
-    el.load();
+  const gtime = () => dragT ?? (engine ? engine.time() : 0);
+
+  // ---------- playback engines: one continuous 17-minute stream wherever possible ----------
+  // 1080p HLS through hls.js (Chrome, Edge, Firefox, Safari, iOS 17.1+) or the system player;
+  // if neither can run, 540p in three files that follow on automatically.
+  function nativeEngine(fail) {
+    // the host serves no .m3u8 type, so hand the system player the playlist as a data URL
+    const abs = (u) => new URL(u, location.href).href;
+    const lines = ['#EXTM3U', '#EXT-X-VERSION:7', '#EXT-X-TARGETDURATION:' + M.td, '#EXT-X-PLAYLIST-TYPE:VOD',
+      '#EXT-X-MAP:URI="' + abs(M.init) + '"'];
+    M.segs.forEach(([d, u]) => lines.push('#EXTINF:' + d + ',', abs(u)));
+    lines.push('#EXT-X-ENDLIST');
+    let okd = false;
+    const onErr = () => { clearTimeout(timer); fail(); };
+    const onMeta = () => { okd = true; clearTimeout(timer); };
+    const timer = setTimeout(() => { if (!okd) onErr(); }, 8000);
+    video.addEventListener('error', onErr);
+    video.addEventListener('loadedmetadata', onMeta, { once: true });
+    video.src = 'data:application/vnd.apple.mpegurl;base64,' + btoa(lines.join('\n'));
+    return { name: 'native', q: '1080p', single: true, time: () => video.currentTime || 0,
+      seek: (T) => { video.currentTime = T; },
+      stop: () => { clearTimeout(timer); video.removeEventListener('error', onErr); video.removeEventListener('loadedmetadata', onMeta); } };
   }
-  const gtime = () => dragT ?? (P[cur].start + (vids[act].currentTime || 0));
+  function hlsEngine(fail) {
+    if (!window.MediaSource && window.ManagedMediaSource) video.disableRemotePlayback = true; // required by iOS for MMS
+    const hls = new Hls({ maxBufferLength: 30, maxMaxBufferLength: 60, backBufferLength: 30 });
+    let attached = false, parsed = false, retries = 0, dead = false;
+    const die = () => { if (dead) return; dead = true; clearTimeout(timer); video.removeEventListener('error', die); hls.destroy(); fail(); };
+    const timer = setTimeout(() => { if (!(attached && parsed)) die(); }, 8000);
+    const check = () => { if (attached && parsed) clearTimeout(timer); };
+    video.addEventListener('error', die); // e.g. the page may not attach a media stream to the video
+    hls.on(Hls.Events.MEDIA_ATTACHED, () => { attached = true; check(); });
+    hls.on(Hls.Events.MANIFEST_PARSED, () => { parsed = true; check(); });
+    hls.on(Hls.Events.ERROR, (ev, d) => {
+      if (!d.fatal) return;
+      if (d.type === Hls.ErrorTypes.MEDIA_ERROR && retries++ < 2) hls.recoverMediaError();
+      else if (d.type === Hls.ErrorTypes.NETWORK_ERROR && retries++ < 4) setTimeout(() => hls.startLoad(), 1500);
+      else die();
+    });
+    hls.loadSource(M.hls);
+    hls.attachMedia(video);
+    return { name: 'hls', q: '1080p', single: true, time: () => video.currentTime || 0,
+      seek: (T) => { video.currentTime = T; }, stop: () => { dead = true; clearTimeout(timer); video.removeEventListener('error', die); hls.destroy(); } };
+  }
+  function partsEngine() {
+    const P = M.lo;
+    let cur = -1, pend = null;
+    const partAt = (T) => { let i = 0; while (i < P.length - 1 && P[i + 1].start <= T + 1e-6) i++; return i; };
+    function load(i, local) {
+      if (cur !== i) { cur = i; pend = local; switching = true; video.src = P[i].src; video.load(); }
+      else video.currentTime = local;
+    }
+    const onMeta = () => { switching = false; if (pend) video.currentTime = pend; pend = null; if (playing) start(); };
+    video.addEventListener('loadedmetadata', onMeta);
+    load(0, 0);
+    return { name: 'parts', q: '540p', single: false,
+      time: () => (cur < 0 ? 0 : P[cur].start + (video.currentTime || 0)),
+      seek: (T) => { const i = partAt(T); load(i, T - P[i].start); },
+      ended: () => { if (cur < P.length - 1) { load(cur + 1, 0); return true; } return false; },
+      stop: () => video.removeEventListener('loadedmetadata', onMeta) };
+  }
+  function use(make) {
+    const T = engine ? engine.time() : 0;
+    if (engine) engine.stop();
+    video.removeAttribute('src'); video.load();
+    engine = make(() => { if (engine && engine.name !== 'parts') use(partsEngine); });
+    video.muted = muted;
+    $('q').textContent = engine.q;
+    if (T > 0.5) {
+      if (engine.single) video.addEventListener('loadedmetadata', () => { engine.seek(T); if (playing) start(); }, { once: true });
+      else engine.seek(T);
+    } else if (playing) start();
+  }
+  const nativeHLS = !!video.canPlayType('application/vnd.apple.mpegurl');
+  const hlsJS = typeof Hls !== 'undefined' && Hls.isSupported();
+  use(hlsJS ? hlsEngine : nativeHLS ? nativeEngine : partsEngine);
 
   // ---------- chapters, ticks ----------
   const list = $('chapters'), scrub = $('scrub');
@@ -234,7 +307,7 @@ const M = /*MANIFEST*/null;
     b.querySelector('.t').textContent = fmt(c.t);
     b.querySelector('.n').textContent = c.n || '';
     b.querySelector('.title').textContent = c.title;
-    b.addEventListener('click', () => { seek(c.t + 0.01, true); $('player').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+    b.addEventListener('click', () => { seek(c.t + 0.01); if (!playing) play(); $('player').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
     li.appendChild(b); list.appendChild(li);
     if (k > 0) {
       const tk = document.createElement('div');
@@ -277,91 +350,38 @@ const M = /*MANIFEST*/null;
     $('play').setAttribute('aria-label', playing ? 'Pause' : 'Play');
     $('big').hidden = playing;
   }
-  function loop() {
-    if (playing && !swapping) {
-      const el = vids[act];
-      if (el.duration && el.currentTime >= el.duration - 0.04) swap();
-    }
-    render();
-    if (playing) requestAnimationFrame(loop);
-  }
+  function loop() { render(); if (playing) requestAnimationFrame(loop); }
 
-  // ---------- playback ----------
-  function prepNext() {
-    const other = vids[1 - act];
-    if (cur + 1 < N) { load(other, cur + 1); if (other.readyState >= 1 && other.currentTime > 0) other.currentTime = 0; }
-  }
-  function bless() {
-    // a play() inside the first tap lets both elements start later without a tap (iOS, Safari)
-    if (blessed) return; blessed = true;
-    const other = vids[1 - act];
-    other.muted = true;
-    const p = other.play();
-    if (p) p.then(() => { other.pause(); other.currentTime = 0; other.muted = muted; }).catch(() => { other.muted = muted; });
-  }
-  function start(el) {
-    const p = el.play();
+  // ---------- transport ----------
+  function start() {
+    const p = video.play();
     if (p) p.catch((e) => {
-      if (e && e.name === 'NotAllowedError') { playing = false; setPlayIcon(); showMsg('Press play to continue.'); }
+      if (e && e.name === 'NotAllowedError') { playing = false; setPlayIcon(); showMsg('Press play to start.'); }
     });
   }
   function play() {
-    if (gtime() >= TOTAL - 0.1) { seek(0, true); return; }
-    hideMsg(); playing = true; setPlayIcon();
-    start(vids[act]); bless(); prepNext();
+    if (gtime() >= TOTAL - 0.2) seek(0);
+    hideMsg(); playing = true; setPlayIcon(); start();
     requestAnimationFrame(loop);
   }
-  function pause() { playing = false; vids.forEach((v) => v.pause()); setPlayIcon(); render(); }
+  function pause() { playing = false; video.pause(); setPlayIcon(); render(); }
   function toggle() { playing ? pause() : play(); }
-  function swap() {
-    if (cur + 1 >= N) { finish(); return; }
-    swapping = true;
-    const old = vids[act], next = vids[1 - act];
-    load(next, cur + 1);
-    next.muted = muted;
-    if (next.currentTime > 0.05) next.currentTime = 0;
-    cur += 1; act = 1 - act;
-    const tok = ++swapTok;
-    const shown = () => { if (tok !== swapTok) return; next.classList.add('on'); old.classList.remove('on'); old.pause(); swapping = false; prepNext(); };
-    if (playing) { next.addEventListener('playing', shown, { once: true }); start(next); }
-    else shown();
-  }
-  function finish() { playing = false; vids[act].pause(); setPlayIcon(); render(); }
-  async function seek(T, autoplay) {
-    T = Math.min(Math.max(T, 0), TOTAL - 0.05);
-    const i = partAt(T), local = T - P[i].start;
-    let el = vids[act];
-    if (el.dataset.part !== String(i)) {
-      const other = vids[1 - act];
-      if (other.dataset.part === String(i)) { // already buffered in the standby element
-        el.pause(); act = 1 - act; el.classList.remove('on'); other.classList.add('on'); el = other;
-      } else { el.pause(); load(el, i); }
-    }
-    cur = i; swapTok++; swapping = false;
-    vids[act].classList.add('on'); vids[1 - act].classList.remove('on');
-    vids[1 - act].pause();
-    await ready(el);
-    el.currentTime = local;
-    el.muted = muted;
-    prepNext();
-    if (autoplay && !playing) { play(); return; }
-    if (playing) start(el);
-    render();
-  }
+  function seek(T) { T = Math.min(Math.max(T, 0), TOTAL - 0.05); engine.seek(T); render(); }
 
   // ---------- events ----------
-  vids.forEach((v) => {
-    v.addEventListener('waiting', () => { if (v === vids[act]) $('spin').hidden = false; });
-    v.addEventListener('playing', () => { if (v === vids[act]) $('spin').hidden = true; });
-    v.addEventListener('canplay', () => { if (v === vids[act]) $('spin').hidden = true; });
-    v.addEventListener('ended', () => { if (v === vids[act] && playing && !swapping) swap(); });
-    v.addEventListener('error', () => {
-      if (v !== vids[act]) return;
-      playing = false; setPlayIcon();
-      showMsg('Part ' + (cur + 1) + ' of ' + N + ' did not load. Check the connection, then press play to try again.');
-      v.removeAttribute('data-part');
-    });
+  video.addEventListener('waiting', () => { $('spin').hidden = false; });
+  video.addEventListener('playing', () => { $('spin').hidden = true; });
+  video.addEventListener('canplay', () => { $('spin').hidden = true; });
+  video.addEventListener('seeked', render);
+  video.addEventListener('ended', () => { if (engine.ended && engine.ended()) return; playing = false; setPlayIcon(); render(); });
+  // keep the page in step with system controls (lock screen, headset buttons, native full screen)
+  video.addEventListener('play', () => { if (!playing) { playing = true; setPlayIcon(); hideMsg(); requestAnimationFrame(loop); } });
+  video.addEventListener('pause', () => { if (playing && !video.ended && !video.seeking && !switching) { playing = false; setPlayIcon(); render(); } });
+  video.addEventListener('error', () => {
+    if (engine && engine.name === 'parts') { playing = false; setPlayIcon(); showMsg('The video did not load. Check the connection, then press play to try again.'); }
   });
+  video.addEventListener('webkitbeginfullscreen', () => { if (track && showCC && engine.single) track.mode = 'showing'; });
+  video.addEventListener('webkitendfullscreen', () => { if (track) track.mode = 'hidden'; });
   function showMsg(s) { $('msg').textContent = s; $('msg').hidden = false; }
   function hideMsg() { $('msg').hidden = true; }
   $('big').addEventListener('click', (e) => { e.stopPropagation(); play(); });
@@ -373,14 +393,16 @@ const M = /*MANIFEST*/null;
   });
   $('cc').setAttribute('aria-pressed', String(showCC));
   $('mute').addEventListener('click', () => {
-    muted = !muted; vids.forEach((v) => { v.muted = muted; });
+    muted = !muted; video.muted = muted;
     $('mute').setAttribute('aria-pressed', String(muted)); $('mute').setAttribute('aria-label', muted ? 'Unmute' : 'Mute');
     $('muteWave').style.opacity = muted ? '0.15' : '1';
   });
   const player = $('player');
-  const fsOK = document.fullscreenEnabled || document.webkitFullscreenEnabled;
-  if (!fsOK) $('fs').hidden = true;
+  const fsEl = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+  const fsVideo = !fsEl && typeof video.webkitEnterFullscreen === 'function'; // iPhone: the system player
+  if (!fsEl && !fsVideo) $('fs').hidden = true;
   $('fs').addEventListener('click', () => {
+    if (fsVideo) { try { video.webkitEnterFullscreen(); } catch (e) {} return; }
     const doc = document;
     if (doc.fullscreenElement || doc.webkitFullscreenElement) { (doc.exitFullscreen || doc.webkitExitFullscreen).call(doc); return; }
     const req = player.requestFullscreen || player.webkitRequestFullscreen;
@@ -424,12 +446,9 @@ const M = /*MANIFEST*/null;
     else if (e.key === 'ArrowRight') { e.preventDefault(); seek(gtime() + 5); }
     else if (e.key === 'c') $('cc').click();
     else if (e.key === 'm') $('mute').click();
-    else if (e.key === 'f' && fsOK) $('fs').click();
+    else if (e.key === 'f' && !$('fs').hidden) $('fs').click();
   });
 
-  // ---------- boot ----------
-  load(vids[0], 0);
-  if (N > 1) load(vids[1], 1);
   setPlayIcon();
   render();
 })();
