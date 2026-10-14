@@ -74,7 +74,7 @@ export default async function verify(ctx) {
           });
           d2.text('+ pre-load, friction, …', 160, 975, { size: 22, color: PAL.ink2, alpha: A * sq * seg(t, at('v4', 'pre-load'), 0.5) });
           const rq = seg(t, at('v4', 'report a range'), 0.6);
-          d2.tag('large spread → report a range, not a single number', 1240, 745, { size: 22, alpha: A * rq, color: PAL.amber, align: 'center' });
+          d2.tag('large spread → report a range, not a single number', 1490, 745, { size: 22, alpha: A * rq, color: PAL.amber, align: 'center' });
         }
       }
       chapterCard(d2, t, 5, 'Verification', 'Check before you believe', { t0: 0, hold: 2.2 });
