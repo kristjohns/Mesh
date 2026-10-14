@@ -1,0 +1,436 @@
+<title>Meshing with Purpose</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one centred column; the screen first, then the chapter index and the model results it cites.
+   Single dark look on purpose: a screening room in the video's own navy, cyan and amber. */
+:root {
+  --bg: #060b12;
+  --surface: #0b141f;
+  --raise: #122030;
+  --line: #1c2a3a;
+  --fg: #e3eaf2;
+  --muted: #8a9cb0;
+  --accent: #4cc9f0;
+  --amber: #f5b13d;
+  --display: "Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  color-scheme: dark;
+}
+html { background: var(--bg); }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 56px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: grid; gap: 40px; }
+header { display: grid; gap: 10px; max-width: 62ch; }
+.eyebrow {
+  font-family: var(--mono); font-size: 12.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent);
+}
+h1 {
+  font-family: var(--display); font-weight: 800; font-stretch: 118%;
+  font-size: clamp(34px, 6vw, 64px); line-height: 1.02; letter-spacing: -.01em; margin: 0; text-wrap: balance;
+}
+.lede { color: var(--muted); font-size: 17px; margin: 0; }
+
+/* ---------- player ---------- */
+.player { display: grid; gap: 0; background: #000; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.stage { position: relative; aspect-ratio: 16 / 9; max-width: 100%; background: #000; container-type: inline-size; cursor: pointer; }
+.stage video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: 0; background: #000; }
+.stage video.on { opacity: 1; }
+.cap {
+  position: absolute; left: 50%; bottom: 5.5%; transform: translateX(-50%); max-width: 86%;
+  font-family: var(--body); font-weight: 500; font-size: clamp(13px, 2.25cqw, 34px); line-height: 1.3;
+  white-space: pre-line; text-align: center; color: #fff; background: rgba(0, 0, 0, .62);
+  padding: .18em .55em; border-radius: 4px; pointer-events: none;
+}
+.cap:empty { display: none; }
+.big {
+  position: absolute; inset: 0; margin: auto; width: clamp(64px, 11cqw, 112px); height: clamp(64px, 11cqw, 112px);
+  border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .55); background: rgba(6, 11, 18, .55);
+  display: grid; place-items: center; cursor: pointer; color: #fff; backdrop-filter: blur(4px);
+}
+.big svg { width: 38%; height: 38%; margin-left: 6%; }
+.big:hover { background: rgba(76, 201, 240, .28); border-color: var(--accent); }
+.spin {
+  position: absolute; inset: 0; margin: auto; width: 44px; height: 44px; border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, .2); border-top-color: var(--accent); animation: rot .9s linear infinite; pointer-events: none;
+}
+@keyframes rot { to { transform: rotate(360deg); } }
+.msg {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); max-width: 80%;
+  background: rgba(6, 11, 18, .88); border: 1px solid var(--line); border-radius: 6px; padding: 12px 16px; font-size: 15px; text-align: center;
+}
+.bar {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 12px;
+  background: var(--surface); border-top: 1px solid var(--line);
+}
+.btn {
+  flex: none; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 6px;
+  background: transparent; border: 1px solid transparent; color: var(--fg); cursor: pointer; padding: 0;
+}
+.btn svg { width: 20px; height: 20px; }
+.btn:hover { background: var(--raise); }
+.btn[aria-pressed="true"] { color: var(--accent); border-color: rgba(76, 201, 240, .35); }
+.btn.txt { width: auto; padding: 0 9px; font-family: var(--mono); font-size: 12.5px; font-weight: 500; letter-spacing: .06em; }
+.time { flex: none; font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 11ch; }
+.time b { color: var(--fg); font-weight: 500; }
+.scrub { flex: 1 1 240px; min-width: 0; position: relative; height: 34px; cursor: pointer; touch-action: none; }
+.scrub .track { position: absolute; left: 0; right: 0; top: 15px; height: 4px; border-radius: 2px; background: var(--line); }
+.scrub .fill { position: absolute; left: 0; top: 15px; height: 4px; border-radius: 2px; background: var(--accent); width: 0; }
+.scrub .tick { position: absolute; top: 11px; width: 2px; height: 12px; background: var(--muted); opacity: .55; transform: translateX(-1px); border-radius: 1px; }
+.scrub .tick.major { background: var(--amber); opacity: .9; height: 14px; top: 10px; }
+.scrub .knob { position: absolute; top: 10px; width: 14px; height: 14px; border-radius: 50%; background: #fff; transform: translateX(-7px); box-shadow: 0 0 0 3px rgba(76, 201, 240, .35); }
+.scrub .tip {
+  position: absolute; bottom: 32px; transform: translateX(-50%); white-space: nowrap; pointer-events: none;
+  background: var(--raise); border: 1px solid var(--line); border-radius: 4px; padding: 3px 8px; font-size: 12.5px;
+}
+.scrub .tip span { font-family: var(--mono); color: var(--accent); margin-right: 6px; }
+.scrub:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+.btn:focus-visible, .big:focus-visible, .ch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.now { padding: 10px 14px; background: var(--surface); border-top: 1px solid var(--line); font-size: 14px; color: var(--muted); }
+.now b { color: var(--fg); font-weight: 600; }
+.player:fullscreen { border: 0; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
+.player:fullscreen .stage { flex: 1; aspect-ratio: auto; }
+.player:fullscreen .now { display: none; }
+
+/* ---------- chapters ---------- */
+section { display: grid; gap: 16px; }
+h2 {
+  font-family: var(--display); font-stretch: 112%; font-weight: 700; font-size: 22px; margin: 0; letter-spacing: .005em;
+}
+.chapters { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px 28px; grid-template-columns: 1fr; }
+@media (min-width: 820px) { .chapters { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(7, auto); grid-auto-flow: column; } }
+.ch button {
+  width: 100%; display: grid; grid-template-columns: 6ch 2.2ch 1fr; align-items: baseline; gap: 10px; text-align: left;
+  background: transparent; border: 0; border-bottom: 1px solid var(--line); color: var(--fg); padding: 11px 6px; cursor: pointer; font: inherit;
+}
+.ch button:hover { background: var(--surface); }
+.ch .t { font-family: var(--mono); font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ch .n { font-family: var(--display); font-weight: 800; color: var(--amber); font-size: 15px; }
+.ch .title { min-width: 0; }
+.ch.major .title { font-weight: 600; }
+.ch.cur button { background: var(--surface); }
+.ch.cur .t { color: var(--accent); }
+
+/* ---------- results ---------- */
+.results { margin: 0; display: grid; gap: 0; grid-template-columns: 1fr; border-top: 1px solid var(--line); }
+@media (min-width: 820px) { .results { grid-template-columns: 1fr 1fr; column-gap: 28px; } }
+.results div { display: grid; grid-template-columns: 11ch 1fr; gap: 14px; padding: 13px 0; border-bottom: 1px solid var(--line); align-items: baseline; }
+.results dt { font-family: var(--mono); font-weight: 500; color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.results dd { margin: 0; min-width: 0; color: var(--fg); }
+.results dd small { display: block; color: var(--muted); font-size: 14px; }
+footer { color: var(--muted); font-size: 14px; max-width: 72ch; display: grid; gap: 6px; }
+footer a { color: var(--accent); }
+.kbd { font-family: var(--mono); font-size: 12.5px; }
+@media (max-width: 560px) {
+  .time { order: 3; }
+  .scrub { order: 10; flex-basis: 100%; }
+  .results div { grid-template-columns: 1fr; gap: 2px; }
+}
+@media (prefers-reduced-motion: reduce) { .spin { animation-duration: 2.5s; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Finite element best practice · 17 min · narrated</div>
+    <h1>Meshing with Purpose</h1>
+    <p class="lede">Element types, mesh size, soil springs and interface boundary conditions, worked through on a subsea template with conductor, surface casing, conductor housing and high-pressure wellhead housing.</p>
+  </header>
+
+  <div class="player" id="player">
+    <div class="stage" id="stage">
+      <video id="va" class="on" playsinline preload="auto" poster="poster.jpg"></video>
+      <video id="vb" playsinline preload="auto"></video>
+      <div class="cap" id="cap"></div>
+      <div class="spin" id="spin" hidden></div>
+      <div class="msg" id="msg" hidden></div>
+      <button class="big" id="big" type="button" aria-label="Play video">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4.5v15l12-7.5z"/></svg>
+      </button>
+    </div>
+    <div class="bar">
+      <button class="btn" id="play" type="button" aria-label="Play">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="playIcon" d="M7 4.5v15l12-7.5z"/></svg>
+      </button>
+      <div class="scrub" id="scrub" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="1020" aria-valuenow="0" aria-valuetext="0:00">
+        <div class="track"></div><div class="fill" id="fill"></div><div class="knob" id="knob"></div>
+        <div class="tip" id="tip" hidden></div>
+      </div>
+      <div class="time" id="time"><b>0:00</b> / 17:00</div>
+      <button class="btn txt" id="cc" type="button" aria-pressed="true" aria-label="Captions">CC</button>
+      <button class="btn" id="mute" type="button" aria-pressed="false" aria-label="Mute">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none"/><path id="muteWave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+      </button>
+      <button class="btn" id="fs" type="button" aria-label="Full screen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg>
+      </button>
+    </div>
+    <div class="now" id="now">Chapter: <b>Introduction</b></div>
+  </div>
+
+  <section aria-labelledby="chh">
+    <h2 id="chh">Chapters</h2>
+    <ol class="chapters" id="chapters"></ol>
+  </section>
+
+  <section aria-labelledby="rh">
+    <h2 id="rh">What the models showed</h2>
+    <dl class="results">
+      <div><dt>22 % · 65 %</dt><dd>Tip deflection of a cantilever with one linear tet (TET4) or one linear hex (HEX8) through the thickness.<small>TET10 98 %, HEX20 99 %, incompatible-mode HEX8 99 % with the same single element.</small></dd></div>
+      <div><dt>Kt 2.29</dt><dd>Converged stress concentration at the filleted shoulder, within 1 % at about 12 elements around the fillet.<small>At the sharp corner the peak grows about 37 % per mesh halving and never converges.</small></dd></div>
+      <div><dt>2.96 MNm</dt><dd>Peak conductor bending moment, 5 m below the mudline, 19 % above the moment at the mudline.</dd></div>
+      <div><dt>−96 %</dt><dd>Error in wellhead deflection if the conductor is simply fixed at the mudline instead of carried by soil springs.</dd></div>
+      <div><dt>50 kN · 266 kN</dt><dd>The 30 mm gap at the template closes at about 50 kN; the contact force then reaches 266 kN, 1.8 times the applied load.</dd></div>
+      <div><dt>7.3 MN</dt><dd>Lock-ring pre-load. The landing shoulder starts to lift off above about 1.4 MNm and is 43 % open at 3 MNm.<small>Interface stiffness after lift-off: 47 % of the initial value.</small></dd></div>
+    </dl>
+  </section>
+
+  <footer>
+    <div>Every result in the video was computed for it: 3D solid, axisymmetric, beam-on-spring and frame FE models. Source, models and renderer: <a href="https://github.com/kristjohns/mesh/tree/fea-best-practice-video" target="_blank" rel="noopener">kristjohns/mesh</a>, branch <span class="kbd">fea-best-practice-video</span>.</div>
+    <div>Keys: <span class="kbd">Space</span> play or pause · <span class="kbd">← →</span> 5 s · <span class="kbd">C</span> captions · <span class="kbd">M</span> mute · <span class="kbd">F</span> full screen.</div>
+  </footer>
+</div>
+
+<script>
+const M = /*MANIFEST*/null;
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const vids = [$('va'), $('vb')];
+  const P = M.parts, N = P.length, TOTAL = M.total;
+  let cur = 0, act = 0, playing = false, swapping = false, swapTok = 0, muted = false, blessed = false, dragT = null;
+  let showCC = true;
+  try { const v = localStorage.getItem('mwp-cc'); if (v !== null) showCC = v === '1'; } catch (e) {}
+
+  const fmt = (s) => { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+  const partAt = (T) => { let i = 0; while (i < N - 1 && P[i + 1].start <= T + 1e-6) i++; return i; };
+  const once = (el, ev) => new Promise((res) => el.addEventListener(ev, res, { once: true }));
+  const ready = (el) => el.readyState >= 1 ? Promise.resolve() : once(el, 'loadedmetadata');
+  function load(el, i) {
+    if (el.dataset.part === String(i)) return;
+    el.dataset.part = String(i);
+    el.src = P[i].src;
+    el.load();
+  }
+  const gtime = () => dragT ?? (P[cur].start + (vids[act].currentTime || 0));
+
+  // ---------- chapters, ticks ----------
+  const list = $('chapters'), scrub = $('scrub');
+  M.chapters.forEach((c, k) => {
+    const li = document.createElement('li');
+    li.className = 'ch' + (c.n ? ' major' : '');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = '<span class="t"></span><span class="n"></span><span class="title"></span>';
+    b.querySelector('.t').textContent = fmt(c.t);
+    b.querySelector('.n').textContent = c.n || '';
+    b.querySelector('.title').textContent = c.title;
+    b.addEventListener('click', () => { seek(c.t + 0.01, true); $('player').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); });
+    li.appendChild(b); list.appendChild(li);
+    if (k > 0) {
+      const tk = document.createElement('div');
+      tk.className = 'tick' + (c.n ? ' major' : '');
+      tk.style.left = (100 * c.t / TOTAL) + '%';
+      scrub.appendChild(tk);
+    }
+  });
+  const chAt = (T) => { let k = 0; while (k < M.chapters.length - 1 && M.chapters[k + 1].t <= T) k++; return k; };
+
+  // ---------- captions ----------
+  function cueAt(T) {
+    let lo = 0, hi = M.cues.length - 1;
+    while (lo <= hi) { const m = (lo + hi) >> 1; const c = M.cues[m]; if (T < c[0]) hi = m - 1; else if (T > c[1]) lo = m + 1; else return c[2]; }
+    return '';
+  }
+
+  // ---------- render ----------
+  let lastCh = -1, lastCap = null;
+  function render() {
+    const T = gtime(), f = Math.min(1, T / TOTAL);
+    $('fill').style.width = (100 * f) + '%';
+    $('knob').style.left = (100 * f) + '%';
+    $('time').innerHTML = '<b>' + fmt(T) + '</b> / ' + fmt(TOTAL);
+    scrub.setAttribute('aria-valuenow', String(Math.round(T)));
+    scrub.setAttribute('aria-valuetext', fmt(T));
+    const cap = showCC ? cueAt(T) : '';
+    if (cap !== lastCap) { $('cap').textContent = cap; lastCap = cap; }
+    const k = chAt(T);
+    if (k !== lastCh) {
+      list.children[lastCh]?.classList.remove('cur');
+      list.children[k].classList.add('cur');
+      $('now').innerHTML = 'Chapter: <b></b>';
+      $('now').querySelector('b').textContent = (M.chapters[k].n ? M.chapters[k].n + ' · ' : '') + M.chapters[k].title;
+      lastCh = k;
+    }
+  }
+  function setPlayIcon() {
+    $('playIcon').setAttribute('d', playing ? 'M7 5h3.5v14H7zM13.5 5H17v14h-3.5z' : 'M7 4.5v15l12-7.5z');
+    $('play').setAttribute('aria-label', playing ? 'Pause' : 'Play');
+    $('big').hidden = playing;
+  }
+  function loop() {
+    if (playing && !swapping) {
+      const el = vids[act];
+      if (el.duration && el.currentTime >= el.duration - 0.04) swap();
+    }
+    render();
+    if (playing) requestAnimationFrame(loop);
+  }
+
+  // ---------- playback ----------
+  function prepNext() {
+    const other = vids[1 - act];
+    if (cur + 1 < N) { load(other, cur + 1); if (other.readyState >= 1 && other.currentTime > 0) other.currentTime = 0; }
+  }
+  function bless() {
+    // a play() inside the first tap lets both elements start later without a tap (iOS, Safari)
+    if (blessed) return; blessed = true;
+    const other = vids[1 - act];
+    other.muted = true;
+    const p = other.play();
+    if (p) p.then(() => { other.pause(); other.currentTime = 0; other.muted = muted; }).catch(() => { other.muted = muted; });
+  }
+  function start(el) {
+    const p = el.play();
+    if (p) p.catch((e) => {
+      if (e && e.name === 'NotAllowedError') { playing = false; setPlayIcon(); showMsg('Press play to continue.'); }
+    });
+  }
+  function play() {
+    if (gtime() >= TOTAL - 0.1) { seek(0, true); return; }
+    hideMsg(); playing = true; setPlayIcon();
+    start(vids[act]); bless(); prepNext();
+    requestAnimationFrame(loop);
+  }
+  function pause() { playing = false; vids.forEach((v) => v.pause()); setPlayIcon(); render(); }
+  function toggle() { playing ? pause() : play(); }
+  function swap() {
+    if (cur + 1 >= N) { finish(); return; }
+    swapping = true;
+    const old = vids[act], next = vids[1 - act];
+    load(next, cur + 1);
+    next.muted = muted;
+    if (next.currentTime > 0.05) next.currentTime = 0;
+    cur += 1; act = 1 - act;
+    const tok = ++swapTok;
+    const shown = () => { if (tok !== swapTok) return; next.classList.add('on'); old.classList.remove('on'); old.pause(); swapping = false; prepNext(); };
+    if (playing) { next.addEventListener('playing', shown, { once: true }); start(next); }
+    else shown();
+  }
+  function finish() { playing = false; vids[act].pause(); setPlayIcon(); render(); }
+  async function seek(T, autoplay) {
+    T = Math.min(Math.max(T, 0), TOTAL - 0.05);
+    const i = partAt(T), local = T - P[i].start;
+    let el = vids[act];
+    if (el.dataset.part !== String(i)) {
+      const other = vids[1 - act];
+      if (other.dataset.part === String(i)) { // already buffered in the standby element
+        el.pause(); act = 1 - act; el.classList.remove('on'); other.classList.add('on'); el = other;
+      } else { el.pause(); load(el, i); }
+    }
+    cur = i; swapTok++; swapping = false;
+    vids[act].classList.add('on'); vids[1 - act].classList.remove('on');
+    vids[1 - act].pause();
+    await ready(el);
+    el.currentTime = local;
+    el.muted = muted;
+    prepNext();
+    if (autoplay && !playing) { play(); return; }
+    if (playing) start(el);
+    render();
+  }
+
+  // ---------- events ----------
+  vids.forEach((v) => {
+    v.addEventListener('waiting', () => { if (v === vids[act]) $('spin').hidden = false; });
+    v.addEventListener('playing', () => { if (v === vids[act]) $('spin').hidden = true; });
+    v.addEventListener('canplay', () => { if (v === vids[act]) $('spin').hidden = true; });
+    v.addEventListener('ended', () => { if (v === vids[act] && playing && !swapping) swap(); });
+    v.addEventListener('error', () => {
+      if (v !== vids[act]) return;
+      playing = false; setPlayIcon();
+      showMsg('Part ' + (cur + 1) + ' of ' + N + ' did not load. Check the connection, then press play to try again.');
+      v.removeAttribute('data-part');
+    });
+  });
+  function showMsg(s) { $('msg').textContent = s; $('msg').hidden = false; }
+  function hideMsg() { $('msg').hidden = true; }
+  $('big').addEventListener('click', (e) => { e.stopPropagation(); play(); });
+  $('stage').addEventListener('click', () => toggle());
+  $('play').addEventListener('click', () => toggle());
+  $('cc').addEventListener('click', () => {
+    showCC = !showCC; $('cc').setAttribute('aria-pressed', String(showCC)); lastCap = null; render();
+    try { localStorage.setItem('mwp-cc', showCC ? '1' : '0'); } catch (e) {}
+  });
+  $('cc').setAttribute('aria-pressed', String(showCC));
+  $('mute').addEventListener('click', () => {
+    muted = !muted; vids.forEach((v) => { v.muted = muted; });
+    $('mute').setAttribute('aria-pressed', String(muted)); $('mute').setAttribute('aria-label', muted ? 'Unmute' : 'Mute');
+    $('muteWave').style.opacity = muted ? '0.15' : '1';
+  });
+  const player = $('player');
+  const fsOK = document.fullscreenEnabled || document.webkitFullscreenEnabled;
+  if (!fsOK) $('fs').hidden = true;
+  $('fs').addEventListener('click', () => {
+    const doc = document;
+    if (doc.fullscreenElement || doc.webkitFullscreenElement) { (doc.exitFullscreen || doc.webkitExitFullscreen).call(doc); return; }
+    const req = player.requestFullscreen || player.webkitRequestFullscreen;
+    try { const r = req.call(player); if (r && r.catch) r.catch(() => {}); } catch (e) {}
+  });
+
+  // scrubber
+  const tAtX = (x) => { const r = scrub.getBoundingClientRect(); return Math.min(1, Math.max(0, (x - r.left) / r.width)) * TOTAL; };
+  const tip = $('tip');
+  function showTip(T) {
+    const c = M.chapters[chAt(T)];
+    tip.innerHTML = '<span></span>'; tip.firstChild.textContent = fmt(T); tip.append(c.title);
+    const r = scrub.getBoundingClientRect(), x = r.width * T / TOTAL, w = tip.offsetWidth || 160;
+    tip.style.left = Math.min(Math.max(x, w / 2), r.width - w / 2) + 'px'; tip.hidden = false;
+  }
+  scrub.addEventListener('pointerdown', (e) => {
+    scrub.setPointerCapture(e.pointerId); dragT = tAtX(e.clientX); showTip(dragT); render();
+  });
+  scrub.addEventListener('pointermove', (e) => {
+    const T = tAtX(e.clientX);
+    if (dragT !== null) { dragT = T; render(); }
+    if (e.pointerType === 'mouse' || dragT !== null) showTip(T);
+  });
+  scrub.addEventListener('pointerleave', () => { if (dragT === null) tip.hidden = true; });
+  const endDrag = () => { if (dragT === null) return; const T = dragT; dragT = null; tip.hidden = true; seek(T); };
+  scrub.addEventListener('pointerup', endDrag);
+  scrub.addEventListener('pointercancel', () => { dragT = null; tip.hidden = true; render(); });
+  scrub.addEventListener('keydown', (e) => {
+    const step = { ArrowLeft: -5, ArrowRight: 5, PageDown: -30, PageUp: 30 }[e.key];
+    if (step) { e.preventDefault(); seek(gtime() + step); }
+    if (e.key === 'Home') { e.preventDefault(); seek(0); }
+    if (e.key === 'End') { e.preventDefault(); seek(TOTAL - 1); }
+  });
+  document.addEventListener('keydown', (e) => {
+    const t = e.target.closest ? e.target : null;
+    if (t && t.closest('[role="slider"]') && /^Arrow|^Page|^Home$|^End$/.test(e.key)) return; // the slider handles these
+    if (t && t.closest('button') && (e.key === ' ' || e.key === 'Enter')) return; // let buttons activate normally
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === ' ' || e.key === 'k') { e.preventDefault(); toggle(); }
+    else if (e.key === 'ArrowLeft') { e.preventDefault(); seek(gtime() - 5); }
+    else if (e.key === 'ArrowRight') { e.preventDefault(); seek(gtime() + 5); }
+    else if (e.key === 'c') $('cc').click();
+    else if (e.key === 'm') $('mute').click();
+    else if (e.key === 'f' && fsOK) $('fs').click();
+  });
+
+  // ---------- boot ----------
+  load(vids[0], 0);
+  if (N > 1) load(vids[1], 1);
+  setPlayIcon();
+  render();
+})();
+</script>

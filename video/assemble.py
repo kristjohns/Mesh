@@ -12,6 +12,8 @@ args = sys.argv[1:]
 opt = lambda k, d: args[args.index(k) + 1] if k in args else d
 crf = opt("--crf", "19")
 scale = opt("--scale", "1080")
+maxrate = opt("--maxrate", "8M")  # caps the few shots with shimmering fine detail
+kf = opt("--keyframes", os.path.join(ROOT, "web", "cuts.json"))  # keyframes where the web player splits the file
 out = opt("--out", os.path.join(os.path.dirname(ROOT), "output", "fea_best_practice_subsea_wellhead.mp4"))
 os.makedirs(os.path.dirname(out), exist_ok=True)
 edl = json.load(open(os.path.join(ROOT, "build", "edl.json")))
@@ -29,6 +31,8 @@ for k in range(1, len(ids)):
 vf = f"[{prev}]" + ("scale=1280:720:flags=lanczos," if scale == "720" else "") + "format=yuv420p[vout]"
 filt.append(vf)
 n = len(ids)
+# a hair early, so float rounding can never push a keyframe to the next frame
+kf_args = ["-force_key_frames", ",".join(f"{x - 0.001:.4f}" for x in json.load(open(kf)))] if kf and os.path.exists(kf) else []
 # explicit length: -shortest would stop at the last subtitle cue and cut the end card
 total = offsets[-1] + edl["durations"][-1]
 cmd = ["ffmpeg", "-y", "-loglevel", "error", "-stats", *inputs,
@@ -36,6 +40,7 @@ cmd = ["ffmpeg", "-y", "-loglevel", "error", "-stats", *inputs,
        "-i", os.path.join(ROOT, "build", "subtitles.srt"),
        "-filter_complex", ";".join(filt), "-map", "[vout]", "-map", f"{n}:a", "-map", f"{n + 1}:s",
        "-c:v", "libx264", "-preset", "slow", "-crf", crf, "-tune", "animation", "-r", "30",
+       "-maxrate", maxrate, "-bufsize", maxrate, *kf_args,
        "-c:a", "aac", "-b:a", "192k", "-c:s", "mov_text", "-metadata:s:s:0", "language=eng",
        "-metadata", "title=Meshing with Purpose - FEA best practice, subsea wellhead & template case study",
        "-movflags", "+faststart", "-t", f"{total:.3f}", out]

@@ -18,6 +18,7 @@ Every result shown in the video was computed for it with the models in `compute/
 | `video/render.mjs` | Deterministic frame renderer (headless Chromium → ffmpeg) |
 | `video/audio.py` | Soundtrack: narration, procedural score, SFX, ducking; subtitles |
 | `video/assemble.py` | Cross-fades the scene chunks and muxes audio + subtitles |
+| `video/web/`, `video/tools_webparts.py` | Web player page; splits the final video into < 15 MB parts at narration pauses (`web/cuts.json`) for hosting as a claude.ai artifact |
 
 ## The computations (`compute/`)
 
@@ -49,6 +50,7 @@ cd ../video && npm install
 python3 narration/tts.py            # needs Kokoro model files in ../tts_models
 ./render_all.sh                      # renders build/chunks/*.mp4 (Mesa llvmpipe via EGL)
 python3 audio.py && python3 assemble.py
+python3 tools_webparts.py            # optional: player page + parts in build/web
 ```
 
 Preview a single frame: `node render.mjs --scene s06_axisym --stills 12.5,30`.
