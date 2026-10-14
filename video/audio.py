@@ -1,6 +1,6 @@
 """Build the soundtrack: narration + procedural ambient music + synthesized SFX, and subtitles.
 
-Usage: python3 audio.py      -> build/audio/mix.wav, build/subtitles.srt, build/edl.json
+Usage: python3 audio.py [--video fatigue]  -> <build>/audio/mix.wav, <build>/subtitles.srt, <build>/edl.json
 """
 import json
 import os
@@ -10,11 +10,17 @@ import soundfile as sf
 from scipy.signal import resample_poly, fftconvolve, butter, sosfilt
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
+import sys  # noqa: E402
+sys.path.insert(0, ROOT)
+from projects import project  # noqa: E402
+
+P = project()
+BUILD = P["build_dir"]
 SR = 48000
 XFADE = 0.6  # seconds of cross-fade between scene chunks
 rng = np.random.default_rng(7)
 
-timing = json.load(open(os.path.join(ROOT, "data", "timing.json")))
+timing = json.load(open(P["timing_path"]))
 scenes = timing["scenes"]
 offsets = []
 t = 0.0
@@ -54,7 +60,7 @@ def midi(m):
 voice = np.zeros(N)
 for sc, off in zip(scenes, offsets):
     for ln in sc["lines"]:
-        x, sr = sf.read(os.path.join(ROOT, "build", "audio", "lines", ln["id"] + ".wav"))
+        x, sr = sf.read(os.path.join(BUILD, "audio", "lines", ln["id"] + ".wav"))
         if x.ndim > 1:
             x = x.mean(axis=1)
         x = resample_poly(x, SR, sr)
@@ -168,7 +174,7 @@ ocean /= np.max(np.abs(ocean))
 ocean *= (0.7 + 0.3 * np.sin(2 * np.pi * tt / 9.0))[:, None]
 ow = np.zeros(N)
 for sc, off in zip(scenes, offsets):
-    if sc["id"] in ("s01_intro", "s02_system", "s14_outro"):
+    if sc["id"] in P["ocean"]:
         a, b = off, off + sc["duration"]
         ow += np.clip((tt - a) / 2.0, 0, 1) * np.clip((b - tt) / 2.0, 0, 1)
 music += (ocean * ow[:, None] * db(-27)).astype(np.float32)
@@ -267,7 +273,7 @@ SFX = {"whoosh": (sfx_whoosh, -25), "thud": (sfx_thud, -21), "click": (sfx_click
        "hit": (sfx_hit, -17), "chapter": (sfx_chapter, -20), "drone": (sfx_drone, -22), "outro": (sfx_outro, -24)}
 fx = np.zeros((N, 2), dtype=np.float32)
 for sc, off in zip(scenes, offsets):
-    mp = os.path.join(ROOT, "build", "meta", sc["id"] + ".json")
+    mp = os.path.join(BUILD, "meta", sc["id"] + ".json")
     if not os.path.exists(mp):
         continue
     meta = json.load(open(mp))
@@ -301,15 +307,32 @@ mix = bed * fade[:, None] + np.c_[voice, voice] * 0.98
 peak = np.max(np.abs(mix))
 mix = np.tanh(mix * (0.95 / max(peak, 1e-6)) * 1.2) / np.tanh(1.2)
 mix *= db(-1.0)
-os.makedirs(os.path.join(ROOT, "build", "audio"), exist_ok=True)
-sf.write(os.path.join(ROOT, "build", "audio", "mix.wav"), mix[: int(TOTAL * SR)].astype(np.float32), SR, subtype="PCM_16")
+os.makedirs(os.path.join(BUILD, "audio"), exist_ok=True)
+sf.write(os.path.join(BUILD, "audio", "mix.wav"), mix[: int(TOTAL * SR)].astype(np.float32), SR, subtype="PCM_16")
 print("wrote mix.wav", mix.shape)
 
 # --------------------------------------------------------------------------- subtitles
 DISPLAY = [("D N V, R P, C two-oh-three", "DNV-RP-C203"), ("P Y curve", "p-y curve"), ("P Y springs", "p-y springs"),
            ("T Z curves", "t-z curves"), ("T Z springs", "t-z springs"), ("Q Z curve", "Q-z curve"), ("Q Z spring", "Q-z spring"),
            ("S N curves", "S-N curves"), ("pre-load", "preload"), ("thirty-six inch", "36-inch"), ("twenty inch", "20-inch"),
-           ("seven point three meganewtons", "7.3 MN"), ("one point four meganewton metres", "1.4 MNm"), ("three meganewton metres", "3 MNm")]
+           ("seven point three meganewtons", "7.3 MN"), ("one point four meganewton metres", "1.4 MNm"), ("three meganewton metres", "3 MNm"),
+           # fatigue video
+           ("C two-oh-three", "C203"), ("S N ", "S-N "), ("delta sigma", "Δσ"), ("a bar,", "ā,"), ("B one", "B1"), ("W three", "W3"),
+           ("point one t", "0.1t"), ("high-low", "hi-lo"), ("Three hundred and fifty metres", "350 metres"),
+           ("ten thousand load cycles", "10,000 load cycles"), ("ninety-seven point seven percent", "97.7%"),
+           ("three metres below", "3 metres below"), ("three metres under", "3 metres under"), ("below two metres", "below 2 metres"),
+           ("above six metres", "above 6 metres"), ("less than two percent", "less than 2%"), ("fifty kilonewtons", "50 kN"),
+           ("one point six", "1.6"), ("one point one five", "1.15"), ("six millimetres", "6 mm"), ("one point one seven", "1.17"),
+           ("fourteen hundred cycles", "1,400 cycles"), ("three-hour", "3-hour"), ("ten million cycles", "10 million cycles"),
+           ("one million cycles", "1 million cycles"), ("slope of five", "slope of 5"), ("twenty-five millimetres", "25 mm"),
+           ("thirty-eight millimetre", "38 mm"), ("nine percent", "9%"), ("less than one percent", "less than 1%"),
+           ("between three and six metres", "between 3 and 6 metres"), ("within ten percent", "within 10%"),
+           ("from one to ten", "from 1 to 10"), ("we use ten", "we use 10"), ("three hundred and thirty days", "330 days"),
+           ("sixteen hundred and sixty days", "1,660 days"), ("a hundred and sixty-six days", "166 days"),
+           ("a hundred and twenty days", "120 days"), ("seventy percent", "70%"), ("ten percent more", "10% more"),
+           ("ten millimetres", "10 mm"), ("instead of six", "instead of 6"), ("sixty-eight days", "68 days"),
+           ("m is three", "m is 3"), ("factor of eight", "factor of 8"), ("Step one", "Step 1"), ("Step two", "Step 2"),
+           ("Step three", "Step 3"), ("Step four", "Step 4"), ("Step five", "Step 5"), ("Step six", "Step 6")]
 
 
 def disp(s):
@@ -344,12 +367,12 @@ for sc, off in zip(scenes, offsets):
             d = ln["dur"] * len(c) / total_chars
             cues.append((t0, t0 + d, c))
             t0 += d
-with open(os.path.join(ROOT, "build", "subtitles.srt"), "w") as fh:
+with open(os.path.join(BUILD, "subtitles.srt"), "w") as fh:
     for i, (a, b, c) in enumerate(cues, 1):
         if len(c) > 42:
             mid = c.rfind(" ", 0, len(c) // 2 + 8)
             c = c[:mid] + "\n" + c[mid + 1:]
         fh.write(f"{i}\n{fmt(a)} --> {fmt(b - 0.02)}\n{c}\n\n")
 json.dump(dict(xfade=XFADE, offsets=offsets, durations=[s["duration"] for s in scenes], ids=[s["id"] for s in scenes], total=TOTAL),
-          open(os.path.join(ROOT, "build", "edl.json"), "w"), indent=1)
+          open(os.path.join(BUILD, "edl.json"), "w"), indent=1)
 print("subtitles:", len(cues))

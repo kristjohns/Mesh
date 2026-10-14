@@ -14,9 +14,11 @@ import s11_wellhead from './s11_wellhead.js';
 import s12_soilbc from './s12_soilbc.js';
 import s13_verify from './s13_verify.js';
 import s14_outro from './s14_outro.js';
+import { FATIGUE_SCENES } from './fatigue/index.js';
 
 export const SCENES = {
   test, fetest,
   s01_intro, s02_system, s03_strategy, s04_families, s05_solids, s06_axisym, s07_meshsize,
   s08_welds, s09_soil, s10_template, s11_wellhead, s12_soilbc, s13_verify, s14_outro,
+  ...FATIGUE_SCENES,
 };

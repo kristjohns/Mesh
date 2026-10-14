@@ -1,7 +1,7 @@
 """Generate narration audio per line with Kokoro TTS and write scene timing.
 
-Usage: python3 tts.py [--only LINE_ID ...]
-Outputs: build/audio/lines/<id>.wav (24 kHz mono) and data/timing.json
+Usage: python3 tts.py [--video fatigue] [--only LINE_ID ...]
+Outputs: <build>/audio/lines/<id>.wav (24 kHz mono) and the timing json of the video (projects.py)
 """
 import json
 import os
@@ -11,9 +11,13 @@ import soundfile as sf
 from kokoro_onnx import Kokoro
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-SCRIPT = os.path.join(ROOT, "narration", "script.json")
-OUT = os.path.join(ROOT, "build", "audio", "lines")
-TIMING = os.path.join(ROOT, "data", "timing.json")
+sys.path.insert(0, ROOT)
+from projects import project  # noqa: E402
+
+P = project()
+SCRIPT = P["script_path"]
+OUT = os.path.join(P["build_dir"], "audio", "lines")
+TIMING = P["timing_path"]
 MODELS = os.path.join(os.path.dirname(ROOT), "tts_models")
 
 
@@ -28,7 +32,7 @@ def trim(x, sr, thr=0.004, pad=0.06):
 
 
 def main():
-    only = set(sys.argv[2:]) if len(sys.argv) > 2 and sys.argv[1] == "--only" else None
+    only = set(sys.argv[sys.argv.index("--only") + 1:]) if "--only" in sys.argv else None
     cfg = json.load(open(SCRIPT))
     os.makedirs(OUT, exist_ok=True)
     k = Kokoro(os.path.join(MODELS, "kokoro-v1.0.onnx"), os.path.join(MODELS, "voices-v1.0.bin"))

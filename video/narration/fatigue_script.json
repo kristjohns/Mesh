@@ -1,0 +1,347 @@
+{
+  "voice": "af_heart",
+  "speed": 1.06,
+  "scenes": [
+    {
+      "id": "f01_cold",
+      "preroll": 2.6,
+      "postroll": 4.2,
+      "lines": [
+        {
+          "id": "c1",
+          "text": "Three hundred and fifty metres below the surface, a wellhead is being bent back and forth. Once with every wave, for as long as the drilling riser is connected.",
+          "pause": 0.8
+        },
+        {
+          "id": "c2",
+          "text": "That's more than ten thousand load cycles a day. None of them comes close to breaking the steel.",
+          "pause": 0.7
+        },
+        {
+          "id": "c3",
+          "text": "But every cycle leaves a little damage behind. Add up enough of them, and a crack starts to grow from a weld.",
+          "pause": 0.8
+        },
+        {
+          "id": "c4",
+          "text": "Down here, nobody will ever inspect those welds. So we have to predict how long they will last before the rig even arrives. In this video, we'll do exactly that, step by step, with the method in D N V, R P, C two-oh-three.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f02_basics",
+      "preroll": 1.0,
+      "postroll": 1.2,
+      "lines": [
+        {
+          "id": "b1",
+          "text": "First, a quick refresher. Fatigue is driven by stress cycles, and what matters most is the stress range: the difference between the highest and the lowest stress in a cycle, written delta sigma.",
+          "pause": 0.6
+        },
+        {
+          "id": "b2",
+          "text": "In welded steel, cracks almost always start at a weld. The weld toe is a sharp notch, welding leaves tiny flaws, and residual stresses close to yield. So a crack starts early, and most of the life is spent growing it through the wall.",
+          "pause": 0.6
+        },
+        {
+          "id": "b3",
+          "text": "To measure fatigue strength, we test welded specimens at a constant stress range and count the cycles to failure. Repeat that at several stress ranges, and plot the results on log-log axes. They fall around a straight line, with a lot of scatter.",
+          "pause": 0.6
+        },
+        {
+          "id": "b4",
+          "text": "D N V, R P, C two-oh-three gives design S N curves that sit two standard deviations below the mean of the test data. That's a survival probability of about ninety-seven point seven percent.",
+          "pause": 0.6
+        },
+        {
+          "id": "b5",
+          "text": "The curve is a power law: the number of cycles to failure is a constant, a bar, divided by the stress range to the power m. For most welds, m is three. So if you double the stress range, the life drops by a factor of eight. Small errors in stress become big errors in life.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f03_roadmap",
+      "preroll": 0.8,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "r1",
+          "text": "Real loading is nothing like a constant-amplitude test. So C two-oh-three turns the problem into a chain of steps.",
+          "pause": 0.6
+        },
+        {
+          "id": "r2",
+          "text": "Describe the sea states the well will see. Turn each one into a stress history at every hot spot. Count the stress cycles. Pick the right S N curve. Add up the damage with Miner's rule. And finally, check it against a design fatigue factor.",
+          "pause": 0.6
+        },
+        {
+          "id": "r3",
+          "text": "Every link in that chain can change the answer, so let's go through them one at a time, on a real wellhead.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f04_hotspots",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "h1",
+          "text": "Here's our well: the same template, conductor and wellhead housings we modelled in our last video. The riser pulls on the top of the blowout preventer, and that force bends the whole stack.",
+          "pause": 0.6
+        },
+        {
+          "id": "h2",
+          "text": "The global beam model shows where the bending goes. Most of the moment passes into the conductor, and it keeps growing below the seabed, to a peak about three metres below the mudline.",
+          "pause": 0.6
+        },
+        {
+          "id": "h3",
+          "text": "Fatigue cracks start where a high stress range meets a weak detail. We'll follow three candidate hot spots: the weld between the high-pressure housing and the surface casing, the weld between the conductor housing and the conductor, and a girth weld in the conductor, three metres below the mudline, right where the moment peaks.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f05_seastates",
+      "preroll": 1.2,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "w1",
+          "text": "Step one: the sea. A scatter diagram tells us how often each combination of significant wave height and peak period occurs. Each cell is a sea state: a few hours of irregular waves with steady statistics.",
+          "pause": 0.6
+        },
+        {
+          "id": "w2",
+          "text": "At this site, half the time the waves are below two metres, and seas above six metres occur less than two percent of the time.",
+          "pause": 0.6
+        },
+        {
+          "id": "w3",
+          "text": "Within a sea state, the surface is a sum of many sine waves, with the energy spread over frequency by a wave spectrum.",
+          "pause": 0.6
+        },
+        {
+          "id": "w4",
+          "text": "A global riser analysis turns those waves into the force at the flex joint, on top of the blowout preventer. Here we stand in for it with a simple transfer function, so the example stays self-contained. The result is a force history for every sea state.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f06_transfer",
+      "preroll": 1.2,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "g1",
+          "text": "Step two: from force to stress. We push the global model with an increasing flex-joint force, and record the moment at each hot spot. These load-to-moment curves are our transfer functions.",
+          "pause": 0.6
+        },
+        {
+          "id": "g2",
+          "text": "They aren't straight lines. The soil springs soften, the radial clearance between the two housings closes, and above about fifty kilonewtons the gap to the template closes too, and the template starts to carry part of the load.",
+          "pause": 0.6
+        },
+        {
+          "id": "g3",
+          "text": "So the stress isn't simply proportional to the force. We keep the full nonlinear curve, and run every force history through it.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f07_hotspot",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "l1",
+          "text": "The beam model gives moments, and a moment divided by the section modulus gives the nominal stress. But a weld sees more than that, because the geometry around it concentrates the stress.",
+          "pause": 0.6
+        },
+        {
+          "id": "l2",
+          "text": "For the two housing welds, we use the hot spot method. In the local solid model, read the surface stress at half a wall thickness and at one and a half wall thicknesses from the weld toe, and extrapolate linearly to the toe. At the high-pressure housing weld, that gives a stress concentration factor of one point six.",
+          "pause": 0.7
+        },
+        {
+          "id": "l3",
+          "text": "At the conductor housing weld, the outside is actually less stressed than the nominal value. The housing thickens inwards, so the wall's mid-surface steps inwards, and the axial stress adds local bending. The inside of the weld is the hot spot, with a factor of one point one five. Always check both surfaces.",
+          "pause": 0.7
+        },
+        {
+          "id": "l4",
+          "text": "The conductor girth weld is a standard detail, so we use the nominal stress, with a concentration factor for misalignment. With six millimetres of high-low between the pipe ends, C two-oh-three gives one point one seven. The point one t in the formula is misalignment that is already included in the S N test data.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f08_rainflow",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "f1",
+          "text": "Step three: counting cycles. A real stress history is irregular. Small cycles ride on top of bigger ones, and it's not obvious what a cycle even is.",
+          "pause": 0.6
+        },
+        {
+          "id": "f2",
+          "text": "The standard answer is rainflow counting. Reduce the history to its peaks and valleys, then read them one at a time, and keep comparing the last two ranges.",
+          "pause": 0.5
+        },
+        {
+          "id": "f3",
+          "text": "Whenever the newest range is at least as large as the one before it, the one before it is a closed cycle. Count it, remove its two points, and carry on. Each small cycle is paired off on its own, without breaking up the big cycle around it.",
+          "pause": 0.6
+        },
+        {
+          "id": "f4",
+          "text": "Whatever is left at the end is counted as half cycles. For a three-hour sea state, we get about fourteen hundred cycles, sorted into a histogram of stress ranges.",
+          "pause": 0.6
+        },
+        {
+          "id": "f5",
+          "text": "Notice that we count ranges, not mean stress. Welds carry residual stresses close to yield, so for as-welded joints C two-oh-three uses the full stress range, whatever the mean. That's also why the lock ring pre-load and the weight of the stack drop out.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f09_sncurve",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "n1",
+          "text": "Step four: the S N curve. C two-oh-three has a whole family of curves, from B one for plain, unwelded steel, down to W three for cracks through the weld metal itself. Which one applies depends on the detail: its geometry, how it's welded and inspected, and which way the stress acts.",
+          "pause": 0.6
+        },
+        {
+          "id": "n2",
+          "text": "Appendix A classifies a long list of details. A girth weld made from both sides is a D curve detail at the weld toe. And when the hot spot stress comes from a finite element model, the D curve is the one to use as well.",
+          "pause": 0.6
+        },
+        {
+          "id": "n3",
+          "text": "Then the environment. In air, the curve bends at ten million cycles, to a shallower slope of five. In seawater with cathodic protection, the steep part is lower, and the bend comes at one million cycles. In free corrosion, there is no bend at all. Our welds are in seawater with cathodic protection.",
+          "pause": 0.6
+        },
+        {
+          "id": "n4",
+          "text": "Thick walls are weaker in fatigue, so the stress range is scaled by the thickness over twenty-five millimetres, to the power k. For the thirty-eight millimetre conductor, that's a nine percent penalty on stress. The thinner casing gets none.",
+          "pause": 0.6
+        },
+        {
+          "id": "n5",
+          "text": "One more thing: under variable amplitude loading, there is no fatigue limit. Cycles below the bend still do damage. They just follow the shallower slope.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f10_miner",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "m1",
+          "text": "Step five: adding it up. Palmgren-Miner's rule says that each stress range uses up a fraction of the life: the number of cycles it occurs, divided by the number the S N curve allows. The damage is the sum of those fractions, and failure is predicted when it reaches one.",
+          "pause": 0.6
+        },
+        {
+          "id": "m2",
+          "text": "We do this for every sea state, weight each one by how often it occurs, and get the damage per day of operation. This map shows where the damage comes from.",
+          "pause": 0.6
+        },
+        {
+          "id": "m3",
+          "text": "The calm days hardly matter. The waves are below two metres half of the time, and cause less than one percent of the damage. The storms don't dominate either: they are rare, and above fifty kilonewtons the template takes part of the load. Three quarters of the damage comes from moderate seas, between three and six metres.",
+          "pause": 0.7
+        },
+        {
+          "id": "m4",
+          "text": "C two-oh-three also offers a shortcut. If the long-term stress ranges follow a Weibull distribution, the damage has a closed-form solution. Fitted to our results, it lands within ten percent of the full calculation. Ignore the bend in the S N curve, though, and the life comes out a third shorter.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f11_check",
+      "preroll": 1.0,
+      "postroll": 1.6,
+      "lines": [
+        {
+          "id": "k1",
+          "text": "Step six: the design check. Even with conservative S N curves, the loads, the soil and the fabrication are uncertain. So the design standard adds a design fatigue factor: the calculated damage, times that factor, must stay below one.",
+          "pause": 0.6
+        },
+        {
+          "id": "k2",
+          "text": "The factor depends on whether a crack could be found and repaired, and on what happens if it isn't. Typical values run from one to ten. A conductor three metres under the mud can never be inspected, and losing it threatens the well, so we use ten.",
+          "pause": 0.7
+        },
+        {
+          "id": "k3",
+          "text": "Here are the results, in days of riser-connected operation. The high-pressure housing weld is far from critical. The conductor housing weld allows about three hundred and thirty days. And the governing hot spot is the plain girth weld in the conductor: sixteen hundred and sixty days of calculated life, or a hundred and sixty-six days with the design fatigue factor.",
+          "pause": 0.7
+        },
+        {
+          "id": "k4",
+          "text": "The drilling campaign needs a hundred and twenty days with the riser connected, so the well passes, at about seventy percent utilisation. But notice which weld governs. Not the big forgings, but an ordinary girth weld, out of sight below the seabed.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f12_sensitivity",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "x1",
+          "text": "Before trusting that answer, ask what moves it. Life scales with stress to the third power, so ten percent more stress costs about a third of the life.",
+          "pause": 0.6
+        },
+        {
+          "id": "x2",
+          "text": "Fabrication matters just as much. If the girth weld had ten millimetres of misalignment instead of six, the allowable time would drop to sixty-eight days, and the well would fail the check. Weld tolerances belong in the fatigue analysis.",
+          "pause": 0.6
+        },
+        {
+          "id": "x3",
+          "text": "And the environment: the same weld in free corrosion, without cathodic protection, has only about half the life.",
+          "pause": 0.6
+        },
+        {
+          "id": "x4",
+          "text": "So report the result together with the assumptions that drive it, and check those assumptions against what was actually built.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f13_outro",
+      "preroll": 1.0,
+      "postroll": 9.0,
+      "lines": [
+        {
+          "id": "o1",
+          "text": "So that's the method: sea states, stress at the hot spots, rainflow counting, the right S N curve, Miner's sum, and a design fatigue factor.",
+          "pause": 0.8
+        },
+        {
+          "id": "o2",
+          "text": "Every wave leaves a little damage behind. Count it carefully, and you'll know how long the steel will last.",
+          "pause": 0.4
+        }
+      ]
+    }
+  ]
+}

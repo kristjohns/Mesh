@@ -3,6 +3,7 @@
 //   node render.mjs --scene s01_intro                 -> build/chunks/s01_intro.mp4
 //   node render.mjs --scene s01_intro --stills 1,5,9  -> build/stills/s01_intro_<t>.png
 //   options: --fps 30 --from 0 --to 12 --crf 16 --every N (render every Nth frame, for previews)
+//            --video fatigue  (which video: selects timing/data in the page and build/<video>/ for output)
 import { chromium } from 'playwright';
 import http from 'node:http';
 import fs from 'node:fs';
@@ -18,6 +19,8 @@ const args = Object.fromEntries(process.argv.slice(2).reduce((acc, a, i, arr) =>
 const sceneId = args.scene;
 const fps = Number(args.fps ?? 30);
 const crf = Number(args.crf ?? 15);
+const video = args.video ?? 'fea';
+const BUILD = path.join(ROOT, 'build', ...(video === 'fea' ? [] : [video]));
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.mjs': 'text/javascript', '.json': 'application/json',
   '.css': 'text/css', '.woff2': 'font/woff2', '.woff': 'font/woff', '.ttf': 'font/ttf', '.png': 'image/png', '.jpg': 'image/jpeg' };
@@ -47,17 +50,17 @@ const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, de
 const logs = [];
 page.on('console', (m) => { const t = m.text(); logs.push(t); if (m.type() === 'error' || args.verbose) console.log('[page]', t); });
 page.on('pageerror', (e) => console.log('[pageerror]', e.message));
-await page.goto(`http://127.0.0.1:${port}/src/index.html?aa=${args.aa ?? 1}`);
+await page.goto(`http://127.0.0.1:${port}/src/index.html?aa=${args.aa ?? 1}&video=${video}`);
 const ok = await page.evaluate(() => window.__ready);
 if (!ok) { console.log(await page.evaluate(() => window.__error)); process.exit(1); }
 const meta = await page.evaluate(([id, o]) => window.__setup(id, o), [sceneId, { preview: !!args.preview, ...(args.opts ? JSON.parse(args.opts) : {}) }]);
-fs.mkdirSync(path.join(ROOT, 'build', 'meta'), { recursive: true });
-fs.writeFileSync(path.join(ROOT, 'build', 'meta', `${sceneId}.json`), JSON.stringify(meta, null, 1));
+fs.mkdirSync(path.join(BUILD, 'meta'), { recursive: true });
+fs.writeFileSync(path.join(BUILD, 'meta', `${sceneId}.json`), JSON.stringify(meta, null, 1));
 const cdp = await page.context().newCDPSession(page);
 const grab = async () => Buffer.from((await cdp.send('Page.captureScreenshot', { format: 'png', optimizeForSpeed: true })).data, 'base64');
 
 if (args.stills) {
-  const dir = path.join(ROOT, 'build', 'stills');
+  const dir = path.join(BUILD, 'stills');
   fs.mkdirSync(dir, { recursive: true });
   const ts = String(args.stills).split(',').map(Number);
   for (const t of ts) {
@@ -73,7 +76,7 @@ if (args.stills) {
   const to = Math.min(Number(args.to ?? meta.duration), meta.duration);
   const every = Number(args.every ?? 1);
   const n = Math.round((to - from) * fps);
-  const dir = path.join(ROOT, 'build', 'chunks');
+  const dir = path.join(BUILD, 'chunks');
   fs.mkdirSync(dir, { recursive: true });
   const out = args.out ?? path.join(dir, `${sceneId}.mp4`);
   const outFps = fps / every;

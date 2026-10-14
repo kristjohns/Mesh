@@ -5,30 +5,22 @@ part boundary never falls inside a spoken sentence. Video is stream-copied;
 each part gets its own AAC track cut sample-exactly from the master mix, so the
 audio of a part covers exactly its video span.
 
-Usage: python3 tools_webparts.py [master.mp4] [outdir]
+Usage: python3 tools_webparts.py [--video fatigue] [master.mp4] [outdir]
 """
 import json, os, re, subprocess, sys
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
-master = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(ROOT), "output", "fea_best_practice_subsea_wellhead.mp4")
-outdir = sys.argv[2] if len(sys.argv) > 2 else os.path.join(ROOT, "build", "web")
+sys.path.insert(0, ROOT)
+from projects import project  # noqa: E402
+
+P = project()
+BUILD = P["build_dir"]
+pos = [a for i, a in enumerate(sys.argv[1:], 1) if a != "--video" and sys.argv[i - 1] != "--video"]
+master = pos[0] if len(pos) > 0 else P["out_path"]
+outdir = pos[1] if len(pos) > 1 else os.path.join(BUILD, "web")
+PLAYER = os.path.join(ROOT, "web", "player.html" if P["id"] == "fea" else f"{P['id']}_player.html")
 FPS = 30
-CHAPTERS = [  # one per scene, in order
-    ("", "Introduction"),
-    ("", "The system we are modelling"),
-    ("", "Questions first: global and local models"),
-    ("1", "Choosing the element type"),
-    ("", "Inside the solid family: locking and hourglassing"),
-    ("", "Axisymmetric or 3D?"),
-    ("2", "Choosing the mesh size"),
-    ("", "Welds and hot-spot stress"),
-    ("3", "Modelling the soil: p-y springs"),
-    ("4", "Interfaces: conductor housing and template"),
-    ("", "Interfaces: conductor housing and HP housing"),
-    ("", "Interfaces: conductor and soil"),
-    ("5", "Verification"),
-    ("", "Takeaways"),
-]
+CHAPTERS = P["chapters"]
 
 
 def run(*a):
@@ -57,17 +49,17 @@ def srt_cues(path):
 
 def main():
     os.makedirs(os.path.join(outdir, "v"), exist_ok=True)
-    tmp = os.path.join(ROOT, "build", "webtmp")
+    tmp = os.path.join(BUILD, "webtmp")
     os.makedirs(tmp, exist_ok=True)
-    edl = json.load(open(os.path.join(ROOT, "build", "edl.json")))
+    edl = json.load(open(os.path.join(BUILD, "edl.json")))
     total = round((edl["offsets"][-1] + edl["durations"][-1]) * FPS) / FPS
-    cuts = json.load(open(os.path.join(ROOT, "web", "cuts.json")))
+    cuts = json.load(open(P["cuts_path"]))
     bounds = [0.0] + cuts + [total]
     # video: stream copy at the forced keyframes (nudged early so rounding can't skip one)
     run("ffmpeg", "-loglevel", "error", "-y", "-i", master, "-map", "0:v", "-c", "copy", "-f", "segment",
         "-segment_times", ",".join(f"{c - 0.02:.4f}" for c in cuts), "-reset_timestamps", "1",
         os.path.join(tmp, "v%02d.mp4"))
-    mix = os.path.join(ROOT, "build", "audio", "mix.wav")
+    mix = os.path.join(BUILD, "audio", "mix.wav")
     parts, t0 = [], 0
     for i in range(len(bounds) - 1):
         vpath = os.path.join(tmp, f"v{i:02d}.mp4")
@@ -92,11 +84,11 @@ def main():
     chapters = [{"t": round(0 if k == 0 else o + edl["xfade"] / 2, 2), "n": num, "title": title}
                 for k, (o, (num, title)) in enumerate(zip(edl["offsets"], CHAPTERS))]
     manifest = {"total": round(t0 / FPS, 4), "parts": parts, "chapters": chapters,
-                "cues": srt_cues(os.path.join(ROOT, "build", "subtitles.srt"))}
+                "cues": srt_cues(os.path.join(BUILD, "subtitles.srt"))}
     # poster: the title card from the intro
-    run("ffmpeg", "-loglevel", "error", "-y", "-ss", "35.5", "-i", master, "-frames:v", "1",
+    run("ffmpeg", "-loglevel", "error", "-y", "-ss", str(P["poster"]), "-i", master, "-frames:v", "1",
         "-vf", "scale=1280:720:flags=lanczos", "-q:v", "4", os.path.join(outdir, "poster.jpg"))
-    page = open(os.path.join(ROOT, "web", "player.html"), encoding="utf-8").read()
+    page = open(PLAYER, encoding="utf-8").read()
     page = page.replace("/*MANIFEST*/null", json.dumps(manifest, ensure_ascii=False, separators=(",", ":")))
     open(os.path.join(outdir, "index.html"), "w", encoding="utf-8").write(page)
     print("wrote", outdir, f"{len(parts)} parts, {sum(p['mb'] for p in parts):.1f} MB")

@@ -64,13 +64,18 @@ export class Engine {
     const weights = [300, 400, 500, 600, 650, 700, 800, 900];
     await Promise.all(weights.map((w) => document.fonts.load(`${w} 40px Inter`)));
     await document.fonts.load(`700 40px "Inter Display"`).catch(() => {});
-    const files = ['timing', 'cantilever', 'hourglass', 'notch', 'global', 'template', 'wellhead_local', 'wellhead_surface'];
-    await Promise.all(files.map(async (f) => {
-      const r = await fetch(`/data/${f}.json`);
-      this.data[f] = await r.json();
-    }));
     const q = new URLSearchParams(location.search);
     this.q = q;
+    this.video = q.get('video') ?? 'fea';
+    // data files per video: [key, file]
+    const files = this.video === 'fatigue'
+      ? [['timing', 'fatigue_timing'], ['global', 'global'], ['template', 'template'], ['wellhead_local', 'wellhead_local'],
+        ['wellhead_surface', 'wellhead_surface'], ['fatigue', 'fatigue'], ['hotspot', 'hotspot']]
+      : ['timing', 'cantilever', 'hourglass', 'notch', 'global', 'template', 'wellhead_local', 'wellhead_surface'].map((f) => [f, f]);
+    await Promise.all(files.map(async ([k, f]) => {
+      const r = await fetch(`/data/${f}.json`);
+      this.data[k] = await r.json();
+    }));
     const renderer = new THREE.WebGLRenderer({ canvas: this.glCanvas, antialias: q.get('aa') !== '0', alpha: false, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(1);
     renderer.setSize(W, H, false);
