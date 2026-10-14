@@ -1,0 +1,484 @@
+{
+  "voice": "af_heart",
+  "speed": 1.06,
+  "scenes": [
+    {
+      "id": "s01_intro",
+      "preroll": 3.0,
+      "postroll": 3.2,
+      "lines": [
+        {
+          "id": "i1",
+          "text": "Three hundred and fifty metres below the surface, a drilling riser connects a floating rig to a wellhead only a few metres tall.",
+          "pause": 0.6
+        },
+        {
+          "id": "i2",
+          "text": "Every wave, every current and every metre of rig offset ends up here, as bending in the wellhead, the conductor, and the soil around it.",
+          "pause": 0.7
+        },
+        {
+          "id": "i3",
+          "text": "To know whether this well will last its design life, we need a finite element model, and we need to be able to trust it.",
+          "pause": 0.7
+        },
+        {
+          "id": "i4",
+          "text": "In this video we build that model step by step: which element types to use, how fine the mesh has to be, and which boundary conditions belong at each interface. And we'll see what goes wrong when those choices are wrong.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s02_system",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "s1",
+          "text": "First, the structure. This is a four-slot subsea template: a steel frame on the seabed, held down by four suction anchors, with a protective roof that fishing trawls slide over.",
+          "pause": 0.6
+        },
+        {
+          "id": "s2",
+          "text": "Each slot holds one well. The first part installed is the conductor: a thirty-six inch steel pipe, jetted or drilled about sixty metres into the seabed.",
+          "pause": 0.5
+        },
+        {
+          "id": "s3",
+          "text": "The conductor housing is welded to the top of the conductor. It's also called the low-pressure wellhead, and it sits in the template's well-slot receptacle.",
+          "pause": 0.5
+        },
+        {
+          "id": "s4",
+          "text": "The surface casing runs inside the conductor. It's a twenty inch pipe, cemented in place.",
+          "pause": 0.5
+        },
+        {
+          "id": "s5",
+          "text": "The high-pressure wellhead housing is welded to the top of the surface casing. It lands on a shoulder inside the conductor housing, and a lock ring pre-loads it down onto that shoulder.",
+          "pause": 0.5
+        },
+        {
+          "id": "s6",
+          "text": "Then the blowout preventer lands on top, and the riser connects it to the rig.",
+          "pause": 0.6
+        },
+        {
+          "id": "s7",
+          "text": "Every load goes down through that stack: weight, riser tension, and above all, a bending moment that cycles with every wave. That cycling bending moment is what drives wellhead fatigue.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s03_strategy",
+      "preroll": 0.8,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "g1",
+          "text": "Before you choose a single element, write down the questions the model has to answer. The questions decide the model.",
+          "pause": 0.6
+        },
+        {
+          "id": "g2",
+          "text": "Some are global questions. How is the load shared between the conductor, the casing and the template? How far down into the soil does the bending go?",
+          "pause": 0.5
+        },
+        {
+          "id": "g3",
+          "text": "For those we build a global model, with beams for the pipes and springs for the soil. It runs in seconds, which makes sensitivity studies easy.",
+          "pause": 0.6
+        },
+        {
+          "id": "g4",
+          "text": "Others are local questions. What is the stress at a weld toe? How is the contact pressure distributed on the landing shoulder? A beam model has no information about either.",
+          "pause": 0.5
+        },
+        {
+          "id": "g5",
+          "text": "For those we cut out the wellhead, build a local solid model, and drive its boundaries with results from the global model. This is called global-local analysis, or submodelling.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s04_families",
+      "preroll": 2.6,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "e1",
+          "text": "Chapter one: choosing the element type. There are four families, and each one makes an assumption about the structure.",
+          "pause": 0.6
+        },
+        {
+          "id": "e2",
+          "text": "A beam element reduces a member to a line with a cross-section attached. It assumes the member is slender, roughly ten times longer than it is deep, and it gives you section forces and deflections, not local stresses. The conductor is more than sixty times longer than its diameter, so it's a natural beam.",
+          "pause": 0.6
+        },
+        {
+          "id": "e3",
+          "text": "A shell element reduces a thin wall to its mid-surface. It assumes the thickness is small compared with the other dimensions, like the skirt of a suction anchor, where the radius is about a hundred times the wall thickness.",
+          "pause": 0.6
+        },
+        {
+          "id": "e4",
+          "text": "A solid element makes no geometric assumption at all. That makes it the most general family, and also the most expensive. You need solids for thick, complex parts like the wellhead housings, where the wall is a third of the radius, and every groove and shoulder carries load.",
+          "pause": 0.6
+        },
+        {
+          "id": "e5",
+          "text": "An axisymmetric element is a shortcut for solids of revolution. If the geometry, the loads and the supports are all symmetric about one axis, a two-dimensional section gives you the full three-dimensional answer.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s05_solids",
+      "preroll": 0.8,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "t1",
+          "text": "Solid elements come in two main shapes, tetrahedra and hexahedra, and in two orders, linear and quadratic. This choice matters more than most people expect.",
+          "pause": 0.6
+        },
+        {
+          "id": "t2",
+          "text": "Here's a simple test: a cantilever with a load at its tip, meshed with only one element through the thickness. We know the correct deflection from beam theory.",
+          "pause": 0.5
+        },
+        {
+          "id": "t3",
+          "text": "The linear hexahedron reaches only sixty-five percent of the correct deflection. The linear tetrahedron reaches twenty-two percent. Both are far too stiff. This is called locking.",
+          "pause": 0.6
+        },
+        {
+          "id": "t4",
+          "text": "Here's why. In bending, the material between two cross-sections curves. A linear element has straight edges, so the only way it can follow the bending is to shear. That shear doesn't exist in the real beam, but it still stores strain energy, so the element is far too stiff. This is shear locking.",
+          "pause": 0.6
+        },
+        {
+          "id": "t5",
+          "text": "A common fix is reduced integration, which samples the strain at a single point in the middle of the element. But this hourglass-shaped mode produces no strain at that point, so nothing resists it. Without hourglass control, our cantilever with one element through the thickness is singular, and with two, the deflection comes out twice too large.",
+          "pause": 0.6
+        },
+        {
+          "id": "t6",
+          "text": "Quadratic elements have mid-side nodes, so their edges can curve. With one element through the thickness, the twenty-node hexahedron and the ten-node tetrahedron both land within two percent of the correct answer. Linear hexahedra with incompatible modes, an enhanced formulation, do just as well.",
+          "pause": 0.6
+        },
+        {
+          "id": "t7",
+          "text": "So, the rules. Use quadratic tetrahedra when the geometry is too complex to sweep. Use hexahedra wherever you can sweep or map the mesh: they give the most accuracy per degree of freedom. Don't use linear tetrahedra for stress. And with linear hexahedra, use an enhanced formulation or at least four elements through the thickness, and check the hourglass energy.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s06_axisym",
+      "preroll": 0.8,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "a1",
+          "text": "The wellhead housings are solids of revolution, so let's take the axisymmetric shortcut. One section of about a thousand quadrilateral elements solves in a fraction of a second.",
+          "pause": 0.6
+        },
+        {
+          "id": "a2",
+          "text": "Revolve the same section around the axis and we get a swept hexahedral mesh, with thirty-seven thousand elements and a hundred and forty thousand degrees of freedom. Under pre-load alone, the two models agree to better than a tenth of a percent.",
+          "pause": 0.6
+        },
+        {
+          "id": "a3",
+          "text": "But the bending moment isn't axisymmetric. It squeezes the landing shoulder on one side and pulls it open on the other. Once the shoulder separates, the contact is different on each side, and an axisymmetric section simply cannot represent that.",
+          "pause": 0.6
+        },
+        {
+          "id": "a4",
+          "text": "This is where axisymmetric elements are no longer enough, and we have to go to 3D. We can still save half the work. Bending in one plane is symmetric about that plane, so we model half the housing, and put a symmetry condition on the cut face, with zero displacement normal to it.",
+          "pause": 0.6
+        },
+        {
+          "id": "a5",
+          "text": "That's the general pattern: start with the cheapest element that captures the physics, and know which physics would rule it out.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s07_meshsize",
+      "preroll": 2.6,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "m1",
+          "text": "Chapter two: mesh size. The principle is simple. The mesh has to be fine where the stress changes quickly, and it can be coarse where it doesn't.",
+          "pause": 0.6
+        },
+        {
+          "id": "m2",
+          "text": "Take a shoulder with a fillet radius, like the steps in a wellhead housing, and refine the mesh at the fillet. With one element across the radius, the peak stress is twenty percent too low. With about twelve quadratic elements around the fillet, it's within one percent. Refine further, and it hardly changes. That's a converged result.",
+          "pause": 0.6
+        },
+        {
+          "id": "m3",
+          "text": "Now make the corner sharp. Each time we halve the element size, the peak stress rises by about thirty-seven percent, and it never levels off. That's a singularity. In linear elastic theory, the stress at a sharp re-entrant corner is infinite, and refining the mesh only shows you more of it.",
+          "pause": 0.6
+        },
+        {
+          "id": "m4",
+          "text": "So never report a peak stress at a singularity. Model the real radius, read the stress at a distance with a method designed for it, or use fracture mechanics.",
+          "pause": 0.6
+        },
+        {
+          "id": "m5",
+          "text": "Here are some starting rules. Put at least two quadratic elements, or four linear ones, through a wall in bending. Use about ten to twelve elements around a ninety degree fillet. Keep the size change between neighbouring elements under about thirty percent. And where the stress matters, keep the elements well shaped, with a low aspect ratio and no heavy distortion.",
+          "pause": 0.6
+        },
+        {
+          "id": "m6",
+          "text": "But rules of thumb only get you started. The real test is a convergence study on the result you care about: refine, rerun, and compare. If the result is still changing, the mesh isn't finished.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s08_welds",
+      "preroll": 0.8,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "w1",
+          "text": "Welds need their own treatment. A weld toe is sharp, so the local stress there doesn't converge either.",
+          "pause": 0.5
+        },
+        {
+          "id": "w2",
+          "text": "For fatigue, standards such as D N V, R P, C two-oh-three use the hot-spot method. Mesh the wall with elements about one thickness in size, read the surface stress at half a thickness and at one and a half thicknesses from the toe, and extrapolate linearly back to the toe. The S N curves are calibrated to that procedure, so follow it exactly. A finer mesh does not give a better answer here.",
+          "pause": 0.6
+        },
+        {
+          "id": "w3",
+          "text": "There's a quick mesh check, too. Compare the averaged and unaveraged nodal stresses. Where they differ by more than about ten percent, the mesh is too coarse for the stress gradient.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s09_soil",
+      "preroll": 2.6,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "p1",
+          "text": "Chapter three: the soil. The conductor gets all of its lateral support from the soil, so the soil model controls the whole global response.",
+          "pause": 0.6
+        },
+        {
+          "id": "p2",
+          "text": "You could mesh the soil as a continuum with solid elements, but that needs a nonlinear soil model, interface elements, and a lot of calibration. For a pile-like conductor, industry practice is more efficient.",
+          "pause": 0.6
+        },
+        {
+          "id": "p3",
+          "text": "We replace the soil with a row of independent, nonlinear springs along the conductor. This is called a Winkler foundation. Each spring resists lateral movement at one depth, and its behaviour comes from a P Y curve: the soil resistance per metre, p, as a function of the lateral displacement, y.",
+          "pause": 0.6
+        },
+        {
+          "id": "p4",
+          "text": "For soft clay, the classic curve is Matlock's. Resistance rises steeply at first, then flattens out at an ultimate value. That ultimate value grows with depth, because deeper soil is stronger and can't escape upward, so every spring gets its own curve. In the FE program, each curve is entered as a table of points.",
+          "pause": 0.6
+        },
+        {
+          "id": "p5",
+          "text": "To turn a curve into a spring, multiply the resistance per metre by the length of conductor the node represents: half an element above it, and half an element below. The vertical direction gets its own springs: T Z curves for skin friction along the conductor, and a Q Z curve for end bearing at the tip.",
+          "pause": 0.6
+        },
+        {
+          "id": "p6",
+          "text": "Now load the wellhead. The conductor bends, and the springs near the mudline mobilise their resistance. The bending moment keeps growing below the seabed, and peaks five metres below the mudline, nineteen percent higher than at the mudline itself.",
+          "pause": 0.6
+        },
+        {
+          "id": "p7",
+          "text": "Because the springs sit at the nodes, the element length is also the spring spacing. A convergence study shows that this model is forgiving: even four-metre elements are only about four percent off at the wellhead. Use about half a diameter near the mudline, where the soil reaction changes fastest, and longer elements deeper down.",
+          "pause": 0.6
+        },
+        {
+          "id": "p8",
+          "text": "A tempting shortcut is to fix the conductor at the mudline. Don't. It deletes the flexibility of the soil. Here, it underestimates the wellhead deflection by ninety-six percent, and the rotation by more than eighty percent.",
+          "pause": 0.6
+        },
+        {
+          "id": "p9",
+          "text": "Soil properties are uncertain, so run lower bound, best estimate and upper bound soils. Softer soil pushes the peak moment deeper and increases the wellhead deflection by half. Stiffer soil pulls the bending up towards the wellhead. For fatigue, use curves for cyclic loading at small displacements, because that's where fatigue damage builds up.",
+          "pause": 0.6
+        },
+        {
+          "id": "p10",
+          "text": "And one trap in 3D models. Two independent springs, in x and in y, make the soil too strong in diagonal directions: by twenty-six percent on the rising part of Matlock's curve, and by up to forty-one percent at failure. Use a coupled radial spring, or line the springs up with the load.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s10_template",
+      "preroll": 2.6,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "b0",
+          "text": "Chapter four: boundary conditions at the interfaces. This is where the most important modelling decisions are made, and our model has three key interfaces.",
+          "pause": 0.6
+        },
+        {
+          "id": "b1",
+          "text": "The first is between the conductor housing and the template. The housing stands in the well-slot receptacle with a radial clearance, here thirty millimetres.",
+          "pause": 0.5
+        },
+        {
+          "id": "b2",
+          "text": "Tying the housing to the template would be wrong, and so would leaving them unconnected. The right model is a gap element. It carries no force while the clearance is open, and the stiffness of the template once it closes.",
+          "pause": 0.6
+        },
+        {
+          "id": "b3",
+          "text": "That stiffness has to include the template frame and its foundation. If we fix the suction anchors, the slot looks almost eight times stiffer than it really is.",
+          "pause": 0.6
+        },
+        {
+          "id": "b4",
+          "text": "Now increase the load. Up to about fifty kilonewtons, the conductor carries everything. Then the gap closes, and the template starts working as a fulcrum. At full load, the contact force is two hundred and sixty-six kilonewtons, almost twice the riser load, and the bending moment at the mudline drops by twenty-one percent.",
+          "pause": 0.6
+        },
+        {
+          "id": "b5",
+          "text": "So the template can relieve the wellhead, but only if the template and its anchors are designed to carry that load. Leave the gap out, and you miss a load path.",
+          "pause": 0.6
+        },
+        {
+          "id": "b6",
+          "text": "The contact geometry matters too. A single, short contact ring can only transfer a lateral force. Two rings some distance apart can transfer a moment. Put contacts where they really occur. And vertically, use compression-only contact with friction, so the housing can bear on its landing face, but also lift off it.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s11_wellhead",
+      "preroll": 0.8,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "c1",
+          "text": "The second interface is between the conductor housing and the high-pressure housing. It controls how the bending moment passes from the inner housing to the outer one.",
+          "pause": 0.6
+        },
+        {
+          "id": "c2",
+          "text": "In the local solid model, every contact surface becomes a surface-to-surface contact pair: the landing shoulder, the lock ring, and the radial contacts above and below. Make the finer side the slave, and keep a similar mesh density on both sides.",
+          "pause": 0.6
+        },
+        {
+          "id": "c3",
+          "text": "Apply the lock ring pre-load in its own load step, before the external loads. Here the pre-load is seven point three meganewtons, and the contact pressure is even all the way around the shoulder.",
+          "pause": 0.6
+        },
+        {
+          "id": "c4",
+          "text": "As the moment increases, the pressure builds on the compression side and falls on the tension side. Above about one point four meganewton metres, the tension side lifts off. At three meganewton metres, forty-three percent of the shoulder is open.",
+          "pause": 0.6
+        },
+        {
+          "id": "c5",
+          "text": "Lift-off changes the load path and roughly halves the rotational stiffness of the joint. You can see the knee in the moment-rotation curve. A tied, or bonded, contact would miss all of that.",
+          "pause": 0.6
+        },
+        {
+          "id": "c6",
+          "text": "The global beam model doesn't need all of this detail. There, represent the interface with nonlinear springs, calibrated against the local model, so both models share the same stiffness.",
+          "pause": 0.6
+        },
+        {
+          "id": "c7",
+          "text": "Notice the hottest spots in this model, at the sharp corners of the lock ring groove. Those are singularities. The model is fine for load transfer, but fatigue at the groove needs the real radius and a converged mesh.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s12_soilbc",
+      "preroll": 0.8,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "d1",
+          "text": "The third interface, between the conductor and the soil, we have already built: lateral P Y springs, axial T Z springs, and a Q Z spring at the tip, all grounded at their far ends. Start them at the real mudline, and reduce the soil strength near the top, where jetting or drilling has disturbed it.",
+          "pause": 0.6
+        },
+        {
+          "id": "d2",
+          "text": "Inside the conductor, the cement ties the surface casing to the conductor. Model it with lateral links between the two pipes, up to the top of cement. Above the cement, the pipes can only touch, so use gap elements there.",
+          "pause": 0.6
+        },
+        {
+          "id": "d3",
+          "text": "The welds are the simplest interfaces of all. The conductor and its housing, and the casing and the high-pressure housing, are continuous steel, so they share nodes.",
+          "pause": 0.6
+        },
+        {
+          "id": "d4",
+          "text": "Finally, when you transfer loads from the global model to the local one, apply them through a distributing coupling. A rigid coupling holds the cut face flat, and adds stiffness that isn't there. And place the cut a diameter or two away from anything you want to measure, so the way the load is applied doesn't affect the result.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s13_verify",
+      "preroll": 2.6,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "v1",
+          "text": "Before you believe any result, check it.",
+          "pause": 0.5
+        },
+        {
+          "id": "v2",
+          "text": "Do the reactions balance the applied loads? Does the deformed shape make sense when you exaggerate it? Has the result you care about converged? Are the contacts open and closed where you expect?",
+          "pause": 0.6
+        },
+        {
+          "id": "v3",
+          "text": "Does a hand calculation agree? Here, Het\u00e9nyi's solution for a beam on an elastic foundation matches the linear spring version of our model, to within a tenth of a percent.",
+          "pause": 0.6
+        },
+        {
+          "id": "v4",
+          "text": "And how sensitive is the answer to the things you don't know well, like soil strength, gaps, pre-load and friction? If small changes move the result a lot, report a range, not a single number.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "s14_outro",
+      "preroll": 1.0,
+      "postroll": 6.0,
+      "lines": [
+        {
+          "id": "o1",
+          "text": "So: choose the element by the physics, size the mesh by the stress gradients, and set boundary conditions that follow the real load paths.",
+          "pause": 0.8
+        },
+        {
+          "id": "o2",
+          "text": "Do that, and your model will answer the question you actually asked.",
+          "pause": 0.4
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+video/node_modules/
+video/build/
+tts_models/
+video/build_tts.log
+video/bench_tmp.mjs
+video/prof_tmp.mjs
+__pycache__/

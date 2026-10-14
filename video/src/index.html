@@ -1,0 +1,31 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>FEA best practice – subsea wellhead</title>
+<link rel="stylesheet" href="/node_modules/katex/dist/katex.min.css">
+<style>
+  html, body { margin: 0; padding: 0; background: #06101a; overflow: hidden; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+  #stage canvas { position: absolute; left: 0; top: 0; }
+  #dom { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; pointer-events: none; }
+  .tex { position: absolute; color: #e9f1f7; white-space: nowrap; transform-origin: 0 0; }
+  .katex { font-size: 1em; }
+</style>
+<script type="importmap">
+{ "imports": {
+    "three": "/node_modules/three/build/three.module.js",
+    "three/addons/": "/node_modules/three/examples/jsm/",
+    "katex": "/node_modules/katex/dist/katex.mjs"
+} }
+</script>
+</head>
+<body>
+<div id="stage">
+  <canvas id="gl" width="1920" height="1080"></canvas>
+  <canvas id="c2d" width="1920" height="1080"></canvas>
+  <div id="dom"></div>
+</div>
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
