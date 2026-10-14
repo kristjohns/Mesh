@@ -181,7 +181,7 @@ export default async function wellheadScene(ctx) {
         P.axes({ alpha: gA * q1, xticks: [0, 0.2, 0.4, 0.6], yticks: [0, 1, 2, 3], xlabel: 'rotation [mrad]', ylabel: 'M [MNm]', fs: 18, ylabelOff: 50, title: 'spring law = local FE result', fmtx: (v) => v.toFixed(1) });
         P.curve(Mr, { color: PAL.amber, width: 4, alpha: gA * q1 });
         d2.text('same stiffness in both models', 1160, 810, { size: 26, weight: 750, color: PAL.green, alpha: gA * seg(t, at('c6', 'share the same'), 0.6) });
-        d2.arrow(1110, 480, 900, Y(2.2), { color: PAL.amber, width: 2.5, alpha: gA * q1, dash: [8, 6] });
+        d2.arrow(1110, 470, cx + 90 + d2.measure('rotational spring at the shoulder', 22, 400) + 14, Y(2.2) - 4, { color: PAL.amber, width: 2.5, alpha: gA * q1, dash: [8, 6] });
       }
       // ------------------------------------------------ c7: groove corner singularity
       const wA = env(t, c[7] + 0.1, ctx.duration, 0.6, 0.5);

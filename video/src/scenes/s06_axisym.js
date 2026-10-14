@@ -185,13 +185,18 @@ export default async function axisym(ctx) {
           d2.line(fx + 0.22 * 280, fy + 0.6 * 280, zx, zy + zh, { color: PAL.cyan, width: 1.2, alpha: sA * zp * 0.6 });
           const X0 = zx + zw / 2 - 0.40 * s, Y0 = zy + zh / 2 + 2.3 * s;
           d2.rect(X0 + 0.372 * s, Y0 - 2.517 * s, 0.056 * s, 0.067 * s, { fill: 'rgba(120,135,145,0.9)', stroke: '#0a1622', width: 1, alpha: sA * zp });
-          d2.text('lock ring', X0 + 0.43 * s + 12, Y0 - 2.48 * s + 8, { size: 20, weight: 650, color: PAL.ink2, alpha: sA * zp });
-          d2.text('shoulder', X0 + 0.405 * s + 12, Y0 - 2.2 * s + 26, { size: 20, weight: 650, color: PAL.ink2, alpha: sA * zp });
+          const lx = X0 + 0.47 * s + 26;
+          d2.line(X0 + 0.428 * s, Y0 - 2.483 * s, lx, Y0 - 2.483 * s, { color: PAL.ink2, width: 1.5, alpha: sA * zp });
+          d2.tag('lock ring', lx, Y0 - 2.483 * s, { size: 20, alpha: sA * zp, color: PAL.ink2, textColor: PAL.ink, fill: 'rgba(6,14,24,0.92)' });
+          d2.line(X0 + 0.405 * s, Y0 - 2.2 * s, lx, Y0 - 2.2 * s, { color: PAL.ink2, width: 1.5, alpha: sA * zp });
+          d2.tag('shoulder', lx, Y0 - 2.2 * s, { size: 20, alpha: sA * zp, color: PAL.ink2, textColor: PAL.ink, fill: 'rgba(6,14,24,0.92)' });
+          d2.rect(zx + 2, zy + 2, zw - 4, 60, { fill: 'rgba(6,14,24,0.92)', alpha: sA * zp });
           d2.text('landing shoulder & lock ring', zx + 20, zy + 40, { size: 24, weight: 650, alpha: sA * zp });
         }
-        const cA = sA * seg(t, at('a1', 'about a thousand') - 0.2, 0.6);
+        const tagHide = 1 - seg(t, at('a2', 'agree') - 0.6, 0.5);
+        const cA = sA * seg(t, at('a1', 'about a thousand') - 0.2, 0.6) * tagHide;
         d2.tag(`${L.n2d_quad.toLocaleString('en-US')} quadrilaterals`, 330, 980, { size: 22, alpha: cA, color: PAL.violet });
-        d2.tag('solves in 0.1 s', 700, 980, { size: 22, alpha: sA * seg(t, at('a1', 'solves'), 0.6), color: PAL.green });
+        d2.tag('solves in 0.1 s', 700, 980, { size: 22, alpha: sA * seg(t, at('a1', 'solves'), 0.6) * tagHide, color: PAL.green });
         if (seg(t, at('a1', 'solves'), 0.6) > 0) colorBar(d2, 990, 640, 18, 260, 0, 120, 'MPa', { alpha: sA * seg(t, at('a1', 'solves'), 0.6) });
       }
       // ------------- a2 counters + agreement
@@ -250,7 +255,7 @@ export default async function axisym(ctx) {
         d2.g.stroke();
         d2.g.restore();
         d2.line(cx - 240, cy, cx + 240, cy, { color: PAL.cyan, width: 3, alpha: hA * p1, progress: p1 });
-        d2.text('plane of bending = symmetry plane', cx, cy + 50, { size: 24, weight: 650, color: PAL.cyan, align: 'center', alpha: hA * p1 });
+        d2.text('plane of bending = symmetry plane', cx, cy + 76, { size: 24, weight: 650, color: PAL.cyan, align: 'center', alpha: hA * p1 });
         d2.arrow(cx - 120, cy - 260, cx + 120, cy - 260, { color: PAL.amber, width: 4, alpha: hA * p1 });
         d2.text('bending direction', cx, cy - 280, { size: 22, color: PAL.amber, align: 'center', alpha: hA * p1 });
         // roller symbols on the plane
