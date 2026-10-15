@@ -204,22 +204,39 @@ function drawStack(d2, t, cx, cy, a, ex) {
   g.globalAlpha = a;
   g.translate(cx, cy + 260);
   g.rotate(f * 0.05);
-  // riser
-  d2.rect(-10, -700, 20, 330, { fill: '#9aa6b1' });
+  const grad = (x0, x1, c0, c1) => { const q = g.createLinearGradient(x0, 0, x1, 0); q.addColorStop(0, c0); q.addColorStop(0.45, c1); q.addColorStop(1, c0); return q; };
+  // riser with buoyancy joints
+  g.fillStyle = grad(-11, 11, '#6f7a84', '#c9d1d8');
+  g.fillRect(-11, -720, 22, 360);
+  g.fillStyle = grad(-26, 26, '#8a6a12', '#e0a80c');
+  for (let k = 0; k < 3; k++) g.fillRect(-26, -715 + k * 100, 52, 70);
   // flex joint
-  d2.circle(0, -365, 18, { fill: '#56606a' });
-  // LMRP + BOP
-  d2.rect(-70, -345, 140, 80, { fill: '#2f3740', stroke: '#5c6b78', width: 2 });
-  d2.rect(-90, -265, 180, 170, { fill: '#a8281f', stroke: '#c25a50', width: 2 });
-  for (let k = 0; k < 4; k++) d2.rect(-110, -255 + k * 40, 220, 26, { fill: '#2b3238' });
-  d2.rect(-60, -95, 120, 60, { fill: '#2b3238' });
-  // wellhead
-  d2.rect(-34, -35, 68, 35, { fill: '#c9d1d8' });
+  d2.circle(0, -352, 20, { fill: '#3b444c', stroke: '#6d7a86', width: 2 });
+  // LMRP
+  d2.roundRectPath(-62, -334, 124, 70, 8); g.fillStyle = grad(-62, 62, '#1f252b', '#4a545e'); g.fill();
+  // frame
+  g.strokeStyle = '#c0392b'; g.lineWidth = 6;
+  g.strokeRect(-118, -262, 236, 210);
+  g.beginPath(); g.moveTo(-118, -160); g.lineTo(118, -160); g.stroke();
+  // accumulator bottles
+  for (let k = 0; k < 5; k++) { d2.roundRectPath(-108 + k * 18, -250, 13, 78, 6); g.fillStyle = '#e0a80c'; g.fill(); }
+  for (let k = 0; k < 5; k++) { d2.roundRectPath(30 + k * 18, -250, 13, 78, 6); g.fillStyle = '#e0a80c'; g.fill(); }
+  // BOP body and ram blocks
+  d2.roundRectPath(-48, -264, 96, 230, 10); g.fillStyle = grad(-48, 48, '#1b2026', '#56616c'); g.fill();
+  for (let k = 0; k < 3; k++) {
+    d2.roundRectPath(-92, -150 + k * 38, 184, 26, 6); g.fillStyle = grad(-92, 92, '#2a3138', '#79858f'); g.fill();
+  }
+  // connector and wellhead
+  d2.roundRectPath(-44, -34, 88, 34, 6); g.fillStyle = grad(-44, 44, '#20262c', '#4f5963'); g.fill();
+  g.fillStyle = grad(-26, 26, '#8d99a3', '#e3e9ee');
+  g.fillRect(-26, -2, 52, 14);
   g.restore();
-  d2.line(cx - 260, cy + 260, cx + 260, cy + 260, { color: '#b9a98a', width: 3, alpha: a });
-  d2.text('MUDLINE', cx + 255, cy + 248, { size: 15, weight: 700, color: '#b9a98a', align: 'right', ls: 2, alpha: a });
-  const ax = cx + Math.sin(f * 0.05) * 625, ay = cy + 260 - 625;
-  d2.arrow(ax, ay, ax + f * 170, ay, { color: PAL.orange, width: 6, head: 22, alpha: a * clamp(Math.abs(f) * 4), glow: PAL.orange });
-  d2.text('F(t)', ax + f * 170 + (f > 0 ? 16 : -16), ay - 14, { size: 26, weight: 800, color: PAL.orange, align: f > 0 ? 'left' : 'right', alpha: a * clamp(Math.abs(f) * 4) });
-  d2.text('flex joint', cx - 40, ay + 8, { size: 20, color: PAL.ink2, align: 'right', alpha: a });
+  d2.line(cx - 260, cy + 272, cx + 260, cy + 272, { color: '#b9a98a', width: 3, alpha: a });
+  d2.text('MUDLINE', cx + 255, cy + 262, { size: 15, weight: 700, color: '#b9a98a', align: 'right', ls: 2, alpha: a });
+  const ax = cx + Math.sin(f * 0.05) * 352, ay = cy + 260 - 352;
+  const fa = a * (0.35 + 0.65 * clamp(Math.abs(f) * 3));
+  d2.arrow(ax + Math.sign(f || 1) * 24, ay, ax + Math.sign(f || 1) * 24 + f * 200, ay, { color: PAL.orange, width: 6, head: 22, alpha: fa * clamp(Math.abs(f) * 12), glow: PAL.orange });
+  d2.text('F(t)', ax + (f >= 0 ? 40 : -40), ay - 28, { size: 26, weight: 800, color: PAL.orange, align: f >= 0 ? 'left' : 'right', alpha: fa });
+  d2.text('flex joint', ax - 34, ay + 8, { size: 20, color: PAL.ink2, align: 'right', alpha: a });
+  d2.text('BOP', cx + 130, cy + 140, { size: 20, weight: 700, color: '#e07a70', alpha: a });
 }
