@@ -95,8 +95,8 @@ export default async function transfer(ctx) {
         }
         const a2 = lA * seg(t, at('g2', 'fifty kilonewtons') - 0.3, 0.6);
         if (a2 > 0) {
-          d2.line(P.X(50), P.y, P.X(50), P.y + P.h, { color: PAL.yellow, width: 2, dash: [8, 6], alpha: a2 });
-          d2.tag('template gap closes ≈ 50 kN', P.X(50) + 12, P.y + P.h - 26, { size: 20, color: PAL.yellow, alpha: a2 });
+          d2.line(P.X(50), P.y + 125, P.X(50), P.y + P.h, { color: PAL.yellow, width: 2, dash: [8, 6], alpha: a2 });
+          d2.tag('template gap closes ≈ 50 kN', P.X(50) + 12, P.y + 150, { size: 20, color: PAL.yellow, alpha: a2 });
           d2.text('the template takes', P.X(205), P.Y(interp(curves.cg, 205)) + 40, { size: 20, color: PAL.amber, align: 'center', alpha: a2 });
           d2.text('part of the load', P.X(205), P.Y(interp(curves.cg, 205)) + 64, { size: 20, color: PAL.amber, align: 'center', alpha: a2 });
         }
