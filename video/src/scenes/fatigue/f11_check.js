@@ -40,8 +40,9 @@ export default async function check(ctx) {
         });
         const fq = seg(t, at('k1', 'design fatigue factor') - 0.3, 0.7);
         d2.panel(1060, 230, 760, 170, { alpha: aA * fq, accent: PAL.red });
-        tex.show('f11dff', 'DFF \\cdot D \\;\\le\\; 1', 1100, 262, { size: 52, alpha: aA * fq });
-        d2.text('⇔  fatigue life ≥ DFF × service time', 1100, 378, { size: 24, weight: 650, color: PAL.ink2, alpha: aA * seg(t, at('k1', 'must stay below') - 0.2, 0.6) });
+        tex.show('f11dff', 'DFF \\cdot D \\;\\le\\; 1', 1090, 256, { size: 46, alpha: aA * fq });
+        tex.show('f11eta', '\\Leftrightarrow\\; D \\le \\eta = \\dfrac{1}{DFF}', 1410, 246, { size: 40, alpha: aA * seg(t, at('k1', 'usage factor eta') - 0.4, 0.6), color: PAL.amber });
+        d2.text('⇔  fatigue life ≥ DFF × service time', 1090, 384, { size: 24, weight: 650, color: PAL.ink2, alpha: aA * seg(t, at('k1', 'must stay below') - 0.2, 0.6) });
         // ------------------------------------------------------ k2: the scale of DFF values
         const sA = aA * seg(t, k2 - 0.3, 0.7);
         if (sA > 0) {

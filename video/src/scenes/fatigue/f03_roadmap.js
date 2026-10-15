@@ -59,7 +59,7 @@ export default async function roadmap(ctx) {
       if (cA > 0 && morph < 1) {
         const tf = 1 - seg(t, r3 + 0.6, 0.6);
         d2.text('The fatigue analysis chain', 960, 190, { size: 50, weight: 800, align: 'center', alpha: cA * seg(t, r2 - 0.2, 0.6) * tf });
-        d2.text('as laid out in DNV-RP-C203', 960, 240, { size: 26, weight: 500, color: PAL.ink2, align: 'center', alpha: cA * seg(t, r2, 0.6) * tf });
+        d2.text('global analysis + the DNV-RP-C203 fatigue method', 960, 240, { size: 26, weight: 500, color: PAL.ink2, align: 'center', alpha: cA * seg(t, r2, 0.6) * tf });
         const g = d2.g;
         CARDS.forEach(([title, l1, l2, icon, tc], i) => {
           const q = seg(t, tc - 0.3, 0.7, ease.outBack);
@@ -89,6 +89,23 @@ export default async function roadmap(ctx) {
             d2.arrow(xa, y, xb, y, { color: rgba(PAL.ink2, 0.8), width: 2.5, head: 10, alpha: cA * p2 });
           }
         });
+        // r2b: where each step lives in the standard
+        const CHIPS = [
+          [4, '§2.2 Miner sum', 'Section two'], [3, '§2.4 S-N curves', 'S N curves'], [3, '§2.4, §2.5 thickness, mean', 'thickness and mean'],
+          [1, '§3 SCFs', 'Section three'], [1, '§4 FE hot spot', 'section four'], [4, '§5 fatigue analysis', 'Section five'],
+          [3, 'App. A detail classes', 'Appendix A'], [0, 'global analysis: RP-E104', 'global analysis'], [5, 'DFF: DNV-OS-C101', 'O S, C'],
+        ];
+        const used = [0, 0, 0, 0, 0, 0];
+        const chipA = cA * (1 - seg(t, r3 - 0.2, 0.6));
+        if (chipA > 0) {
+          CHIPS.forEach(([ci, str, cueW]) => {
+            const row = used[ci]++;
+            const q = seg(t, at('r2b', cueW) - 0.3, 0.5);
+            if (q <= 0) return;
+            const cxp = x0 + ci * (CW + GAP) + CW / 2;
+            d2.tag(str, cxp, y0 + CH + 40 + row * 44 + (1 - q) * 10, { size: 16, color: STEPS[ci].col, align: 'center', alpha: chipA * q, fill: 'rgba(5,14,26,0.92)', ls: 0.4 });
+          });
+        }
         // a pulse running along the chain during r3
         const pr = seg(t, r3 - 0.3, 1.5, ease.inOutSine);
         if (pr > 0 && pr < 1 && morph <= 0) {

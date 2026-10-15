@@ -20,7 +20,7 @@ class TexLayer {
       el.className = 'tex';
       el.style.fontSize = size + 'px';
       el.style.color = color;
-      katex.render(latex, el, { throwOnError: false, displayMode: false });
+      katex.render(latex, el, { throwOnError: false, displayMode: false, trust: true, strict: 'ignore' });
       this.div.appendChild(el);
       it = { el, latex, w: 0, h: 0 };
       it.w = el.offsetWidth;
@@ -45,6 +45,19 @@ class TexLayer {
     if (o.glow) it.el.style.textShadow = `0 0 18px ${o.glow}`;
     this.used.add(id);
     return it;
+  }
+  // screen boxes [x, y, w, h] of the parts tagged \\htmlClass{<cls>}{...} in a formula shown this frame
+  boxes(id, classes) {
+    const it = this.items.get(id);
+    const out = {};
+    if (!it) return out;
+    for (const c of classes) {
+      const e = it.el.querySelector('.' + c);
+      if (!e) continue;
+      const r = e.getBoundingClientRect();
+      out[c] = [r.left, r.top, r.width, r.height];
+    }
+    return out;
   }
   begin() { this.used.clear(); }
   end() {
@@ -87,7 +100,11 @@ export class Engine {
     renderer.localClippingEnabled = true;
     this.renderer = renderer;
     // await KaTeX fonts
-    this.tex.show('__warm', 'x^2\\,\\sigma', -500, -500, { alpha: 0.01 });
+    this.tex.show('__warm', 'x^2\\,\\sigma\\left(\\dfrac{a}{b}\\right)\\Big(\\Bigg(\\sqrt{x}\\sum_i\\Gamma\\bar a\\mathrm{d}\\mathbf{x}\\le', -900, -500, { alpha: 0.01 });
+    const kf = ['KaTeX_Main', 'KaTeX_Math', 'KaTeX_Size1', 'KaTeX_Size2', 'KaTeX_Size3', 'KaTeX_Size4', 'KaTeX_AMS'];
+    await Promise.all(kf.map((f) => document.fonts.load(`40px ${f}`).catch(() => {})));
+    await document.fonts.load('italic 40px KaTeX_Math').catch(() => {});
+    await document.fonts.load('bold 40px KaTeX_Main').catch(() => {});
     await document.fonts.ready;
     return true;
   }

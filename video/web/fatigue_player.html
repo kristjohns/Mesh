@@ -142,9 +142,9 @@ footer a { color: var(--accent); }
 
 <div class="wrap">
   <header>
-    <div class="eyebrow">Fatigue design with DNV-RP-C203 · 12 min · narrated</div>
+    <div class="eyebrow">Fatigue design with DNV-RP-C203 · 24 min · narrated</div>
     <h1>Every Wave Counts</h1>
-    <p class="lede">The DNV-RP-C203 fatigue method, step by step, on a subsea wellhead: sea states and riser loads, hot-spot stress and stress concentration factors, rainflow counting, S-N curves, Miner's rule and the design fatigue factor.</p>
+    <p class="lede">The DNV-RP-C203 fatigue method, step by step, on a subsea wellhead: sea states and riser loads, nominal and hot-spot stress, misalignment, rainflow counting, S-N curves, Miner's rule, the Weibull closed form and the design fatigue factor. Every formula is explained term by term, with a worked example.</p>
   </header>
 
   <div class="player" id="player">
@@ -186,13 +186,14 @@ footer a { color: var(--accent); }
   <section aria-labelledby="rh">
     <h2 id="rh">What the models showed</h2>
     <dl class="results">
-      <div><dt>SCF 1.60 · 1.15</dt><dd>Hot-spot stress concentration at the HP housing weld (outside) and the conductor housing weld (inside), read at 0.5t and 1.5t in a 47,000-element solid model.<small>At the conductor housing weld the outside sees less than the nominal stress: the wall's mid-surface steps inwards.</small></dd></div>
-      <div><dt>SCF 1.27</dt><dd>Conductor girth weld with 6 mm hi-lo misalignment, from C203 eq. (3.9): 1 + 3(δm − δ0)/t · e<sup>−α</sup>, with δ0 = 0.05t already in the S-N data.</dd></div>
+      <div><dt>SCF 1.60 · 1.24</dt><dd>Hot-spot stress concentration at the HP housing weld (outside, linear extrapolation from 0.5t and 1.5t) and the conductor housing weld (inside, quadratic extrapolation of C203 eq. 4.9 for the thick wall), from a 47,000-element solid model.<small>At the conductor housing weld the outside sees less than the nominal stress: the wall's mid-surface steps inwards.</small></dd></div>
+      <div><dt>SCF 1.27 → 1.25</dt><dd>Conductor girth weld with 6 mm hi-lo misalignment, from C203 eq. (3.9): 1 + 3(δm − δ0)/t · e<sup>−α</sup>, with δ0 = 0.05t already in the S-N data.<small>Under global bending the local bending is driven by the mid-wall stress (App. B.5, eq. B.53): 1.25 × the outer-fibre stress.</small></dd></div>
       <div><dt>12,100 / day</dt><dd>Stress cycles per day of riser-connected operation, averaged over the scatter diagram.</dd></div>
       <div><dt>73 %</dt><dd>Share of the fatigue damage from seas with Hs between 3 and 6 m, which occur 23 % of the time.<small>Hs below 2 m: half the time, 0.7 % of the damage.</small></dd></div>
-      <div><dt>1,234 d → 123 d</dt><dd>Fatigue life of the governing conductor girth weld (S-N class D, shop-welded), and the allowable connected time with a design fatigue factor of 10.<small>Planned campaign 120 days: utilisation 97 %.</small></dd></div>
+      <div><dt>1,276 d → 128 d</dt><dd>Fatigue life of the governing conductor girth weld (S-N class D, shop-welded), and the allowable connected time with a design fatigue factor of 10.<small>Planned campaign 120 days: utilisation 94 %.</small></dd></div>
       <div><dt>+9 % · −28 %</dt><dd>Weibull closed form against full rainflow summation: two-slope curve within 10 %, one-slope curve more than a quarter shorter.</dd></div>
-      <div><dt>−30 %</dt><dd>Life lost for 10 % more stress.<small>8 mm misalignment instead of 6 mm (86 days), or the same weld made on site, class E (79 days), and the well fails the check.</small></dd></div>
+      <div><dt>−30 %</dt><dd>Life lost for 10 % more stress.<small>8 mm misalignment instead of 6 mm (90 days), or the same weld made on site, class E (82 days), and the well fails the check.</small></dd></div>
+      <div><dt>192 d · 450 d</dt><dd>Buying back margin: a 4 mm hi-lo tolerance, or grinding the weld flush (curve C1, but δ0 = 0 and SCF 1.39).<small>Toe grinding (× 3.5 on life, Table 7-1) is best kept as a reserve, as C203 advises.</small></dd></div>
     </dl>
   </section>
 

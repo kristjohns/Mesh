@@ -19,8 +19,8 @@
         },
         {
           "id": "c3",
-          "text": "But every cycle leaves a little damage behind. Add up enough of them, and a crack starts to grow from a weld.",
-          "pause": 0.8
+          "text": "But every cycle leaves a little damage behind. Add up enough of them, and a crack grows through the wall of a weld.",
+          "pause": 0.574
         },
         {
           "id": "c4",
@@ -75,6 +75,11 @@
           "id": "r2",
           "text": "Describe the sea states the well will see. Turn each one into a stress history at every hot spot. Count the stress cycles. Pick the right S N curve. Add up the damage with Miner's rule. And finally, check it against a design fatigue factor.",
           "pause": 0.6
+        },
+        {
+          "id": "r2b",
+          "text": "In the standard itself, the method is spread over a few chapters. Section two holds Miner's rule and the S N curves, with the rules for thickness and mean stress. Section three gives stress concentration factors, and section four the hot spot stress from finite element models. Section five covers the fatigue analysis, including the Weibull shortcut, and Appendix A classifies the details. The loads come from a global analysis, which for a wellhead is described in D N V, R P, E one-oh-four. And the design fatigue factor comes from the design standard, for example D N V, O S, C one-oh-one.",
+          "pause": 0.7
         },
         {
           "id": "r3",
@@ -155,28 +160,117 @@
       ]
     },
     {
+      "id": "f06b_nominal",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "s1",
+          "text": "From moment to stress. In a pipe under bending, the axial stress varies linearly across the section, from tension on one side to compression on the other. Its largest value, at the outer fibre, is the nominal stress.",
+          "pause": 0.6
+        },
+        {
+          "id": "s2",
+          "text": "It is the bending moment, M, divided by the section modulus, W. The section modulus is the second moment of area, I, divided by the distance to the outer fibre: half the outer diameter. For a tube, I is pi over sixty-four, times the outer diameter to the fourth power, minus the inner diameter to the fourth.",
+          "pause": 0.6
+        },
+        {
+          "id": "s3",
+          "text": "For the thirty-six inch conductor, with an outer diameter of nine hundred and fourteen millimetres and a thirty-eight point one millimetre wall, W is zero point zero two two cubic metres. At twenty-five kilonewtons of flex-joint force, the moment at the girth weld is about four hundred and thirty kilonewton metres. Divided by W, that's a nominal stress of nineteen point four megapascals.",
+          "pause": 0.6
+        },
+        {
+          "id": "s4",
+          "text": "Because the relation is linear, a range of moment gives a range of stress: delta sigma equals delta M over W. Loads that stay constant, like the weight of the stack, shift the mean stress, but they don't change the range.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
       "id": "f07_hotspot",
       "preroll": 1.0,
       "postroll": 1.4,
       "lines": [
         {
           "id": "l1",
-          "text": "The beam model gives moments, and a moment divided by the section modulus gives the nominal stress. But a weld sees more than that, because the geometry around it concentrates the stress.",
+          "text": "The nominal stress assumes a smooth pipe. At a weld, the geometry concentrates the stress. C two-oh-three calls the result the hot spot stress: the nominal stress, times a stress concentration factor.",
+          "pause": 0.6
+        },
+        {
+          "id": "l1b",
+          "text": "Through the wall at the weld toe, the stress has three parts. A membrane part, constant through the thickness. A bending part, varying linearly. And a sharp, nonlinear peak from the notch of the weld itself. The hot spot stress is the structural stress: membrane plus bending, at the surface. The notch peak is left out on purpose, because its effect is already in the hot spot S N curve.",
           "pause": 0.6
         },
         {
           "id": "l2",
-          "text": "For the two housing welds, we use the hot spot method. In the local solid model, read the surface stress at half a wall thickness and at one and a half wall thicknesses from the weld toe, and extrapolate linearly to the toe. At the high-pressure housing weld, that gives a stress concentration factor of one point six.",
+          "text": "For the two housing welds, we compute it with the local solid model. Read the surface stress at half a wall thickness and at one and a half wall thicknesses from the weld toe. These points lie outside the notch peak, where the stress still varies smoothly.",
+          "pause": 0.6
+        },
+        {
+          "id": "l2b",
+          "text": "Then extrapolate linearly to the toe. The straight line through the two points reaches the toe at one and a half times the first stress, minus half the second. At the high-pressure housing weld, that gives thirty-five megapascals. Divided by the nominal stress of twenty-one point nine, the stress concentration factor is one point six.",
           "pause": 0.7
         },
         {
           "id": "l3",
-          "text": "At the conductor housing weld, the outside is actually less stressed than the nominal value. The housing thickens inwards, so the wall's mid-surface steps inwards, and the axial stress adds local bending. The inside of the weld is the hot spot, with a factor of one point one five. Always check both surfaces.",
-          "pause": 0.7
+          "text": "At the conductor housing weld, the outside is actually less stressed than the nominal value. The housing thickens inwards, so the wall's mid-surface steps inwards, and the axial stress adds local bending. The inside of the weld is the hot spot. That assumes the weld is made from both sides, so the inside is a weld toe. Welded from the outside only, the inside would be a weld root, an F three detail, with less than fifty days allowed. Always check both surfaces.",
+          "pause": 0.6
         },
         {
-          "id": "l4",
-          "text": "The conductor girth weld is a standard detail, so we use the nominal stress, with a concentration factor for misalignment. With six millimetres of high-low between the pipe ends, C two-oh-three gives one point two seven. Delta nought, five percent of the wall, is misalignment that is already included in the S N test data. And the exponential term spreads the bending over the width of the weld.",
+          "id": "l3q",
+          "text": "And the conductor wall is thick. For thick walls, C two-oh-three recommends a quadratic extrapolation instead, through points at zero point four, zero point nine and one point four wall thicknesses: equation four point nine. Here it gives eight percent more than the straight line, so we use it: a stress concentration factor of one point two four.",
+          "pause": 0.6
+        },
+        {
+          "id": "l3b",
+          "text": "One caveat. Our model has perfectly aligned walls. At butt welds, C two-oh-three requires fabrication tolerances to be accounted for. We assume the housing welds stay within the five percent already in the S N data: under one millimetre on the casing, and two on the conductor. Anything beyond that would need an extra factor.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f07b_misalign",
+      "preroll": 1.0,
+      "postroll": 3.2,
+      "lines": [
+        {
+          "id": "a1",
+          "text": "The conductor girth weld is a standard butt weld in a tube. So instead of a finite element model, C two-oh-three gives a formula for the stress concentration that matters most here: misalignment.",
+          "pause": 0.6
+        },
+        {
+          "id": "a2",
+          "text": "When the two pipe ends don't line up, the axial stress has to jog sideways by the misalignment, delta m. That eccentricity bends the wall locally, and adds bending stress right at the weld toe.",
+          "pause": 0.6
+        },
+        {
+          "id": "a3",
+          "text": "This is equation three point nine. The S C F is one, plus three times delta m minus delta nought, divided by the wall thickness, t, times e to the minus alpha.",
+          "pause": 0.6
+        },
+        {
+          "id": "a4",
+          "text": "The one is the stress without misalignment. The second term is the extra bending. An eccentricity e in a wall of thickness t creates a bending moment. The pipe on both sides of the weld shares it, and the bending stress at the surface becomes three e over t, times the membrane stress.",
+          "pause": 0.6
+        },
+        {
+          "id": "a5",
+          "text": "Delta nought is the misalignment already present in the test specimens behind the S N curve, so it is subtracted. For girth welds in tubular structures, C two-oh-three sets it to five percent of the wall thickness, and to zero for welds ground flush.",
+          "pause": 0.6
+        },
+        {
+          "id": "a6",
+          "text": "Alpha brings in the pipe. It is zero point nine one times L, the width of the weld at the surface, divided by the square root of D times t. A wider weld takes out the eccentricity more gradually, and the S C F drops.",
+          "pause": 0.6
+        },
+        {
+          "id": "a7",
+          "text": "For our weld: six millimetres of high-low, a thirty-eight point one millimetre wall, a forty millimetre wide weld cap, and a nine hundred and fourteen millimetre pipe. Alpha is zero point one nine five, so e to the minus alpha is zero point eight two, and the S C F is one point two seven.",
+          "pause": 0.6
+        },
+        {
+          "id": "a8",
+          "text": "One more detail, from Appendix B. Under global bending, the local bending is driven by the stress at mid-wall, which here is four percent lower than at the outer fibre. So the stress at the outside toe is the outer-fibre stress, plus S C F minus one, times the mid-wall stress. That's one point two five times the nominal stress.",
           "pause": 0.4
         }
       ]
@@ -198,7 +292,7 @@
         },
         {
           "id": "f3",
-          "text": "Whenever the newest range is at least as large as the one before it, the one before it is a closed cycle. Count it, remove its two points, and carry on. Each small cycle is paired off on its own, without breaking up the big cycle around it.",
+          "text": "Whenever the newest range is at least as large as the one before it, the one before it is counted. If it contains the very first point of the history, it counts as half a cycle, and only that point is dropped. Otherwise it is a closed cycle: count it, remove its two points, and carry on. Each small cycle is paired off on its own, without breaking up the big cycle around it.",
           "pause": 0.6
         },
         {
@@ -208,7 +302,12 @@
         },
         {
           "id": "f5",
-          "text": "Notice that we count ranges, not mean stress. Welds carry residual stresses close to yield, so for as-welded joints C two-oh-three uses the full stress range, whatever the mean. That's also why the lock ring pre-load and the weight of the stack drop out.",
+          "text": "Notice that we count ranges, not mean stress. Welds carry residual stresses close to yield, so for as-welded joints C two-oh-three uses the full stress range, whatever the mean. So the lock ring pre-load and the weight of the stack don't enter the S N check as a mean stress. They still matter, though: they set the contact and the load sharing in the global model.",
+          "pause": 0.6
+        },
+        {
+          "id": "f6",
+          "text": "There are exceptions. For base material, and for welds that are post weld heat treated, C two-oh-three lets you reduce the stress range when part of the cycle is in compression. For a stress-relieved weld at zero mean stress, the reduction factor is zero point nine. Our welds are as-welded, so the full range counts.",
           "pause": 0.4
         }
       ]
@@ -230,17 +329,49 @@
         },
         {
           "id": "n3",
-          "text": "Then the environment. For the D curve in air, the slope changes at ten million cycles, to a shallower slope of five. In seawater with cathodic protection, the steep part is lower, and the bend comes at one million cycles. In free corrosion, there is no bend at all. Our welds are in seawater with cathodic protection.",
+          "text": "Then the environment. Seawater is harsher than air. With cathodic protection, the steep part of the D curve drops by a factor of two and a half in life, and the bend moves from ten million cycles to one million. In free corrosion, the curve is a factor of three below air, with a single slope and no bend at all. Our welds use the cathodic protection curve. Below the mudline, C two-oh-three allows it when the structure above the mudline is cathodically protected.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f09b_snequation",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "e1",
+          "text": "Now let's read the S N curve properly. Equation two point eight writes it in logarithms: log N equals log a bar, minus m times log delta sigma.",
           "pause": 0.6
         },
         {
-          "id": "n4",
-          "text": "Thick walls are weaker in fatigue, so the stress range is scaled by the thickness over twenty-five millimetres, to the power k. For the thirty-eight millimetre conductor, that's a nine percent penalty on stress. The thinner casing gets none.",
+          "id": "e2",
+          "text": "N is the number of cycles to failure at a constant stress range delta sigma, in megapascals. m is the negative inverse slope: on log-log axes, the curve drops one decade in stress for every m decades in life. And log a bar is where the design curve meets the log N axis, at a stress range of one megapascal.",
           "pause": 0.6
         },
         {
-          "id": "n5",
-          "text": "One more thing: under variable amplitude loading, there is no fatigue limit. Cycles below the bend still do damage. They just follow the shallower slope.",
+          "id": "e3",
+          "text": "a bar is not the average of the tests. Equation two point nine shifts the mean curve down by two standard deviations of log N. C two-oh-three uses a standard deviation of zero point two, so the shift is zero point four: the design curve allows two and a half times fewer cycles than the mean.",
+          "pause": 0.6
+        },
+        {
+          "id": "e4",
+          "text": "Each curve has two branches. For the D curve in seawater with cathodic protection, log a bar one is eleven point seven six four, with m equal to three, up to a million cycles. Beyond that, log a bar two is fifteen point six oh six, with m equal to five. The two branches meet at a stress range of eighty-three megapascals.",
+          "pause": 0.6
+        },
+        {
+          "id": "e5",
+          "text": "Below the bend, cycles still count. Under variable amplitude loading there is no fatigue limit: once the big cycles have started a crack, the small ones help it grow. They just follow the shallower slope of five.",
+          "pause": 0.6
+        },
+        {
+          "id": "e6",
+          "text": "Then the thickness effect, equation two point ten. The stress range is multiplied by t over t ref, to the power k, before it enters the curve. t ref is twenty-five millimetres, t is the thickness the crack grows through, and walls thinner than twenty-five millimetres get no correction. For the D curve, k is zero point two, so the thirty-eight millimetre conductor pays a nine percent penalty on stress.",
+          "pause": 0.6
+        },
+        {
+          "id": "e7",
+          "text": "Let's try it. A sixty megapascal range at the girth weld becomes sixty-five point three after the thickness correction. That's below the bend, so we use the second branch: log N is fifteen point six oh six, minus five times log sixty-five point three, which is six point five three. About three point four million cycles. A range of one hundred megapascals lands on the steep branch, with four hundred and fifty thousand cycles. Sixty-seven percent more stress, seven and a half times less life.",
           "pause": 0.4
         }
       ]
@@ -256,18 +387,60 @@
           "pause": 0.6
         },
         {
+          "id": "m1b",
+          "text": "Written out, this is equation two point three: D is the sum of n i over N i. From the S N curve, N i is a bar divided by delta sigma i to the power m. So D is one over a bar, times the sum of n i times delta sigma i to the m. That's why the big ranges dominate: each cycle counts with its stress range cubed.",
+          "pause": 0.6
+        },
+        {
+          "id": "m1c",
+          "text": "With a two-slope curve, each range goes to its own branch. A sixty-nine megapascal range is below the bend after the thickness correction, so N comes from the m equals five branch: one point seven million cycles. Twenty-five of them use one point five times ten to the minus five. A range of eighty-six megapascals lands on the steep branch, with seven hundred thousand cycles. C two-oh-three asks for at least twenty blocks in a histogram. We have forty-two, and together this three-hour sea state uses one point nine times ten to the minus four.",
+          "pause": 0.7
+        },
+        {
           "id": "m2",
           "text": "We do this for every sea state, weight each one by how often it occurs, and get the damage per day of operation. This map shows where the damage comes from.",
           "pause": 0.6
         },
         {
           "id": "m3",
-          "text": "The calm days hardly matter. The waves are below two metres half of the time, and cause less than one percent of the damage. The storms don't dominate either: they are rare, and above fifty kilonewtons the template takes part of the load. Three quarters of the damage comes from moderate seas, between three and six metres.",
-          "pause": 0.7
+          "text": "The calm days hardly matter. The waves are below two metres half of the time, and cause less than one percent of the damage. For the girth weld, the storms don't dominate either: they are rare, and above fifty kilonewtons the template takes part of the load. Three quarters of the damage comes from moderate seas, between three and six metres.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f10b_weibull",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "wb1",
+          "text": "Section five point four offers a shortcut. If the long-term stress ranges follow a two-parameter Weibull distribution, the damage has a closed-form solution, and you don't need to count every cycle.",
+          "pause": 0.6
         },
         {
-          "id": "m4",
-          "text": "C two-oh-three also offers a shortcut. If the long-term stress ranges follow a Weibull distribution, the damage has a closed-form solution. Fitted to our results, it lands within ten percent of the full calculation. Ignore the bend in the S N curve, though, and the life comes out more than a quarter shorter.",
+          "id": "wb2",
+          "text": "Equation five point one gives the probability that a stress range exceeds delta sigma: Q equals e to the power minus delta sigma over q, to the power h. q is the scale parameter, in megapascals, and h is the shape parameter, which sets how fast the tail drops off. Fitted to our girth weld, h is one point one, and q is twenty-one megapascals.",
+          "pause": 0.6
+        },
+        {
+          "id": "wb3",
+          "text": "Equation five point two links q to the largest range you expect. In n nought cycles, the largest range, delta sigma nought, is q times the natural log of n nought, to the power one over h.",
+          "pause": 0.6
+        },
+        {
+          "id": "wb4",
+          "text": "Now the damage, equation five point three. Nu nought times T d is the total number of cycles. q to the m, times the gamma function of one plus m over h, is the average of delta sigma to the m over the Weibull distribution. So the closed form is just Miner's sum: the number of cycles, times the mean of delta sigma to the m, divided by a bar.",
+          "pause": 0.6
+        },
+        {
+          "id": "wb5",
+          "text": "With a two-slope S N curve, equation five point four splits the same average at the bend, S one. The complementary incomplete gamma function covers the ranges above the bend, with m one and a bar one. The incomplete gamma function covers those below it, with m two and a bar two.",
+          "pause": 0.6
+        },
+        {
+          "id": "wb6",
+          "text": "For our weld: twelve thousand cycles a day, h of one point one, and q of twenty-three megapascals after the thickness correction. The two-slope form gives fourteen hundred days, within ten percent of the full rainflow sum, but on the long side. That's why C two-oh-three asks for a shape parameter on the safe side when you use the closed form. Use a single slope throughout, and the life drops to nine hundred and fourteen days: safe, but conservative.",
           "pause": 0.4
         }
       ]
@@ -279,7 +452,7 @@
       "lines": [
         {
           "id": "k1",
-          "text": "Step six: the design check. Even with conservative S N curves, the loads, the soil and the fabrication are uncertain. So the design standard adds a design fatigue factor: the calculated damage, times that factor, must stay below one.",
+          "text": "Step six: the design check. Even with conservative S N curves, the loads, the soil and the fabrication are uncertain. So the design standard adds a design fatigue factor: the calculated damage, times that factor, must stay below one. In C two-oh-three's terms, the damage must stay below the usage factor eta, which is one over the design fatigue factor.",
           "pause": 0.6
         },
         {
@@ -289,12 +462,12 @@
         },
         {
           "id": "k3",
-          "text": "Here are the results, in days of riser-connected operation. The high-pressure housing weld is far from critical. The conductor housing weld allows about three hundred and thirty days. And the governing hot spot is the plain girth weld in the conductor: about twelve hundred and thirty days of calculated life, or a hundred and twenty-three days with the design fatigue factor.",
+          "text": "Here are the results, in days of riser-connected operation. The high-pressure housing weld is far from critical. The conductor housing weld allows about two hundred and forty days. And the governing hot spot is the plain girth weld in the conductor: about twelve hundred and seventy-five days of calculated life, or a hundred and twenty-eight days with the design fatigue factor.",
           "pause": 0.7
         },
         {
           "id": "k4",
-          "text": "The drilling campaign needs a hundred and twenty days with the riser connected, so the well passes, but only just, at ninety-seven percent utilisation. And notice which weld governs. Not the big forgings, but an ordinary girth weld, out of sight below the seabed.",
+          "text": "The drilling campaign needs a hundred and twenty days with the riser connected, so the well passes, but only just, at ninety-four percent utilisation. And notice which weld governs. Not the big forgings, but an ordinary girth weld, out of sight below the seabed.",
           "pause": 0.4
         }
       ]
@@ -311,7 +484,7 @@
         },
         {
           "id": "x2",
-          "text": "With three percent to spare, fabrication matters. Eight millimetres of misalignment instead of six, and the allowable time drops to eighty-six days: the well would fail the check. Weld the same joint on site, and it becomes an E detail, with only seventy-nine days. Welding and tolerances belong in the fatigue analysis.",
+          "text": "With six percent to spare, fabrication matters. Eight millimetres of misalignment instead of six, and the allowable time drops to ninety days: the well would fail the check. Weld the same joint on site, and it becomes an E detail, with only eighty-two days. Welding and tolerances belong in the fatigue analysis.",
           "pause": 0.6
         },
         {
@@ -322,6 +495,38 @@
         {
           "id": "x4",
           "text": "So report the result together with the assumptions that drive it, and check those assumptions against what was actually built.",
+          "pause": 0.4
+        }
+      ]
+    },
+    {
+      "id": "f12b_improve",
+      "preroll": 1.0,
+      "postroll": 1.4,
+      "lines": [
+        {
+          "id": "i1",
+          "text": "So what if the margin is too thin? C two-oh-three gives you several levers, and they differ a lot in how much you can rely on them.",
+          "pause": 0.6
+        },
+        {
+          "id": "i2",
+          "text": "The first is the detail itself. Specify shop welding with the pipe rotated, so the weld stays a D and not an E. And tighten the tolerance: with four millimetres of high-low instead of six, the allowable time grows from a hundred and twenty-eight to a hundred and ninety-two days.",
+          "pause": 0.6
+        },
+        {
+          "id": "i3",
+          "text": "Second, grind the weld flush on both sides, and prove it free of defects. Appendix A then allows curve C one. But the misalignment allowance in the S N data is gone: delta nought becomes zero, and the S C F rises to one point three nine. Even so, the allowable time grows to about four hundred and fifty days.",
+          "pause": 0.6
+        },
+        {
+          "id": "i4",
+          "text": "Third, improve the weld toe, by grinding, T I G dressing or hammer peening. Table seven one credits up to three and a half times the life for grinding, and four for hammer peening. But C two-oh-three advises keeping toe grinding as a reserve rather than counting on it at the design stage, T I G dressing is not recommended for general use in design, and hammer peening is only for members where failure has no substantial consequences.",
+          "pause": 0.6
+        },
+        {
+          "id": "i5",
+          "text": "None of this helps if the crack would start at the root of a one-sided weld. And with a calculated life this short, under fifteen years for a component where failure is severe, C two-oh-three asks for a more refined analysis, or fracture mechanics, before trusting the number. Often the best lever is the simplest: a lower stress range, by design.",
           "pause": 0.4
         }
       ]

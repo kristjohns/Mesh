@@ -143,3 +143,72 @@ export function lerpArr(arr, f) {
   const i = Math.floor(x), u = x - i;
   return i >= n - 1 ? arr[n - 1] : lerp(arr[i], arr[i + 1], u);
 }
+
+// ------------------------------------------------------------------ formula walk-through
+const WALK_COLS = [PAL.amber, PAL.cyan, PAL.green, PAL.violet, PAL.orange, PAL.pink, PAL.teal, PAL.red];
+
+// Explain a formula term by term. parts: [[key | null, tex], ...] are concatenated into one KaTeX formula;
+// rows: [{ k (key or keys), sym (tex), text, sub, t, col }] appear one by one in a legend, and while a row is
+// the current one its term(s) in the formula are boxed in the row's colour. tOff ends the highlighting.
+// legend: { x, y, gap, symW, size, symSize, w } ; returns the screen box of the formula.
+export function formulaWalk(ctx, t, o) {
+  const { d2, tex } = ctx;
+  const a = o.alpha ?? 1;
+  if (a <= 0.001) return null;
+  const cls = (k) => `fw-${o.id}-${k}`;
+  const latex = o.latex ?? o.parts.map(([k, s]) => (k ? `\\htmlClass{${cls(k)}}{${s}}` : s)).join('');
+  const fa = a * (o.fAlpha ?? 1);
+  const it = tex.show(o.id, latex, o.x, o.y, { size: o.size ?? 54, alpha: fa, color: o.color, align: o.align });
+  const rows = (o.rows ?? []).map((r, i) => ({ ...r, col: r.col ?? WALK_COLS[i % WALK_COLS.length] }));
+  const keys = [...new Set(rows.flatMap((r) => [].concat(r.k ?? [])))];
+  const boxes = tex.boxes(o.id, keys.map(cls));
+  rows.forEach((r, i) => {
+    if (r.k == null) return;
+    const t1 = i + 1 < rows.length ? rows[i + 1].t : (o.tOff ?? 1e9);
+    const h = env(t, r.t - 0.2, Math.min(t1, o.tOff ?? 1e9), 0.3, 0.3);
+    if (h <= 0.001) return;
+    for (const k of [].concat(r.k)) {
+      const b = boxes[cls(k)];
+      if (!b) continue;
+      const pad = o.pad ?? 7;
+      d2.panel(b[0] - pad, b[1] - pad + 2, b[2] + 2 * pad, b[3] + 2 * pad - 4, { r: 9, alpha: fa * h, fill: rgba(r.col, 0.17), border: rgba(r.col, 0.95), borderWidth: 2.2, shadow: false });
+    }
+  });
+  const L = o.legend;
+  if (L) {
+    const gap = L.gap ?? 74, symW = L.symW ?? 150, size = L.size ?? 25, symSize = L.symSize ?? 34;
+    rows.forEach((r, i) => {
+      const q = seg(t, r.t - 0.25, 0.5);
+      if (q <= 0) return;
+      const y = L.y + i * gap;
+      const t1 = i + 1 < rows.length ? rows[i + 1].t : (o.tOff ?? 1e9);
+      const on = env(t, r.t - 0.2, Math.min(t1, o.tOff ?? 1e9), 0.3, 0.3);
+      const ra = a * q * (L.alpha ?? 1);
+      if (ra <= 0.001) return;
+      if (on > 0.001) d2.panel(L.x - 16, y - 8, L.w ?? 760, gap - 10, { r: 10, alpha: ra * on, fill: rgba(r.col, 0.10), border: rgba(r.col, 0.55), shadow: false });
+      d2.rect(L.x - 16, y - 8, 5, gap - 10, { fill: r.col, alpha: ra });
+      if (r.sym) tex.show(`${o.id}-s${i}`, r.sym, L.x + 4, y - 2, { size: symSize, alpha: ra, color: r.col });
+      d2.text(r.text, L.x + symW, y + size * 0.95, { size, weight: 650, color: PAL.ink, alpha: ra });
+      if (r.sub) d2.text(r.sub, L.x + symW, y + size * 0.95 + size * 1.05, { size: size * 0.78, weight: 500, color: PAL.ink2, alpha: ra });
+    });
+  }
+  return it;
+}
+
+// a column of KaTeX lines that appear one after the other (worked examples): lines [{ tex, t, col, size, dx }]
+export function texSteps(ctx, t, id, lines, x, y, o = {}) {
+  const a = o.alpha ?? 1;
+  if (a <= 0.001) return;
+  const gap = o.gap ?? 78;
+  lines.forEach((ln, i) => {
+    const q = seg(t, ln.t - 0.25, 0.6);
+    if (q <= 0) return;
+    ctx.tex.show(`${id}-${i}`, ln.tex, x + (ln.dx ?? 0) + (1 - q) * 18, y + (ln.dy ?? i * gap), { size: ln.size ?? o.size ?? 40, alpha: a * q, color: ln.col ?? o.color });
+  });
+}
+
+// small reference chip, e.g. "C203 eq. (2.8)"
+export function refChip(d2, str, x, y, a, o = {}) {
+  if (a <= 0.001) return;
+  d2.tag(str, x, y, { size: o.size ?? 18, color: o.color ?? PAL.ink2, align: o.align ?? 'left', alpha: a, fill: 'rgba(5,14,26,0.85)', ls: 0.6 });
+}

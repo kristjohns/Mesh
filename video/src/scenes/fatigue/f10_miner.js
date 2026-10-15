@@ -2,14 +2,15 @@
 // Weibull closed form of C203 as a check.
 import { makeBackdrop } from '../../engine/env.js';
 import { Plot } from '../../engine/draw2d.js';
-import { chainBar, stepCard, heading, heat, pow10, snN, snS, fmtInt } from './fcommon.js';
+import { chainBar, stepCard, heading, heat, pow10, snN, snS, snCurvePts, fmtInt, formulaWalk, texSteps, refChip } from './fcommon.js';
 import { PAL, seg, env, ease, clamp, lerp, rgba } from '../../engine/util.js';
 
 export default async function miner(ctx) {
   const { d2, cue, at, renderer, data, tex } = ctx;
   const F = data.fatigue;
   const back = makeBackdrop();
-  const m1 = cue('m1'), m2 = cue('m2'), m3 = cue('m3'), m4 = cue('m4');
+  const m1 = cue('m1'), m1b = cue('m1b'), m1c = cue('m1c'), m2 = cue('m2'), m3 = cue('m3');
+  const WM = F.worked.miner, WS = F.worked.sn;
   const Hh = F.example.hist;
   const hsC = F.hotspots.find((h) => h.id === 'cg');
   const cpD = F.sn_table_cp.D;
@@ -32,7 +33,7 @@ export default async function miner(ctx) {
     render(t) {
       back.render(renderer);
       // ------------------------------------------------------------ m1: Miner for one sea state
-      const aA = env(t, 1.6, m2 - 0.1, 0.6, 0.6);
+      const aA = env(t, 1.6, m1b - 0.1, 0.6, 0.6);
       if (aA > 0) {
         heading(d2, 'Palmgren–Miner rule', 110, 150, aA, { sub: 'one sea state: Hs 3–4 m, Tp 9–10 s, 3 hours' });
         tex.show('f10miner', 'D = \\sum_i \\dfrac{n_i}{N_i} \\;\\le\\; 1', 1180, 92, { size: 46, alpha: aA * seg(t, at('m1', 'The damage is') - 0.3, 0.6) });
@@ -89,7 +90,7 @@ export default async function miner(ctx) {
         d2.tag(`this sea state alone, nonstop: failure after ≈ ${fmtInt(3 / Hh.D_3h / 24)} days`, 960, 1020, { size: 20, color: PAL.ink2, align: 'center', alpha: aA * fq, fill: 'rgba(5,14,26,0.92)' });
       }
       // ------------------------------------------------------------ m2/m3: long term
-      const bA = env(t, m2 - 0.2, m4 - 0.1, 0.6, 0.6);
+      const bA = env(t, m2 - 0.2, ctx.duration, 0.6, 0.6);
       if (bA > 0) {
         heading(d2, 'Long-term damage', 110, 150, bA, { sub: 'every sea state, weighted by how often it occurs' });
         tex.show('f10lt', 'D_{day} = 24\\,\\mathrm{h} \\sum_{j} p_j \\, d_j', 1220, 92, { size: 38, alpha: bA * seg(t, m2 + 0.6, 0.6) });
@@ -144,44 +145,55 @@ export default async function miner(ctx) {
           d2.tag('above 50 kN the template carries part of the load', 1400, 960, { size: 19, color: PAL.yellow, align: 'center', alpha: bA * tq, fill: 'rgba(5,14,26,0.92)' });
         }
       }
-      // ------------------------------------------------------------ m4: Weibull closed form
-      const wA = env(t, m4 - 0.2, ctx.duration, 0.6, 0.5);
-      if (wA > 0) {
-        heading(d2, 'Shortcut: the Weibull closed form', 110, 150, wA, { sub: 'DNV-RP-C203, simplified fatigue analysis' });
-        const E = DG.exceed;
-        const WP = new Plot(d2, { x: 220, y: 260, w: 640, h: 560, xr: [0, 140], yr: [-8, 0] });
-        d2.panel(110, 210, 830, 790, { alpha: wA });
-        WP.axes({ alpha: wA, xticks: [0, 20, 40, 60, 80, 100, 120, 140], yticks: [0, -2, -4, -6, -8], fs: 18, fmty: (v) => (v === 0 ? '1' : `10${'⁻'}${'⁰¹²³⁴⁵⁶⁷⁸'[-v]}`), xlabel: 'stress range Δσ [MPa]', ylabel: 'probability of exceedance', ylabelOff: 64 });
-        d2.text('long-term stress ranges, girth weld', 140, 248, { size: 20, weight: 700, color: PAL.ink2, alpha: wA });
-        const pq = seg(t, m4 + 0.6, 1.4);
-        const pts = E.Q.map((Q, k) => [E.s[k], Math.log10(Q)]).filter((p) => p[0] > 0.5 && p[0] <= 140);
-        WP.points(pts, { color: PAL.orange, r: 5, progress: pq, alpha: wA });
-        const fq = seg(t, at('m4', 'Weibull distribution') - 0.2, 1.0);
-        const h = DG.weibull_h, q = DG.weibull_q;
-        const wpts = [];
-        for (let i = 0; i <= 100; i++) { const s = 140 * i / 100; wpts.push([s, Math.log10(Math.exp(-Math.pow(s / q, h)))]); }
-        WP.clipBegin(); WP.curve(wpts, { color: PAL.cyan, width: 3.5, progress: fq, alpha: wA }); WP.clipEnd();
-        d2.text(`Weibull fit: h = ${h.toFixed(2)}, q = ${q.toFixed(1)} MPa`, WP.x + WP.w - 10, WP.y + 34, { size: 21, weight: 750, color: PAL.cyan, align: 'right', alpha: wA * fq });
-        // formula + comparison
-        const kq = seg(t, at('m4', 'closed-form') - 0.4, 0.6);
-        d2.panel(990, 210, 850, 260, { alpha: wA * kq, accent: PAL.cyan });
-        tex.show('f10wb', 'D = \\dfrac{\\nu_0\\, T_d}{\\bar a}\\; q^{m}\\; \\Gamma\\!\\left(1 + \\dfrac{m}{h}\\right)', 1020, 245, { size: 44, alpha: wA * kq });
-        d2.text('two-slope curve: incomplete gamma functions', 1020, 440, { size: 19, color: PAL.ink2, alpha: wA * kq });
-        const rows = [
-          ['rainflow + Miner, all sea states', DG.life_days, PAL.orange, at('m4', 'Fitted')],
-          ['Weibull, two-slope S-N curve', DG.life_wb2, PAL.cyan, at('m4', 'within ten')],
-          ['Weibull, one slope (no bend)', DG.life_wb1, PAL.red, at('m4', 'Ignore the bend')],
-        ];
-        d2.panel(990, 500, 850, 500, { alpha: wA * seg(t, at('m4', 'Fitted') - 0.3, 0.6) });
-        d2.text('fatigue life, days of operation', 1020, 545, { size: 22, weight: 700, alpha: wA * seg(t, at('m4', 'Fitted') - 0.3, 0.6) });
-        rows.forEach(([lab, v, col, tt], k) => {
-          const qq = seg(t, tt - 0.2, 0.8, ease.out);
-          const y = 610 + k * 120;
-          d2.text(lab, 1020, y, { size: 22, weight: 650, alpha: wA * clamp(qq * 2) });
-          d2.rect(1020, y + 18, 560 * v / 2000 * qq, 34, { fill: rgba(col, 0.75), alpha: wA });
-          const rel = k === 0 ? '' : `  (${v > DG.life_days ? '+' : '−'}${Math.round(Math.abs(v / DG.life_days - 1) * 100)} %)`;
-          d2.text(`${fmtInt(v)}${rel}`, 1030 + 560 * v / 2000 * qq, y + 44, { size: 22, weight: 800, color: col, alpha: wA * clamp(qq * 2) });
+      // ------------------------------------------------------------ m1b/m1c: eq. (2.3) term by term, two slopes, worked bins
+      const fA = env(t, m1b - 0.2, m2 - 0.1, 0.6, 0.6);
+      if (fA > 0) {
+        heading(d2, 'Palmgren–Miner, written out', 110, 150, fA, { sub: 'DNV-RP-C203 [2.2], eq. (2.3)' });
+        d2.panel(80, 210, 1760, 250, { alpha: fA });
+        const H = (k, x) => `\\htmlClass{fw-f10E-${k}}{${x}}`;
+        formulaWalk(ctx, t, {
+          id: 'f10E', x: 130, y: 250, size: 56, alpha: fA, tOff: m1c - 0.2,
+          latex: `D = ${H('s', '\\sum_{i=1}^{k} \\dfrac{n_i}{N_i}')} = ${H('a', '\\dfrac{1}{\\bar a}')} \\sum_{i=1}^{k} n_i\\, ${H('m', '(\\Delta\\sigma_i)^{m}')} \\;\\le\\; ${H('e', '\\eta')}`,
+          rows: [
+            { k: 's', sym: '\\tfrac{n_i}{N_i}', text: 'cycles counted in block i ÷ cycles to failure at Δσᵢ', t: at('m1b', 'D is the sum'), col: PAL.orange },
+            { k: 'a', sym: 'N_i = \\bar a\\, \\Delta\\sigma_i^{-m}', text: 'the S-N curve put in for Nᵢ', t: at('m1b', 'From the S N curve'), col: PAL.violet },
+            { k: 'm', sym: '\\Delta\\sigma_i^{\\,m}', text: 'each cycle counts with its range to the power m', sub: 'm = 3: twice the range, eight times the damage', t: at('m1b', "That's why"), col: PAL.amber },
+          ],
+          legend: { x: 130, y: 500, w: 820, gap: 100, symW: 250, size: 23, symSize: 32, alpha: 1 - seg(t, m1c - 0.4, 0.6) },
         });
+        const eq = seg(t, at('m1b', 'D is the sum') - 0.4, 0.6);
+        d2.text('η: usage factor = 1 / DFF (see the design check)', 1240, 420, { size: 20, color: PAL.ink2, alpha: fA * eq });
+        d2.text('k: number of stress blocks (≥ 20)', 1240, 392, { size: 20, color: PAL.ink2, alpha: fA * eq });
+        // two slopes
+        const tq = seg(t, m1c - 0.3, 0.6);
+        d2.panel(1000, 480, 840, 520, { alpha: fA * seg(t, m1c - 0.3, 0.6) });
+        if (tq > 0) {
+          d2.text('two-slope curve: each range to its own branch', 1030, 530, { size: 23, weight: 750, alpha: fA * tq });
+          tex.show('f10two', `D = \\dfrac{1}{\\bar a_1}\\!\\sum_{\\Delta\\sigma_i > S_1}\\! n_i\\,\\Delta\\sigma_i^{\\,m_1} + \\dfrac{1}{\\bar a_2}\\!\\sum_{\\Delta\\sigma_i \\le S_1}\\! n_i\\,\\Delta\\sigma_i^{\\,m_2}`, 1030, 560, { size: 32, alpha: fA * tq });
+          d2.text(`S₁ = ${WS.S1.toFixed(1)} MPa after the thickness correction, m₁ = 3, m₂ = 5`, 1030, 690, { size: 19, color: PAL.ink2, alpha: fA * tq });
+          const b2 = { s: 86.25 };
+          b2.se = b2.s * WS.tf; b2.N = Math.pow(10, WS.la1 - 3 * Math.log10(b2.se));
+          texSteps(ctx, t, 'f10W', [
+            { tex: `${WM.s.toFixed(2)} \\cdot ${WS.tf.toFixed(3)} = ${WM.s_eff.toFixed(1)} < ${WS.S1.toFixed(1)}:\\; N = 10^{${WS.la2.toFixed(3)} - 5\\log ${WM.s_eff.toFixed(1)}} = ${(WM.N / 1e6).toFixed(2)}\\times 10^6`, t: at('m1c', 'A sixty-nine') + 0.5, size: 24, dy: 0, col: PAL.cyan },
+            { tex: `n/N = ${WM.n} / ${(WM.N / 1e6).toFixed(2)}\\times 10^6 = ${(WM.d * 1e5).toFixed(1)}\\times 10^{-5}`, t: at('m1c', 'Twenty-five of them'), size: 26, dy: 52, col: PAL.cyan },
+            { tex: `${b2.s.toFixed(2)} \\cdot ${WS.tf.toFixed(3)} = ${b2.se.toFixed(1)} > ${WS.S1.toFixed(1)}:\\; N = 10^{${WS.la1.toFixed(3)} - 3\\log ${b2.se.toFixed(1)}} = ${(b2.N / 1e5).toFixed(1)}\\times 10^5`, t: at('m1c', 'eighty-six'), size: 24, dy: 120, col: PAL.amber },
+            { tex: `k = ${WM.nbins}\\ \\text{blocks}, \\quad D_{3\\,h} = \\sum_i n_i/N_i = ${(WM.D_3h * 1e4).toFixed(1)}\\times 10^{-4}`, t: at('m1c', 'We have forty-two'), size: 28, dy: 200, col: PAL.orange },
+          ], 1030, 720, { alpha: fA * tq });
+          // mini S-N plot with the two blocks
+          const SP = new Plot(d2, { x: 200, y: 540, w: 700, h: 380, xr: [1e5, 1e8], yr: [40, 160], xlog: true, ylog: true });
+          const pa = fA * tq;
+          d2.panel(80, 480, 900, 520, { alpha: pa });
+          SP.axes({ alpha: pa, xticks: [1e5, 1e6, 1e7, 1e8], yticks: [40, 60, 80, 100, 150], fmtx: pow10, fmty: (v) => String(v), xlabel: 'N', ylabel: 'Δσ after thickness correction [MPa]', fs: 18, ylabelOff: 62 });
+          const cp = [WS.m1, WS.la1, WS.m2, WS.la2];
+          SP.clipBegin(); SP.curve(snCurvePts(cp, 1e5, 1e8), { color: PAL.ink2, width: 3, alpha: pa }); SP.clipEnd();
+          d2.circle(SP.X(WS.N1), SP.Y(WS.S1), 7, { fill: PAL.ink, alpha: pa });
+          d2.text('bend', SP.X(WS.N1) + 10, SP.Y(WS.S1) - 10, { size: 18, color: PAL.ink2, alpha: pa });
+          const p1 = seg(t, at('m1c', 'A sixty-nine') + 0.3, 0.6), p2 = seg(t, at('m1c', 'eighty-six') - 0.2, 0.6);
+          d2.circle(SP.X(WM.N), SP.Y(WM.s_eff), 10, { fill: PAL.cyan, alpha: pa * p1, glow: PAL.cyan });
+          d2.text('branch 2 (m = 5)', SP.X(WM.N) + 14, SP.Y(WM.s_eff) + 26, { size: 19, weight: 750, color: PAL.cyan, alpha: pa * p1 });
+          d2.circle(SP.X(b2.N), SP.Y(b2.se), 10, { fill: PAL.amber, alpha: pa * p2, glow: PAL.amber });
+          d2.text('branch 1 (m = 3)', SP.X(b2.N) + 14, SP.Y(b2.se) - 14, { size: 19, weight: 750, color: PAL.amber, alpha: pa * p2 });
+        }
       }
       chainBar(d2, 5, { alpha: seg(t, 1.6, 0.6) });
       stepCard(d2, t, 5, 'Adding up the damage', 'Palmgren–Miner, sea state by sea state');

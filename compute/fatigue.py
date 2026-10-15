@@ -8,7 +8,7 @@ Chain (one function per link):
                      on the local model, template gap) gives the section moment at each hot spot as a
                      nonlinear function of the flex-joint force; SCFs from hotspot.py (FE hot-spot
                      stress) or from the C203 misalignment formula (girth weld)
-  4. cycle counting  rainflow (ASTM E1049 four-point rule) on 3-hour stress histories
+  4. cycle counting  rainflow (ASTM E1049 three-point method) on 3-hour stress histories
   5. S-N curve       C203 table values, environment, thickness correction (t / 25 mm)^k
   6. damage          Palmgren-Miner per sea state, weighted by probability -> damage per day of
                      riser-connected operation; Weibull closed form as a check
@@ -207,10 +207,18 @@ DELTA_M = 0.006   # girth weld misalignment (hi-lo) [m]
 L_WELD = 0.040    # width of the girth weld cap at the surface [m]
 
 
-def girth_scf(dm, t=0.0381, D=0.9144, L=L_WELD):
-    """C203 eq. (3.9), butt weld in a tubular, equal thickness; delta0 = 0.05t is in the S-N data (Table 3-1)"""
+def girth_scf(dm, t=0.0381, D=0.9144, L=L_WELD, d0=0.05):
+    """C203 eq. (3.9), butt weld in a tubular, equal thickness; delta0 = 0.05t is in the S-N data for as-welded
+    girth welds, 0 for ground welds (Table 3-1)"""
     alpha = 0.91 * L / math.sqrt(D * t)
-    return max(1.0, 1 + 3 * (dm - 0.05 * t) / t * math.exp(-alpha))
+    return max(1.0, 1 + 3 * (dm - d0 * t) / t * math.exp(-alpha))
+
+
+def girth_eff(scf, t=0.0381, D=0.9144):
+    """C203 App. B.5, eq. (B.53): under global bending the local bending from misalignment is driven by the
+    mid-wall stress sigma_gm, so sigma_outside = (SCF - 1) sigma_gm + sigma_go.  Returned as a factor on the
+    outer-fibre nominal stress sigma_go (sigma_gm / sigma_go = (D - t) / D)."""
+    return 1 + (scf - 1) * (D - t) / D
 
 
 def transfer_curves(soil, template, H_max=250e3, n=26):
@@ -241,8 +249,25 @@ def main():
     Hs, curves, diag = transfer_curves(soil, Gap(0.030, K_T))
     # SCFs
     scf = {"hp": hot["welds"]["hpwhh"]["scf"], "lp": hot["welds"]["lpwh"]["scf"]}
+    # thick conductor wall: C203 [4.3.4.2] recommends quadratic extrapolation from 0.4t, 0.9t, 1.4t (eq. 4.9)
+    # for thick-walled structures; use it where it gives the higher hot-spot stress
+    hs_quad = {}
+    for wid, side, hid in (("hpwhh", "out", "hp"), ("lpwh", "in", "lp")):
+        wl = hot["welds"][wid]
+        lv = wl["levels"][1]
+        dd = np.array(lv[side]["d"]) / wl["t"]
+        ss = np.array(lv[side]["surf"])
+        o_ = np.argsort(dd)
+        fq = lambda x: float(np.interp(x, dd[o_], ss[o_]))
+        q_hs = 2.52 * fq(0.4) - 2.24 * fq(0.9) + 0.72 * fq(1.4)
+        hs_quad[hid] = dict(s04=fq(0.4), s09=fq(0.9), s14=fq(1.4), shs=q_hs, scf=q_hs * 1e6 / lv["snom"],
+                            s05=lv[side]["s05"] / 1e6, s15=lv[side]["s15"] / 1e6, shs_lin=lv[side]["shs"] / 1e6,
+                            snom=lv["snom"] / 1e6, scf_lin=scf[hid])
+    scf["lp"] = max(scf["lp"], hs_quad["lp"]["scf"])
+    print("hot spot, linear vs quadratic:", {k: (round(v["scf_lin"], 3), round(v["scf"], 3)) for k, v in hs_quad.items()})
     t_c = 0.0381
-    scf["cg"] = girth_scf(DELTA_M, t_c)
+    scf39 = girth_scf(DELTA_M, t_c)
+    scf["cg"] = girth_eff(scf39, t_c)
     for hs in HOTSPOTS:
         D, t = hs["D"], hs["t"]
         I = np.pi / 64 * (D ** 4 - (D - 2 * t) ** 4)
@@ -412,9 +437,11 @@ def main():
     print("environment lives (days):", {k: round(v) for k, v in env_life.items()})
 
     # ---- sensitivity: stress scaling, misalignment, soil bounds (governing detail)
-    def life_scaled(hsid, factor, cls=None, env=None):
+    def life_scaled(hsid, factor, cls=None, env=None, k=None):
         hs = next(h for h in HOTSPOTS if h["id"] == hsid)
         snh = SN(cls or hs["cls"], env or hs["env"], hs["t"])
+        if k is not None:
+            snh.tf = max(1.0, hs["t"] / T_REF) ** k
         tot = 0.0
         for p, r, c in long_ranges[hsid]:
             tot += p * np.sum(c / snh.N(r * factor)) / (TSIM / 3600)
@@ -423,8 +450,8 @@ def main():
     # misalignment of the girth weld
     sens["misalign"] = []
     for dm in (0.0, 0.002, 0.004, 0.006, 0.008, 0.010, 0.012):
-        s_new = girth_scf(dm, t_c)
-        sens["misalign"].append([dm * 1e3, s_new, life_scaled("cg", s_new / scf["cg"])])
+        s39 = girth_scf(dm, t_c)
+        sens["misalign"].append([dm * 1e3, s39, life_scaled("cg", girth_eff(s39, t_c) / scf["cg"])])
     # soil bounds: recompute transfer curves for LB and UB soils
     sens["soil"] = {}
     for name, fs, e50 in (("LB", 0.6, 0.02), ("BE", 1.0, 0.01), ("UB", 1.5, 0.005)):
@@ -440,10 +467,24 @@ def main():
     # the girth weld made on site instead of in the shop with the pipe rotated: S-N class E ([3.3.7.3])
     sens["class_E"] = life_scaled("cg", 1.0, cls="E")
     print("girth weld as class E:", round(sens["class_E"]))
+    # ways to buy back margin ([7], Table A-9, Table 3-1)
+    s39_g = girth_scf(DELTA_M, t_c, d0=0.0)                       # ground flush: delta0 = 0
+    imp = dict(
+        base=out["damage"]["cg"]["life_days"],
+        tol4=life_scaled("cg", girth_eff(girth_scf(0.004, t_c), t_c) / scf["cg"]),
+        flush_C1=life_scaled("cg", girth_eff(s39_g, t_c) / scf["cg"], cls="C1"), scf39_flush=s39_g,
+        toe_grind=3.5 * life_scaled("cg", 1.0, k=0.15),
+        site_E=sens["class_E"],
+    )
+    sens["improve"] = imp
+    # conductor housing weld welded from the outside only: the inside is a weld root, F3 with k = 0.10 ([2.4.3])
+    sens["lp_root_F3"] = life_scaled("lp", 1.0, cls="F3", k=0.10)
+    print("conductor housing weld, one-sided root F3:", round(sens["lp_root_F3"]))
+    print("improvement options (days):", {k: round(v, 3) for k, v in imp.items()})
     out["sens"] = sens
     out["hotspots"] = [{k: v for k, v in hs.items()} for hs in HOTSPOTS]
     out["scf"] = scf
-    out["girth"] = dict(delta_m=DELTA_M, t=t_c, D=0.9144, L=L_WELD, scf=scf["cg"],
+    out["girth"] = dict(delta_m=DELTA_M, t=t_c, D=0.9144, L=L_WELD, scf=scf["cg"], scf39=scf39, gm_ratio=(0.9144 - t_c) / 0.9144,
                         alpha=0.91 * L_WELD / math.sqrt(0.9144 * t_c))
     out["governing"] = gov["id"]
     out["dff"] = 10
@@ -451,6 +492,45 @@ def main():
     for hs in HOTSPOTS:
         L_ = out["damage"][hs["id"]]["life_days"]
         print(f"{hs['id']}: life {L_:.0f} d, allowable with DFF 10: {L_ / 10:.0f} d")
+    # ---- worked examples shown in the video
+    wk = {}
+    cg = next(h for h in HOTSPOTS if h["id"] == "cg")
+    Dc, tc_ = cg["D"], cg["t"]
+    Ic = np.pi / 64 * (Dc ** 4 - (Dc - 2 * tc_) ** 4)
+    H25 = 25e3
+    M25 = float(np.interp(H25, Hs, curves["cg"]))
+    wk["nominal"] = dict(D=Dc, t=tc_, Di=Dc - 2 * tc_, I=Ic, W=Ic / (Dc / 2), H=H25, M=M25,
+                         s_nom=M25 / (Ic / (Dc / 2)) / 1e6, s_gm=M25 / (Ic / (Dc / 2)) / 1e6 * (Dc - tc_) / Dc,
+                         W_casing=next(h for h in HOTSPOTS if h["id"] == "hp")["W"])
+    snx = SN("D", "cp", tc_)
+    ex = []
+    for ds in (60.0, 100.0):
+        de = ds * snx.tf
+        upper = math.log10(de) >= snx.logS1
+        la, m = (snx.la1, snx.m1) if upper else (snx.la2, snx.m2)
+        ex.append(dict(ds=ds, ds_eff=de, branch=1 if upper else 2, loga=la, m=m, logN=la - m * math.log10(de),
+                       N=10 ** (la - m * math.log10(de))))
+    wk["sn"] = dict(tf=snx.tf, S1=10 ** snx.logS1, N1=snx.N1, la1=snx.la1, la2=snx.la2, m1=snx.m1, m2=snx.m2,
+                    examples=ex, la1_air=SN_AIR["D"][1], la1_fc=SN_FC["D"][1])
+    Hh = out["example"]["hist"]
+    edges, nn = Hh["edges"], Hh["n"]
+    kb = int(np.argmax(Hh["dmg"]))
+    smid = 0.5 * (edges[kb] + edges[kb + 1])
+    Nb = float(sns["cg"].N(np.array([smid]))[0])
+    wk["miner"] = dict(bin_lo=edges[kb], bin_hi=edges[kb + 1], s=smid, s_eff=smid * sns["cg"].tf, n=nn[kb], N=Nb,
+                       d=nn[kb] / Nb, d_bin=Hh["dmg"][kb], D_3h=Hh["D_3h"], nbins=int(sum(1 for v in nn if v > 0)),
+                       cycles=Hh["cycles"])
+    dg = out["damage"]["cg"]
+    h_, q_ = dg["weibull_h"], dg["weibull_q"]
+    snc = sns["cg"]
+    n0 = dg["nu_day"]
+    wk["weibull"] = dict(h=h_, q=q_, q_t=q_ * snc.tf, nu_day=dg["nu_day"], G1=float(G(1 + snc.m1 / h_)),
+                         G2=float(G(1 + snc.m2 / h_)), S1=10 ** snc.logS1, x=(10 ** snc.logS1 / (q_ * snc.tf)) ** h_,
+                         n0=n0, ds0=q_ * math.log(n0) ** (1 / h_), life_wb1=dg["life_wb1"], life_wb2=dg["life_wb2"],
+                         life=dg["life_days"])
+    wk["hotspot"] = hs_quad
+    out["worked"] = wk
+    print("worked:", json.dumps(wk, default=float)[:900])
     with open(DATA + "fatigue.json", "w") as fh:
         json.dump(out, fh)
     print("written")

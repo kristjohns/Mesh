@@ -26,9 +26,10 @@ PROJECTS = {
         maxrate="5M",  # keeps every web part under the artifact file limit
         chapters=[("", "Cold open"), ("", "Fatigue in a nutshell"), ("", "The C203 chain"),
                   ("", "Where will it crack?"), ("1", "Sea states and riser loads"),
-                  ("2", "From force to moment"), ("", "Hot-spot stress and SCFs"),
-                  ("3", "Rainflow counting"), ("4", "Choosing the S-N curve"), ("5", "Miner's rule and long-term damage"),
-                  ("6", "Design fatigue factor and results"), ("", "What moves the answer"), ("", "Recap")],
+                  ("2", "From force to moment"), ("", "From moment to nominal stress"), ("", "Hot-spot stress from the FE model"),
+                  ("", "Misalignment at the girth weld"), ("3", "Rainflow counting"), ("4", "Choosing the S-N curve"),
+                  ("", "Reading the S-N equation"), ("5", "Miner's rule and long-term damage"), ("", "The Weibull shortcut"),
+                  ("6", "Design fatigue factor and results"), ("", "What moves the answer"), ("", "Buying back margin"), ("", "Recap")],
     ),
 }
 

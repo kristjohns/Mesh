@@ -125,7 +125,7 @@ export default async function transfer(ctx) {
         d2.panel(220, 680, 680, 380, { alpha: mA * 0.9 });
         d2.text('force F(t) [kN]', 240, 716, { size: 20, weight: 700, color: PAL.orange, alpha: mA });
         d2.panel(940, 220, 900, 450, { alpha: mA * 0.9 });
-        d2.text('stress σ(t) [MPa]', 960, 256, { size: 20, weight: 700, color: PAL.amber, alpha: mA });
+        d2.text('nominal stress σ(t) [MPa], before the SCF', 960, 256, { size: 20, weight: 700, color: PAL.amber, alpha: mA });
         const inPts = [], outPts = [];
         const n = Math.floor(tn / ex.dt);
         for (let k = 0; k <= n; k++) {

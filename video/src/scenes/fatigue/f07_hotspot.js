@@ -5,14 +5,15 @@ import { makeBackdrop, renderViewport, studioScene, envMap, cameraPath } from '.
 import { Plot } from '../../engine/draw2d.js';
 import { makeHotspotFE, drawProfile, divBar, divergingCss } from '../../models/hotspotfe.js';
 import { keyLine } from '../common.js';
-import { chainBar, heading } from './fcommon.js';
+import { chainBar, heading, formulaWalk, texSteps, refChip } from './fcommon.js';
 import { PAL, seg, env, ease, clamp, lerp, rgba } from '../../engine/util.js';
 
 export default async function hotspot(ctx) {
   const { d2, cue, at, renderer, data, tex } = ctx;
   const HS = data.hotspot, F = data.fatigue;
   const back = makeBackdrop();
-  const l1 = cue('l1'), l2 = cue('l2'), l3 = cue('l3'), l4 = cue('l4');
+  const l1 = cue('l1'), l1b = cue('l1b'), l2 = cue('l2'), l2b = cue('l2b'), l3 = cue('l3'), l3q = cue('l3q'), l3b = cue('l3b');
+  const WK = F.worked.hotspot;
   const fe = studioScene({ hemi: 1.4, key: 1.5 });
   const model = makeHotspotFE(HS.surface, { vmax: 30, env: envMap(renderer) });
   const zclip = new THREE.Plane(new THREE.Vector3(0, 1, 0), 0.3);
@@ -23,8 +24,8 @@ export default async function hotspot(ctx) {
   const t3d = l2 - 0.2;
   const camf = cameraPath(cam, [
     { t: t3d, pos: [-5.6, 3.4, 7.4], tgt: [-0.75, 1.75, -0.2], fov: 26 },
-    { t: at('l2', 'read the surface') - 1.6, pos: [-4.0, 2.6, 5.6], tgt: [-0.5, 1.5, -0.1], fov: 26, e: ease.inOutSine },
-    { t: at('l2', 'read the surface') + 0.4, pos: [-0.36, 1.21, 0.42], tgt: [-0.28, 1.2, 0.0], fov: 24 },
+    { t: at('l2', 'Read the surface') - 1.6, pos: [-4.0, 2.6, 5.6], tgt: [-0.5, 1.5, -0.1], fov: 26, e: ease.inOutSine },
+    { t: at('l2', 'Read the surface') + 0.4, pos: [-0.36, 1.21, 0.42], tgt: [-0.28, 1.2, 0.0], fov: 24 },
   ]);
   const W = HS.welds;
   const hp = W.hpwhh.levels[1], lp = W.lpwh.levels[1];
@@ -32,47 +33,108 @@ export default async function hotspot(ctx) {
   const sec = HS.section_szz;
 
   return {
-    sfx: [{ t: at('l2', 'read the surface') - 0.6, type: 'whoosh' }],
+    sfx: [{ t: at('l2', 'Read the surface') - 0.6, type: 'whoosh' }],
     render(t) {
       back.render(renderer);
-      // ---------------------------------------------------------- l1: nominal stress and SCF
+      // ---------------------------------------------------------- l1/l1b: what the hot-spot stress is
       const nA = env(t, 0.4, l2 - 0.1, 0.6, 0.6);
       if (nA > 0) {
-        heading(d2, 'Nominal stress and stress concentration', 120, 170, nA, { sub: 'what the weld actually sees' });
-        // pipe cross-section with linear bending stress
-        const cx = 470, cy = 590, Ro = 230, Ri = 190;
-        const g = d2.g;
-        g.save();
-        g.globalAlpha = nA;
-        for (let k = 0; k < 180; k++) {
-          const a0 = (k / 180) * Math.PI * 2, a1 = ((k + 1.2) / 180) * Math.PI * 2;
-          const x = Math.cos((a0 + a1) / 2);
-          g.beginPath();
-          g.arc(cx, cy, Ro, a0, a1);
-          g.arc(cx, cy, Ri, a1, a0, true);
-          g.closePath();
-          g.fillStyle = divergingCss(-x * 0.95);
-          g.fill();
+        heading(d2, 'Hot-spot stress', 110, 150, nA, { sub: 'structural stress at the weld toe, DNV-RP-C203 sections 3 and 4' });
+        d2.panel(80, 210, 860, 790, { alpha: nA });
+        // schematic: wall with a weld at a thickness step, surface stress rising towards the toe
+        const x0 = 140, xt = 600, yS = 520, T = 70;
+        d2.poly([[x0, yS], [xt, yS], [xt, yS + T], [x0, yS + T]], { fill: 'rgba(130,160,185,0.40)', stroke: '#9fb3c4', width: 2, alpha: nA });
+        d2.poly([[xt + 70, yS - 90], [880, yS - 90], [880, yS + T], [xt, yS + T], [xt, yS]], { fill: 'rgba(130,160,185,0.55)', stroke: '#9fb3c4', width: 2, alpha: nA });
+        d2.poly([[xt - 8, yS], [xt + 70, yS - 90], [xt + 70, yS - 40], [xt + 14, yS]], { fill: 'rgba(176,152,108,0.75)', stroke: '#d1bd92', width: 1.5, alpha: nA });
+        d2.text('weld', xt + 40, yS - 100, { size: 20, weight: 700, color: '#d1bd92', align: 'center', alpha: nA });
+        for (const yy of [yS + 18, yS + T - 18]) d2.arrow(x0 - 10, yy, x0 - 60, yy, { color: PAL.cyan, width: 3, head: 11, alpha: nA });
+        const tq = seg(t, at('l1', 'concentrates') - 0.4, 0.6);
+        d2.circle(xt - 4, yS, 10 + 2 * Math.sin(t * 6), { stroke: PAL.red, width: 3, alpha: nA * tq, glow: PAL.red });
+        d2.text('weld toe', xt - 20, yS + T + 34, { size: 20, weight: 750, color: PAL.red, align: 'center', alpha: nA * tq });
+        // surface stress along the wall
+        const pyB = 470, pyN = 420;
+        const sxy = (u) => {                                   // u = distance from the toe in wall thicknesses
+          const sN = 1.0, struct = sN + 0.9 * Math.exp(-u / 1.4), notch = 0.8 * Math.exp(-u / 0.12);
+          return [struct, notch];
+        };
+        const Yp = (v) => pyB - v * 80;
+        const pq = seg(t, at('l1', 'concentrates') - 0.2, 1.4, ease.inOutSine);
+        const nq = seg(t, at('l1b', 'nonlinear peak') - 0.3, 1.0);
+        if (pq > 0) {
+          const ps = [], pn = [];
+          for (let i = 0; i <= 120; i++) {
+            const x = lerp(x0, xt - 4, i / 120);
+            const u = (xt - 4 - x) / T;
+            const [st, no] = sxy(u);
+            ps.push([x, Yp(st)]);
+            pn.push([x, Yp(st + no)]);
+          }
+          d2.line(x0, Yp(1.0), xt, Yp(1.0), { color: PAL.ink2, width: 1.6, dash: [8, 6], alpha: nA * pq });
+          d2.text('nominal', x0 + 4, Yp(1.0) + 24, { size: 19, color: PAL.ink2, alpha: nA * pq });
+          d2.path(ps, { color: PAL.amber, width: 3.5, alpha: nA, progress: pq });
+          if (nq > 0) d2.path(pn.slice(96), { color: PAL.red, width: 3, alpha: nA * nq });
+          const hq = seg(t, at('l1', 'hot spot stress') - 0.3, 0.6);
+          d2.circle(xt - 4, Yp(sxy(0)[0]), 8, { fill: PAL.amber, alpha: nA * hq, glow: PAL.amber });
+          d2.text('σ_hs', xt - 18, Yp(sxy(0)[0]) - 16, { size: 22, weight: 800, color: PAL.amber, align: 'right', alpha: nA * hq });
+          if (nq > 0) d2.text('notch peak', xt + 10, Yp(sxy(0)[0] + 0.7), { size: 19, weight: 700, color: PAL.red, alpha: nA * nq });
+          d2.text('surface stress', x0, 270, { size: 21, weight: 700, color: PAL.ink, alpha: nA * pq });
         }
-        g.restore();
-        d2.line(cx, cy - Ro - 40, cx, cy + Ro + 40, { color: PAL.ink2, width: 1.5, dash: [8, 6], alpha: nA });
-        d2.text('neutral axis', cx, cy + Ro + 70, { size: 20, color: PAL.ink2, align: 'center', alpha: nA });
-        d2.momentArrow(cx, cy, Ro + 50, -Math.PI * 0.85, -Math.PI * 0.15, { color: PAL.amber, width: 4, alpha: nA * seg(t, l1 + 0.5, 0.8), progress: seg(t, l1 + 0.5, 1.0), glow: PAL.amber });
-        d2.text('M', cx, cy - Ro - 70, { size: 34, weight: 800, color: PAL.amber, align: 'center', alpha: nA * seg(t, l1 + 0.8, 0.6) });
-        d2.text('tension', cx - Ro - 20, cy + 8, { size: 22, weight: 700, color: PAL.red, align: 'right', alpha: nA });
-        d2.text('compression', cx + Ro + 20, cy + 8, { size: 22, weight: 700, color: '#6f8cff', alpha: nA });
-        const fq = seg(t, at('l1', 'section modulus') - 0.4, 0.6);
-        d2.panel(860, 300, 900, 170, { alpha: nA * fq, accent: PAL.cyan });
-        tex.show('f07nom', '\\sigma_{nom} = \\dfrac{M}{W}, \\qquad W = \\dfrac{I}{D/2}', 900, 330, { size: 44, alpha: nA * fq });
-        const sq = seg(t, at('l1', 'concentrates') - 0.6, 0.6);
-        d2.panel(860, 510, 900, 330, { alpha: nA * sq, accent: PAL.red });
-        d2.text('but the weld geometry raises it locally', 900, 560, { size: 26, weight: 700, color: PAL.red, alpha: nA * sq });
-        tex.show('f07scf', '\\sigma_{hs} = SCF \\cdot \\sigma_{nom}', 900, 600, { size: 46, alpha: nA * sq });
-        d2.text('SCF: stress concentration factor, from', 900, 740, { size: 22, color: PAL.ink2, alpha: nA * sq });
-        d2.text('FE hot-spot analysis or C203 formulas', 900, 772, { size: 22, color: PAL.ink2, alpha: nA * sq });
+        // l1b: through-thickness decomposition at the toe
+        const dA = nA * seg(t, l1b - 0.2, 0.7);
+        if (dA > 0) {
+          const yT = 690, yB = 900, cw = 110;
+          const parts = [
+            ['membrane', PAL.cyan, at('l1b', 'membrane part'), (f) => 0.55],
+            ['bending', PAL.green, at('l1b', 'bending part'), (f) => 0.45 * (1 - 2 * f)],
+            ['notch peak', PAL.red, at('l1b', 'nonlinear peak'), (f) => 0.9 * Math.exp(-f / 0.06) - 0.06],
+            ['total at the toe', PAL.amber, at('l1b', 'nonlinear peak') + 1.2, (f) => 0.55 + 0.45 * (1 - 2 * f) + 0.9 * Math.exp(-f / 0.06) - 0.06],
+          ];
+          parts.forEach(([lab, col, tt, fn], k) => {
+            const q = seg(t, tt - 0.3, 0.7);
+            if (q <= 0) return;
+            const xa = 140 + k * 190;
+            d2.line(xa, yT - 10, xa, yB + 10, { color: PAL.ink3, width: 2, alpha: dA * q });
+            const pts = [[xa, yT]];
+            for (let i = 0; i <= 40; i++) { const f = i / 40; pts.push([xa + fn(f) * cw * 0.8 * q, lerp(yT, yB, f)]); }
+            pts.push([xa, yB]);
+            d2.poly(pts, { fill: rgba(col, 0.28), stroke: col, width: 2.2, alpha: dA * q });
+            d2.text(lab, xa + 10, yB + 42, { size: 19, weight: 700, color: col, alpha: dA * q });
+            if (k < 3) d2.text(k < 2 ? '+' : '=', xa + 160, (yT + yB) / 2 + 12, { size: 38, weight: 700, color: PAL.ink2, alpha: dA * seg(t, parts[k + 1][2] - 0.3, 0.5), align: 'center' });
+          });
+          d2.text('through the wall at the toe', 120, 640, { size: 21, weight: 700, alpha: dA });
+          const sq = seg(t, at('l1b', 'structural stress') - 0.3, 0.6);
+          if (sq > 0) d2.panel(116, yT - 26, 324, yB - yT + 86, { r: 12, alpha: dA * sq, fill: 'rgba(255,183,3,0.06)', border: rgba(PAL.amber, 0.9), borderWidth: 2, shadow: false });
+        }
+        // right: the definition, term by term
+        d2.panel(980, 210, 860, 790, { alpha: nA });
+        refChip(d2, 'C203 [3.1], [4.3.1]', 1010, 246, nA);
+        formulaWalk(ctx, t, {
+          id: 'f07hs', x: 1030, y: 290, size: 64, alpha: nA, tOff: l1b - 0.2,
+          parts: [['h', '\\sigma_{hs}'], [null, ' = '], ['k', 'SCF'], [null, '\\cdot'], ['n', '\\sigma_{nom}']],
+          rows: [
+            { k: 'h', sym: '\\sigma_{hs}', text: 'hot-spot stress at the weld toe', sub: 'the structural stress the weld sees', t: at('l1', 'hot spot stress'), col: PAL.amber },
+            { k: 'n', sym: '\\sigma_{nom}', text: 'nominal stress', sub: 'M / W from the beam model', t: at('l1', 'the nominal stress,'), col: PAL.cyan },
+            { k: 'k', sym: 'SCF', text: 'stress concentration factor', sub: 'from FE hot-spot analysis or C203 formulas', t: at('l1', 'stress concentration factor'), col: PAL.violet },
+          ],
+          legend: { x: 1030, y: 420, w: 770, gap: 80, symW: 140, size: 24, symSize: 32, alpha: 1 - seg(t, l1b - 0.3, 0.6) },
+        });
+        const bq = seg(t, l1b + 0.2, 0.6);
+        if (bq > 0) {
+          const items = [
+            ['membrane + bending', 'structural, or hot-spot, stress', PAL.amber, at('l1b', 'structural stress')],
+            ['nonlinear notch peak', 'left out: it is in the hot-spot S-N curve', PAL.red, at('l1b', 'left out on purpose')],
+          ];
+          items.forEach(([a, b, col, tt], k) => {
+            const q = seg(t, tt - 0.3, 0.6);
+            const y = 470 + k * 130;
+            d2.rect(1014, y - 32, 5, 90, { fill: col, alpha: nA * bq * q });
+            d2.text(a, 1036, y, { size: 28, weight: 750, color: col, alpha: nA * bq * q });
+            d2.text(b, 1036, y + 40, { size: 23, color: PAL.ink2, alpha: nA * bq * q });
+          });
+        }
       }
       // ---------------------------------------------------------- l2: 3D model then hot-spot read-out (HP weld)
-      const zoomT = at('l2', 'read the surface');
+      const zoomT = at('l2', 'Read the surface');
       const mA = env(t, l2 - 0.3, zoomT + 0.6, 0.7, 0.5);
       if (mA > 0) {
         camf(t);
@@ -117,11 +179,11 @@ export default async function hotspot(ctx) {
         // surface stress vs distance (right)
         hotspotPlot(d2, tex, t, hA, {
           box: [960, 200, 880, 780], lev: hp, t_, side: 'out', id: 'hp',
-          t1: at('l2', 'read the surface'), t2: at('l2', 'extrapolate'), t3: at('l2', 'that gives'),
+          t1: at('l2', 'Read the surface'), t2: at('l2b', 'extrapolate'), t3: at('l2b', 'that gives'), wk: WK.hp,
         });
       }
       // ---------------------------------------------------------- l3: conductor housing weld, both surfaces
-      const bA = env(t, l3 - 0.1, l4 - 0.1, 0.5, 0.5);
+      const bA = env(t, l3 - 0.1, ctx.duration, 0.5, 0.5);
       if (bA > 0) {
         heading(d2, 'B · conductor housing weld', 100, 150, bA, { sub: 'the inside is the hot spot' });
         const box = [80, 200, 820, 800];
@@ -172,61 +234,26 @@ export default async function hotspot(ctx) {
         d2.text('section on the tension side, axial stress [MPa]', box[0] + 20, box[1] + 34, { size: 20, weight: 650, color: PAL.ink2, alpha: bA });
         hotspotPlot(d2, tex, t, bA, {
           box: [960, 200, 880, 700], lev: lp, t_, side: 'both', id: 'lp',
-          t1: at('l3', 'outside is'), t2: at('l3', 'The inside') - 0.2, t3: at('l3', 'with a factor'),
+          t1: at('l3', 'outside is'), t2: at('l3', 'The inside') - 0.2, t3: at('l3', 'hot spot. That'),
+          quad: { t: at('l3q', 'quadratic'), t2: at('l3q', 'Here it gives'), wk: WK.lp },
         });
-        keyLine(d2, t, at('l3', 'Always check'), l4 - 0.3, 'Always check both surfaces of a weld', { accent: PAL.amber, size: 30, y: 960 });
-      }
-      // ---------------------------------------------------------- l4: girth weld misalignment, summary
-      const cA = env(t, l4 - 0.1, ctx.duration, 0.5, 0.5);
-      if (cA > 0) {
-        heading(d2, 'C · conductor girth weld', 100, 150, cA, { sub: 'nominal stress × SCF for misalignment' });
-        const cx = 480, cy = 470, T = 120, dm = 34;
-        d2.panel(80, 200, 820, 520, { alpha: cA });
-        // two walls with hi-lo misalignment
-        d2.poly([[cx - 360, cy - T / 2], [cx - 30, cy - T / 2], [cx - 30, cy + T / 2], [cx - 360, cy + T / 2]], { fill: 'rgba(130,160,185,0.4)', stroke: '#9fb3c4', width: 2, alpha: cA });
-        d2.poly([[cx + 30, cy - T / 2 + dm], [cx + 360, cy - T / 2 + dm], [cx + 360, cy + T / 2 + dm], [cx + 30, cy + T / 2 + dm]], { fill: 'rgba(130,160,185,0.4)', stroke: '#9fb3c4', width: 2, alpha: cA });
-        d2.poly([[cx - 60, cy - T / 2], [cx - 20, cy - T / 2 - 18], [cx + 30, cy - T / 2 - 10 + dm * 0.5], [cx + 60, cy - T / 2 + dm], [cx + 60, cy + T / 2 + dm], [cx + 20, cy + T / 2 + dm + 14], [cx - 30, cy + T / 2 + 10], [cx - 60, cy + T / 2]], { fill: 'rgba(176,152,108,0.6)', stroke: '#d1bd92', width: 2, alpha: cA });
-        d2.line(cx - 360, cy, cx - 30, cy, { color: PAL.ink3, width: 1.5, dash: [6, 6], alpha: cA });
-        d2.line(cx + 30, cy + dm, cx + 360, cy + dm, { color: PAL.ink3, width: 1.5, dash: [6, 6], alpha: cA });
-        const ph = 0.5 + 0.5 * Math.sin(t * 2.2);
-        for (const s of [-1, 1]) d2.arrow(cx + s * 380, cy + (s > 0 ? dm : 0), cx + s * (410 + 30 * ph), cy + (s > 0 ? dm : 0), { color: PAL.cyan, width: 4, head: 14, alpha: cA });
-        const dq = seg(t, at('l4', 'six millimetres') - 0.3, 0.6);
-        d2.dim(cx + 250, cy - T / 2, cx + 250, cy - T / 2 + dm, '', { color: PAL.amber, alpha: cA * dq });
-        d2.text('δm = 6 mm', cx + 270, cy - T / 2 + dm / 2 + 8, { size: 24, weight: 800, color: PAL.amber, alpha: cA * dq });
-        d2.dim(cx - 300, cy - T / 2, cx - 300, cy + T / 2, '', { color: PAL.ink2, alpha: cA });
-        d2.text('t = 38.1 mm', cx - 290, cy + 8, { size: 22, weight: 700, color: PAL.ink2, alpha: cA });
-        d2.text('hi-lo misalignment bends the wall locally', cx, cy + T / 2 + dm + 90, { size: 22, color: PAL.ink2, align: 'center', alpha: cA });
-        // formula: C203 eq. (3.9), delta0 from Table 3-1
-        const fq = seg(t, at('l4', 'C two-oh-three gives') - 0.5, 0.7);
-        const G = F.girth;
-        d2.panel(80, 750, 820, 260, { alpha: cA * fq, accent: PAL.amber });
-        tex.show('f07mis', 'SCF = 1 + \\dfrac{3\\,(\\delta_m - \\delta_0)}{t}\\, e^{-\\alpha}', 110, 772, { size: 36, alpha: cA * fq });
-        tex.show('f07mis3', '\\alpha = \\dfrac{0.91\\,L}{\\sqrt{D\\,t}}', 600, 772, { size: 30, alpha: cA * fq, color: PAL.ink2 });
-        tex.show('f07mis2', `= 1 + \\dfrac{3\\,(6 - ${(0.05 * G.t * 1e3).toFixed(1)})}{${(G.t * 1e3).toFixed(1)}} \\cdot ${Math.exp(-G.alpha).toFixed(2)} = ${G.scf.toFixed(2)}`, 110, 880, { size: 36, alpha: cA * seg(t, at('l4', 'one point two seven') - 0.3, 0.6), color: PAL.amber });
-        const lq = cA * seg(t, at('l4', 'exponential') - 0.3, 0.6);
-        d2.text(`L = ${Math.round(G.L * 1e3)} mm weld width`, 625, 912, { size: 18, color: PAL.ink3, alpha: lq });
-        d2.text(`D = ${(G.D * 1e3).toFixed(0)} mm outer diameter`, 625, 938, { size: 18, color: PAL.ink3, alpha: lq });
-        const d0 = seg(t, at('l4', 'five percent') - 0.3, 0.6);
-        d2.tag('δ0 = 0.05t is already in the S-N test data (C203 Table 3-1)', 490, 1040, { size: 19, color: PAL.ink2, align: 'center', alpha: cA * d0, fill: 'rgba(5,14,26,0.92)' });
-        // summary table (right)
-        const sq = seg(t, l4 + 1.0, 0.7);
-        const rows = [
-          ['A', 'HP housing weld', 'hot spot, FE', 'outside', F.scf.hp, PAL.violet],
-          ['B', 'conductor housing weld', 'hot spot, FE', 'inside', F.scf.lp, PAL.cyan],
-          ['C', 'conductor girth weld', 'nominal + C203 formula', 'outside', F.scf.cg, PAL.amber],
-        ];
-        d2.panel(960, 200, 880, 520, { alpha: cA * sq });
-        d2.text('Stress concentration factors', 1000, 255, { size: 30, weight: 750, alpha: cA * sq });
-        rows.forEach(([L, n, m, side, v, col], k) => {
-          const q = seg(t, l4 + 1.4 + k * 0.5, 0.6);
-          const y = 340 + k * 120;
-          d2.circle(1022, y - 8, 20, { fill: rgba(col, 0.25), stroke: col, width: 2.5, alpha: cA * q });
-          d2.text(L, 1022, y, { size: 22, weight: 800, color: col, align: 'center', alpha: cA * q });
-          d2.text(n, 1062, y - 6, { size: 26, weight: 700, alpha: cA * q });
-          d2.text(`${m} · ${side}`, 1062, y + 26, { size: 20, color: PAL.ink2, alpha: cA * q });
-          const lit = k === 2 ? seg(t, at('l4', 'one point two seven'), 0.5) : 1;
-          d2.text(v.toFixed(2), 1790, y + 8, { size: 44, weight: 800, color: col, align: 'right', alpha: cA * q * lit });
-        });
+        keyLine(d2, t, at('l3', 'Always check'), l3q - 0.3, 'Always check both surfaces of a weld', { accent: PAL.amber, size: 30, y: 1042 });
+        // both-sided weld assumed: a one-sided weld would put an F3 root on the inside
+        const rq = env(t, at('l3', 'That assumes') - 0.3, at('l3', 'Always check') - 0.2, 0.5, 0.5);
+        if (rq > 0) {
+          d2.panel(990, 912, 840, 96, { alpha: bA * rq, accent: PAL.red, fill: 'rgba(8,20,34,0.95)' });
+          d2.text('assumed welded from both sides: the inside is a weld toe (D)', 1016, 950, { size: 21, weight: 700, alpha: bA * rq });
+          d2.text(`one-sided weld: inside root, F3, k = 0.10 → ${Math.round(F.sens.lp_root_F3 / F.dff)} days allowed`, 1016, 984, { size: 21, weight: 650, color: PAL.red, alpha: bA * rq * seg(t, at('l3', 'Welded from the outside') - 0.3, 0.6) });
+        }
+        // l3q: quadratic extrapolation formula
+        const qA = bA * env(t, l3q - 0.2, l3b - 0.1, 0.6, 0.5);
+        if (qA > 0) {
+          d2.panel(990, 912, 840, 110, { alpha: qA, accent: PAL.green, fill: 'rgba(8,20,34,0.95)' });
+          tex.show('f07q49', '\\sigma_{hs} = 2.52\\,\\sigma_{0.4t} - 2.24\\,\\sigma_{0.9t} + 0.72\\,\\sigma_{1.4t}', 1016, 926, { size: 30, alpha: qA * seg(t, at('l3q', 'equation four') - 0.4, 0.6) });
+          d2.text('C203 eq. (4.9), recommended for thick walls [4.3.4.2]', 1016, 1006, { size: 18, color: PAL.ink2, alpha: qA * seg(t, at('l3q', 'equation four') - 0.4, 0.6) });
+        }
+        // l3b: tolerances
+        keyLine(d2, t, l3b + 0.2, ctx.duration - 0.2, 'Assumed: housing welds within δ0 = 0.05t (0.8 mm casing, 1.9 mm conductor)', { accent: PAL.cyan, size: 26, y: 1042 });
       }
       chainBar(d2, 2, { alpha: 1 - seg(t, l2 - 0.3, 0.4) + seg(t, zoomT + 0.1, 0.5) });
     },
@@ -234,6 +261,7 @@ export default async function hotspot(ctx) {
 }
 
 // surface stress approaching the toe, with the C203 read-out points and linear extrapolation
+// (o.quad: also the quadratic extrapolation of eq. 4.9 on the inside surface)
 function hotspotPlot(d2, tex, t, a, o) {
   const [bx, by, bw, bh] = o.box;
   const lev = o.lev, t_ = o.t_;
@@ -242,7 +270,8 @@ function hotspotPlot(d2, tex, t, a, o) {
   const all = sides.flatMap((s) => lev[s].surf);
   const ymax = Math.ceil(Math.max(...all, sn) / 10) * 10 + 10;
   d2.panel(bx, by, bw, bh, { alpha: a });
-  const P = new Plot(d2, { x: bx + 110, y: by + 80, w: bw - 170, h: bh - (o.side === 'both' ? 230 : 300), xr: [4, 0], yr: [0, ymax] });
+  const single = o.side !== 'both';
+  const P = new Plot(d2, { x: bx + 110, y: by + 80, w: bw - 170, h: bh - (single ? 400 : 230), xr: [4, 0], yr: [0, ymax] });
   P.axes({ alpha: a, xticks: [4, 3, 2, 1.5, 1, 0.5, 0], yticks: [0, 10, 20, 30, 40].filter((v) => v <= ymax), fs: 19, ylabelOff: 62,
     fmtx: (v) => (v === 0 ? 'toe' : `${v}t`), fmty: (v) => String(v), xlabel: 'distance from the weld toe', ylabel: 'surface stress [MPa]' });
   d2.text('surface stress, tension side (FE)', bx + 30, by + 46, { size: 22, weight: 700, alpha: a });
@@ -250,14 +279,13 @@ function hotspotPlot(d2, tex, t, a, o) {
   d2.line(P.X(4), P.Y(sn), P.X(0), P.Y(sn), { color: PAL.ink2, width: 2, dash: [10, 7], alpha: a });
   d2.text(`nominal ${sn.toFixed(1)}`, P.X(4) + 8, P.Y(sn) - 10, { size: 19, color: PAL.ink2, alpha: a });
   const cols = { out: o.id === 'hp' ? PAL.violet : PAL.cyan, in: PAL.amber };
-  const res = [];
   sides.forEach((s, k) => {
     const L = lev[s];
     const q = seg(t, k === 0 ? o.t1 - 0.4 : o.t2, 1.0);
     const pts = L.d.map((d, i) => [d / t_, L.surf[i]]).filter((p) => p[0] <= 4).sort((p, q2) => p[0] - q2[0]);
     P.curve(pts.slice().reverse(), { color: cols[s], width: 3.2, progress: q, alpha: a });
-    P.points(pts.filter((_, i) => i % 1 === 0).map((p) => p), { color: cols[s], r: 3.5, progress: q, alpha: a * 0.7 });
-    const e = seg(t, k === 0 ? (o.side === 'both' ? o.t1 + 1.2 : o.t2) : o.t2 + 1.0, 1.0, ease.inOutSine);
+    P.points(pts, { color: cols[s], r: 3.5, progress: q, alpha: a * 0.7 });
+    const e = seg(t, k === 0 ? (single ? o.t2 : o.t1 + 1.2) : o.t2 + 1.0, 1.0, ease.inOutSine);
     const s05 = L.s05 / 1e6, s15 = L.s15 / 1e6, shs = L.shs / 1e6;
     if (e > 0) {
       d2.circle(P.X(1.5), P.Y(s15), 9, { fill: cols[s], stroke: '#06101a', width: 2, alpha: a });
@@ -266,16 +294,36 @@ function hotspotPlot(d2, tex, t, a, o) {
       d2.line(P.X(1.5), P.Y(s15), P.X(xe), P.Y(s15 + (shs - s15) * (1.5 - xe) / 1.5), { color: cols[s], width: 3, dash: [9, 6], alpha: a });
       if (e >= 1) d2.circle(P.X(0), P.Y(shs), 11, { fill: cols[s], alpha: a, glow: cols[s] });
     }
-    res.push([s, shs, e, cols[s]]);
   });
+  // quadratic extrapolation on the inside (eq. 4.9)
+  if (o.quad) {
+    const W = o.quad.wk, qq = seg(t, o.quad.t - 0.3, 1.0), qe = seg(t, o.quad.t + 1.2, 1.4, ease.inOutSine);
+    if (qq > 0) {
+      const xs = [0.4, 0.9, 1.4], ys = [W.s04, W.s09, W.s14];
+      xs.forEach((x, i) => d2.poly([[P.X(x), P.Y(ys[i]) - 10], [P.X(x) + 10, P.Y(ys[i])], [P.X(x), P.Y(ys[i]) + 10], [P.X(x) - 10, P.Y(ys[i])]], { fill: PAL.green, alpha: a * qq }));
+      // Lagrange parabola through the three points
+      const Lg = (x) => ys[0] * (x - xs[1]) * (x - xs[2]) / ((xs[0] - xs[1]) * (xs[0] - xs[2]))
+        + ys[1] * (x - xs[0]) * (x - xs[2]) / ((xs[1] - xs[0]) * (xs[1] - xs[2]))
+        + ys[2] * (x - xs[0]) * (x - xs[1]) / ((xs[2] - xs[0]) * (xs[2] - xs[1]));
+      const pc = [];
+      for (let i = 0; i <= 40; i++) { const x = lerp(1.6, lerp(1.6, 0, qe), i / 40); pc.push([P.X(x), P.Y(Lg(x))]); }
+      if (qe > 0) d2.path(pc, { color: PAL.green, width: 3, dash: [4, 5], alpha: a });
+      if (qe >= 1) d2.circle(P.X(0), P.Y(W.shs), 11, { fill: PAL.green, alpha: a, glow: PAL.green });
+    }
+  }
   // results
   const rq = seg(t, o.t3 - 0.3, 0.6);
-  if (o.side !== 'both') {
-    tex.show(`f07ext${o.id}`, '\\sigma_{hs} = 1.5\\,\\sigma_{0.5t} - 0.5\\,\\sigma_{1.5t}', bx + 40, by + bh - 120, { size: 34, alpha: a * seg(t, o.t2, 0.6) });
-    d2.text(`SCF = ${(lev[o.side].shs / lev.snom).toFixed(2)}`, bx + bw - 40, by + bh - 50, { size: 40, weight: 800, color: cols[o.side], align: 'right', alpha: a * rq });
+  if (single) {
+    const W = o.wk;
+    tex.show(`f07ext${o.id}`, '\\sigma_{hs} = 1.5\\,\\sigma_{0.5t} - 0.5\\,\\sigma_{1.5t}', bx + 40, by + bh - 232, { size: 34, alpha: a * seg(t, o.t2, 0.6) });
+    tex.show(`f07exn${o.id}`, `= 1.5 \\cdot ${W.s05.toFixed(1)} - 0.5 \\cdot ${W.s15.toFixed(1)} = ${W.shs_lin.toFixed(1)}\\ \\mathrm{MPa}`, bx + 40, by + bh - 172, { size: 32, alpha: a * seg(t, o.t3 - 1.2, 0.6), color: cols[o.side] });
+    tex.show(`f07exs${o.id}`, `SCF = \\dfrac{${W.shs_lin.toFixed(1)}}{${W.snom.toFixed(1)}} = ${W.scf_lin.toFixed(2)}`, bx + 40, by + bh - 112, { size: 36, alpha: a * rq, color: cols[o.side] });
   } else {
     const so = lev.out.shs / lev.snom, si = lev.in.shs / lev.snom;
-    d2.text(`outside: SCF ${so.toFixed(2)}`, bx + 40, by + bh - 50, { size: 30, weight: 750, color: cols.out, alpha: a * seg(t, o.t1 + 2.0, 0.6) });
-    d2.text(`inside: SCF ${si.toFixed(2)}`, bx + bw - 40, by + bh - 50, { size: 36, weight: 800, color: cols.in, align: 'right', alpha: a * rq });
+    d2.text(`outside: SCF ${so.toFixed(2)}`, bx + 40, by + bh - 50, { size: 28, weight: 750, color: cols.out, alpha: a * seg(t, o.t1 + 2.0, 0.6) });
+    const qd = o.quad ? seg(t, o.quad.t2 - 0.3, 0.6) : 0;
+    d2.text(`inside: SCF ${si.toFixed(2)}`, bx + bw - 40, by + bh - 50, { size: 30, weight: 800, color: cols.in, align: 'right', alpha: a * rq * (1 - qd) });
+    if (qd > 0) d2.text(`inside, quadratic: SCF ${o.quad.wk.scf.toFixed(2)}`, bx + bw - 40, by + bh - 50, { size: 30, weight: 800, color: PAL.green, align: 'right', alpha: a * qd });
+    d2.text('SCF relative to the outer-fibre nominal stress', bx + 40, by + bh - 14, { size: 16, color: PAL.ink3, alpha: a });
   }
 }

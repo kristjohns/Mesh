@@ -2,14 +2,14 @@
 // variable amplitude (no fatigue limit).
 import { makeBackdrop } from '../../engine/env.js';
 import { Plot } from '../../engine/draw2d.js';
-import { chainBar, stepCard, pow10, snCurvePts, snS } from './fcommon.js';
+import { chainBar, stepCard, pow10, snCurvePts, snS, refChip } from './fcommon.js';
 import { PAL, seg, env, ease, clamp, lerp, rgba, mixHex } from '../../engine/util.js';
 
 export default async function sncurve(ctx) {
   const { d2, cue, at, renderer, data, tex } = ctx;
   const F = data.fatigue;
   const back = makeBackdrop();
-  const n1 = cue('n1'), n2 = cue('n2'), n3 = cue('n3'), n4 = cue('n4'), n5 = cue('n5');
+  const n1 = cue('n1'), n2 = cue('n2'), n3 = cue('n3');
   const classes = ['B1', 'B2', 'C', 'C1', 'C2', 'D', 'E', 'F', 'F1', 'F3', 'G', 'W1', 'W2', 'W3'];
   const air = {}, cp = {}, fc = {};
   for (const c of classes) {
@@ -64,7 +64,7 @@ export default async function sncurve(ctx) {
           d2.circle(P.X(ka.N), P.Y(ka.S), 9, { fill: PAL.cyan, alpha: eA * kq1, glow: PAL.cyan });
           d2.text('bend at 10⁷', P.X(ka.N) + 10, P.Y(ka.S) - 16, { size: 21, weight: 750, color: PAL.cyan, alpha: eA * kq1 });
           d2.text('m = 3', P.X(1e5) + 30, P.Y(snS(air.D, 1e5)) - 22, { size: 22, weight: 800, color: PAL.cyan, alpha: eA * kq1 });
-          d2.text('m = 5', P.X(1e8) - 10, P.Y(snS(air.D, 1e8)) - 18, { size: 22, weight: 800, color: PAL.cyan, alpha: eA * seg(t, at('n3', 'slope of five') - 0.2, 0.5) * (1 - seg(t, n5, 0.5)) });
+          d2.text('m = 5', P.X(1e8) - 10, P.Y(snS(air.D, 1e8)) - 18, { size: 22, weight: 800, color: PAL.cyan, alpha: eA * seg(t, at('n3', 'bend moves') - 0.2, 0.5) });
           const kq2 = seg(t, at('n3', 'one million') - 0.2, 0.5);
           d2.circle(P.X(kc.N), P.Y(kc.S), 9, { fill: PAL.amber, alpha: eA * kq2, glow: PAL.amber });
           d2.text('bend at 10⁶', P.X(kc.N) - 14, P.Y(kc.S) + 36, { size: 21, weight: 750, color: PAL.amber, align: 'right', alpha: eA * kq2 });
@@ -78,29 +78,6 @@ export default async function sncurve(ctx) {
           d2.text('D curve', P.x + 30, P.y + P.h - 156, { size: 22, weight: 800, color: PAL.ink2, alpha: eA * qa });
           const ours = seg(t, at('n3', 'Our welds') - 0.2, 0.6);
           if (ours > 0) d2.check(P.x + 88 + d2.measure('seawater + cathodic protection', 21, 650) + 26, P.y + P.h - 120 + 36 - 7, 13, { progress: ours, alpha: eA });
-          // n4: thickness-corrected curve for the conductor
-          const tq = seg(t, at('n4', 'thirty-eight') - 0.3, 1.0);
-          if (tq > 0) {
-            const shifted = snCurvePts(cp.D, 1e4, 1e9).map(([N, S]) => [N, S / tfac]);
-            P.clipBegin();
-            P.curve(shifted, { color: PAL.orange, width: 3, dash: [6, 6], progress: tq, alpha: eA });
-            P.clipEnd();
-            d2.text('D, seawater + CP, t = 38.1 mm', P.X(1e9) - 6, P.Y(snS(cp.D, 1e9) / tfac) + 30, { size: 19, weight: 750, color: PAL.orange, align: 'right', alpha: eA * tq * (1 - seg(t, n5, 0.5)) });
-          }
-          // n5: no fatigue limit
-          const vq = seg(t, n5 + 0.2, 0.8);
-          if (vq > 0) {
-            const y = P.Y(kc.S);
-            d2.line(P.X(kc.N), y, P.X(1e9), y, { color: PAL.ink2, width: 2.5, dash: [10, 8], alpha: eA * vq });
-            d2.text('no cut-off here', P.X(3e8), y - 14, { size: 20, weight: 700, color: PAL.ink2, align: 'center', alpha: eA * vq });
-            d2.cross(P.X(3e8), y + 34, 16, { progress: seg(t, at('n5', 'no fatigue limit'), 0.8), alpha: eA });
-            const bq = seg(t, at('n5', 'still do damage') - 0.2, 0.8);
-            P.clipBegin();
-            const br = snCurvePts(cp.D, kc.N, 1e9);
-            P.curve(br, { color: PAL.green, width: 6, progress: bq, alpha: eA, glow: PAL.green });
-            P.clipEnd();
-            d2.text('small cycles still count (m = 5)', P.X(1.2e8), P.Y(snS(cp.D, 1.2e8)) - 26, { size: 21, weight: 750, color: PAL.green, alpha: eA * bq });
-          }
         }
       }
       // ------------------------------------------------------------ right column
@@ -160,44 +137,29 @@ export default async function sncurve(ctx) {
         d2.text('misalignment beyond 0.05t: add an SCF', gx, 750, { size: 18, color: PAL.ink3, alpha: aA * q2 });
       }
       // n3: environment summary
-      const vA = env(t, n3 + 0.4, n4 - 0.1, 0.6, 0.5);
+      const vA = env(t, n3 + 0.4, ctx.duration, 0.6, 0.5);
       if (vA > 0) {
-        d2.panel(X0, 160, W0, 440, { alpha: vA, accent: PAL.amber });
+        d2.panel(X0, 160, W0, 640, { alpha: vA, accent: PAL.amber });
         d2.text('Environment', X0 + 30, 214, { size: 28, weight: 750, alpha: vA });
-        const rows = [['in air', 'D curve: bend at 10⁷ cycles', PAL.cyan, n3 + 0.4], ['seawater, cathodic protection', 'lower until 10⁶, then m = 5', PAL.amber, at('n3', 'cathodic protection') - 0.3],
-          ['free corrosion', 'one slope, no bend', PAL.red, at('n3', 'free corrosion') - 0.3]];
-        rows.forEach(([a, b, col, tt], i) => {
+        const W = F.worked.sn;
+        const rows = [
+          ['in air', 'D: log ā₁ = 12.164, bend at 10⁷ cycles', '', PAL.cyan, n3 + 0.4],
+          ['seawater, cathodic protection', `log ā₁ = ${W.la1.toFixed(3)}: ÷ 2.5 on life`, 'bend at 10⁶, then m = 5 as in air', PAL.amber, at('n3', 'cathodic protection') - 0.3],
+          ['free corrosion', `log ā = ${W.la1_fc.toFixed(3)} = air − log 3: ÷ 3`, 'one slope, no bend', PAL.red, at('n3', 'free corrosion') - 0.3],
+        ];
+        rows.forEach(([a, b, c, col, tt], i) => {
           const q = seg(t, tt, 0.6);
-          d2.circle(X0 + 46, 280 + i * 100, 9, { fill: col, alpha: vA * q });
-          d2.text(a, X0 + 70, 288 + i * 100, { size: 24, weight: 700, color: col, alpha: vA * q });
-          d2.text(b, X0 + 70, 318 + i * 100, { size: 20, color: PAL.ink2, alpha: vA * q });
+          const y = 280 + i * 130;
+          d2.circle(X0 + 46, y - 8, 9, { fill: col, alpha: vA * q });
+          d2.text(a, X0 + 70, y, { size: 24, weight: 700, color: col, alpha: vA * q });
+          d2.text(b, X0 + 70, y + 32, { size: 20, color: PAL.ink2, alpha: vA * q });
+          if (c) d2.text(c, X0 + 70, y + 60, { size: 20, color: PAL.ink2, alpha: vA * q });
         });
-      }
-      // n4: thickness
-      const tA = env(t, n4 - 0.2, n5 - 0.1, 0.6, 0.5);
-      if (tA > 0) {
-        d2.panel(X0, 160, W0, 600, { alpha: tA, accent: PAL.orange });
-        d2.text('Thickness effect', X0 + 30, 214, { size: 28, weight: 750, alpha: tA });
-        tex.show('f09th', '\\Delta\\sigma \\cdot \\left(\\dfrac{t}{t_{ref}}\\right)^{k}', X0 + 40, 250, { size: 44, alpha: tA * seg(t, n4 + 0.6, 0.6) });
-        d2.text('t_ref = 25 mm, k = 0.20 for the D curve', X0 + 40, 400, { size: 21, color: PAL.ink2, alpha: tA * seg(t, at('n4', 'twenty-five') - 0.2, 0.6) });
-        const q1 = seg(t, at('n4', 'thirty-eight') - 0.3, 0.6);
-        d2.rect(X0 + 40, 450, 300 * 38.1 / 40, 46, { fill: rgba(PAL.orange, 0.35), stroke: PAL.orange, width: 2, alpha: tA * q1 });
-        d2.text('conductor, 38.1 mm', X0 + 40, 530, { size: 22, weight: 700, alpha: tA * q1 });
-        d2.text(`× ${tfac.toFixed(2)}`, X0 + W0 - 40, 486, { size: 36, weight: 800, color: PAL.orange, align: 'right', alpha: tA * q1 });
-        const q2 = seg(t, at('n4', 'casing') - 0.3, 0.6);
-        d2.rect(X0 + 40, 590, 300 * 15.9 / 40, 46, { fill: rgba(PAL.violet, 0.35), stroke: PAL.violet, width: 2, alpha: tA * q2 });
-        d2.text('casing, 15.9 mm', X0 + 40, 670, { size: 22, weight: 700, alpha: tA * q2 });
-        d2.text('× 1.00', X0 + W0 - 40, 626, { size: 36, weight: 800, color: PAL.violet, align: 'right', alpha: tA * q2 });
-        d2.text('(no correction below 25 mm)', X0 + 40, 700, { size: 19, color: PAL.ink3, alpha: tA * q2 });
-      }
-      // n5: variable amplitude note
-      const wA = env(t, n5 + 0.3, ctx.duration, 0.6, 0.5);
-      if (wA > 0) {
-        d2.panel(X0, 160, W0, 330, { alpha: wA, accent: PAL.green });
-        d2.text('Variable amplitude', X0 + 30, 214, { size: 28, weight: 750, alpha: wA });
-        d2.text('no fatigue limit: every cycle counts,', X0 + 30, 268, { size: 23, alpha: wA });
-        d2.text('small ones on the m = 5 branch', X0 + 30, 300, { size: 23, alpha: wA });
-        tex.show('f09m5', 'N = \\bar a_2 \\, \\Delta\\sigma^{-5}', X0 + 40, 340, { size: 40, alpha: wA * seg(t, at('n5', 'shallower'), 0.6), color: PAL.green });
+        const mq = seg(t, at('n3', 'Below the mudline') - 0.3, 0.6);
+        d2.line(X0 + 30, 655, X0 + W0 - 30, 655, { color: 'rgba(140,180,210,0.25)', width: 1, alpha: vA * mq });
+        d2.text('below the mudline: CP curves allowed', X0 + 30, 700, { size: 21, weight: 700, color: PAL.amber, alpha: vA * mq });
+        d2.text('when the structure above is protected', X0 + 30, 730, { size: 20, color: PAL.ink2, alpha: vA * mq });
+        refChip(d2, 'C203 [2.4.13]', X0 + 30, 770, vA * mq);
       }
       chainBar(d2, 4, { alpha: seg(t, 1.6, 0.6) });
       stepCard(d2, t, 4, 'Choosing the S-N curve', 'detail category, environment and thickness');

@@ -8,7 +8,7 @@ cd "$(dirname "$0")"
 N=${N:-3}
 VIDEO=${VIDEO:-fea}
 if [ "$VIDEO" = "fatigue" ]; then
-  DEF="f01_cold f04_hotspots f09_sncurve f02_basics f07_hotspot f11_check f10_miner f08_rainflow f13_outro f05_seastates f12_sensitivity f06_transfer f03_roadmap"
+  DEF="f07_hotspot f01_cold f04_hotspots f09b_snequation f07b_misalign f10b_weibull f10_miner f12b_improve f08_rainflow f11_check f09_sncurve f06b_nominal f02_basics f03_roadmap f13_outro f05_seastates f12_sensitivity f06_transfer"
   B=build/fatigue
 else
   DEF="s09_soil s05_solids s07_meshsize s10_template s11_wellhead s04_families s06_axisym s02_system s12_soilbc s03_strategy s01_intro s08_welds s13_verify s14_outro"

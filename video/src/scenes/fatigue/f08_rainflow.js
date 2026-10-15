@@ -3,14 +3,14 @@
 import { makeBackdrop } from '../../engine/env.js';
 import { Plot } from '../../engine/draw2d.js';
 import { keyLine } from '../common.js';
-import { chainBar, stepCard, heading } from './fcommon.js';
+import { chainBar, stepCard, heading, refChip } from './fcommon.js';
 import { PAL, seg, env, ease, clamp, lerp, rgba } from '../../engine/util.js';
 
 export default async function rainflow(ctx) {
   const { d2, cue, at, renderer, data, tex } = ctx;
   const F = data.fatigue;
   const back = makeBackdrop();
-  const f1 = cue('f1'), f2 = cue('f2'), f3 = cue('f3'), f4 = cue('f4'), f5 = cue('f5');
+  const f1 = cue('f1'), f2 = cue('f2'), f3 = cue('f3'), f4 = cue('f4'), f5 = cue('f5'), f6 = cue('f6');
   const ex = F.example, rf = F.rf_demo;
   const rev = rf.rev, ridx = rf.rev_idx, seg_s = rf.s;
   const trace = rf.trace;
@@ -99,10 +99,12 @@ export default async function rainflow(ctx) {
         const rq = seg(t, at('f3', 'Whenever'), 0.6);
         d2.text('X = newest range', sx + 30, sy + 100, { size: 23, weight: 600, alpha: rA * rq });
         d2.text('Y = the range before it', sx + 30, sy + 134, { size: 23, weight: 600, alpha: rA * rq });
-        d2.text('if X ≥ Y:', sx + 30, sy + 190, { size: 24, weight: 800, color: PAL.green, alpha: rA * seg(t, at('f3', 'at least as large'), 0.6) });
-        d2.text('Y is a closed cycle — count it,', sx + 30, sy + 226, { size: 22, color: PAL.ink, alpha: rA * seg(t, at('f3', 'closed cycle'), 0.6) });
-        d2.text('remove its two points', sx + 30, sy + 258, { size: 22, color: PAL.ink, alpha: rA * seg(t, at('f3', 'remove its'), 0.6) });
-        d2.text('left over at the end: half cycles', sx + 30, sy + 306, { size: 21, color: PAL.violet, alpha: rA * seg(t, f4 - 0.3, 0.6) });
+        d2.text('if X ≥ Y, count Y:', sx + 30, sy + 180, { size: 24, weight: 800, color: PAL.green, alpha: rA * seg(t, at('f3', 'at least as large'), 0.6) });
+        d2.text('Y holds the start point → ½ cycle,', sx + 30, sy + 214, { size: 21, color: PAL.ink, alpha: rA * seg(t, at('f3', 'very first point') - 0.3, 0.6) });
+        d2.text('drop only that point', sx + 54, sy + 240, { size: 21, color: PAL.ink2, alpha: rA * seg(t, at('f3', 'very first point') - 0.3, 0.6) });
+        d2.text('otherwise → full cycle,', sx + 30, sy + 272, { size: 21, color: PAL.ink, alpha: rA * seg(t, at('f3', 'closed cycle'), 0.6) });
+        d2.text('remove its two points', sx + 54, sy + 298, { size: 21, color: PAL.ink2, alpha: rA * seg(t, at('f3', 'remove its'), 0.6) });
+        d2.text('left over at the end: half cycles', sx + 30, sy + 322, { size: 20, color: PAL.violet, alpha: rA * seg(t, f4 - 0.3, 0.6) });
         // counted list (right, below)
         const lx = 1320, ly = 570;
         d2.panel(lx, ly, 480, 360, { alpha: rA * seg(t, tA, 0.6) });
@@ -173,14 +175,40 @@ export default async function rainflow(ctx) {
           d2.text('same Δσ', x + 20, P.Y(y0) + 8, { size: 20, weight: 800, color: col, alpha: mA * sq });
         }
         const pq = seg(t, at('f5', 'lock ring') - 0.4, 0.6);
-        d2.panel(1080, 300, 720, 340, { alpha: mA * sq, accent: PAL.green });
-        d2.text('same stress range → same damage', 1110, 352, { size: 28, weight: 750, color: PAL.green, alpha: mA * sq });
-        d2.text('for as-welded joints C203 uses the', 1110, 400, { size: 23, color: PAL.ink, alpha: mA * sq });
-        d2.text('full range, whatever the mean', 1110, 432, { size: 23, color: PAL.ink, alpha: mA * sq });
-        d2.text('static loads drop out:', 1110, 500, { size: 23, weight: 700, color: PAL.ink2, alpha: mA * pq });
-        d2.text('lock-ring pre-load, weight of the stack', 1110, 534, { size: 23, color: PAL.ink2, alpha: mA * pq });
-        d2.text('(a reduction for compressive mean stress is mainly', 1110, 590, { size: 19, color: PAL.ink3, alpha: mA * pq });
-        d2.text('for base material and post-weld heat-treated joints)', 1110, 616, { size: 19, color: PAL.ink3, alpha: mA * pq });
+        const f5a = mA * sq * (1 - seg(t, f6 - 0.4, 0.6));
+        d2.panel(1080, 300, 720, 340, { alpha: f5a, accent: PAL.green });
+        d2.text('same stress range → same damage', 1110, 352, { size: 28, weight: 750, color: PAL.green, alpha: f5a });
+        d2.text('for as-welded joints C203 uses the', 1110, 400, { size: 23, color: PAL.ink, alpha: f5a });
+        d2.text('full range, whatever the mean', 1110, 432, { size: 23, color: PAL.ink, alpha: f5a });
+        const pa = mA * pq * (1 - seg(t, f6 - 0.4, 0.6));
+        d2.text('lock-ring preload, weight of the stack:', 1110, 500, { size: 23, weight: 700, color: PAL.ink2, alpha: pa });
+        d2.text('no mean-stress effect in the S-N check,', 1110, 534, { size: 23, color: PAL.ink2, alpha: pa });
+        d2.text('but they set contact and load sharing', 1110, 568, { size: 23, color: PAL.ink2, alpha: pa * seg(t, at('f5', 'They still matter') - 0.3, 0.6) });
+        d2.text('in the global model', 1110, 602, { size: 23, color: PAL.ink2, alpha: pa * seg(t, at('f5', 'They still matter') - 0.3, 0.6) });
+        // f6: the exceptions of C203 [2.5]
+        const xA = mA * seg(t, f6 - 0.2, 0.7);
+        if (xA > 0) {
+          d2.panel(1060, 220, 780, 680, { alpha: xA, accent: PAL.violet });
+          d2.text('Exceptions', 1090, 270, { size: 30, weight: 750, alpha: xA });
+          refChip(d2, 'C203 [2.5]', 1290, 262, xA);
+          tex.show('f08fm0', '\\Delta\\sigma_{used} = f_m \\cdot \\Delta\\sigma', 1090, 300, { size: 40, alpha: xA * seg(t, at('f6', 'reduce the stress range') - 0.4, 0.6) });
+          const rows = [
+            ['base material', 'eq. (2.15)', 'f_m = \\dfrac{\\sigma_t + 0.6\\,|\\sigma_c|}{\\sigma_t + |\\sigma_c|}', '0.8 at zero mean', at('f6', 'base material'), PAL.cyan],
+            ['post weld heat treated', 'eq. (2.16)', 'f_m = \\dfrac{\\sigma_t + 0.8\\,|\\sigma_c|}{\\sigma_t + |\\sigma_c|}', '0.9 at zero mean', at('f6', 'heat treated'), PAL.green],
+          ];
+          rows.forEach(([a, eq, f, z, tt, col], k) => {
+            const q = seg(t, tt - 0.3, 0.6);
+            const y = 410 + k * 175;
+            d2.text(a, 1090, y, { size: 24, weight: 750, color: col, alpha: xA * q });
+            d2.text(eq, 1090, y + 30, { size: 18, color: PAL.ink3, alpha: xA * q });
+            tex.show(`f08fm${k + 1}`, f, 1390, y - 40, { size: 34, alpha: xA * q });
+            d2.text(z, 1090, y + 62, { size: 20, weight: 650, color: PAL.ink2, alpha: xA * q * seg(t, at('f6', 'zero point nine') - 0.3, 0.6) });
+          });
+          d2.text('σt: max tension, σc: max compression in the cycle', 1090, 770, { size: 19, color: PAL.ink3, alpha: xA * seg(t, at('f6', 'base material'), 0.6) });
+          const wq = seg(t, at('f6', 'as-welded, so') - 0.3, 0.6);
+          d2.panel(1090, 800, 720, 70, { alpha: xA * wq, accent: PAL.amber, fill: 'rgba(8,20,34,0.95)' });
+          d2.text('as-welded (our welds): f_m = 1, the full range', 1116, 846, { size: 24, weight: 750, color: PAL.amber, alpha: xA * wq });
+        }
       }
       chainBar(d2, 3, { alpha: seg(t, 1.6, 0.6) * (1 - 0.0) });
       stepCard(d2, t, 3, 'Counting cycles', 'rainflow counting of the stress history');
@@ -188,7 +216,7 @@ export default async function rainflow(ctx) {
   };
 }
 
-// rerun the four-point rainflow algorithm on the reversal list, recording the order of events
+// rerun the three-point (ASTM E1049) rainflow algorithm on the reversal list, recording the order of events
 function simulate(r) {
   const stack = [];
   const ev = [];
