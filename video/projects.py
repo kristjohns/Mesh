@@ -23,6 +23,7 @@ PROJECTS = {
         out="every_wave_counts_fatigue_dnv_rp_c203", cuts="web/fatigue_cuts.json",
         title="Every Wave Counts - fatigue design of a subsea wellhead with DNV-RP-C203",
         ocean=("f01_cold", "f04_hotspots", "f13_outro"), poster=40.2,
+        maxrate="5M",  # keeps every web part under the artifact file limit
         chapters=[("", "Cold open"), ("", "Fatigue in a nutshell"), ("", "The C203 chain"),
                   ("", "Where will it crack?"), ("1", "Sea states and riser loads"),
                   ("2", "From force to moment"), ("", "Hot-spot stress and SCFs"),

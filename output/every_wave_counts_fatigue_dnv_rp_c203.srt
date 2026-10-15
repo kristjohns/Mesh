@@ -1,0 +1,914 @@
+1
+00:00:02,600 --> 00:00:07,246
+350 metres below the surface, a wellhead
+is being bent back and forth.
+
+2
+00:00:07,266 --> 00:00:11,845
+Once with every wave, for as long as the
+drilling riser is connected.
+
+3
+00:00:12,665 --> 00:00:14,922
+That's more than 10,000 load cycles a day.
+
+4
+00:00:14,942 --> 00:00:17,471
+None of them comes close to
+breaking the steel.
+
+5
+00:00:18,191 --> 00:00:20,753
+But every cycle leaves a
+little damage behind.
+
+6
+00:00:20,773 --> 00:00:24,232
+Add up enough of them, and a crack
+starts to grow from a weld.
+
+7
+00:00:25,053 --> 00:00:28,258
+Down here, nobody will ever
+inspect those welds.
+
+8
+00:00:28,278 --> 00:00:33,230
+So we have to predict how long they will
+last before the rig even arrives.
+
+9
+00:00:33,250 --> 00:00:38,806
+In this video, we'll do exactly that, step by
+step, with the method in DNV-RP-C203.
+
+10
+00:00:43,433 --> 00:00:44,975
+First, a quick refresher.
+
+11
+00:00:44,995 --> 00:00:49,847
+Fatigue is driven by stress cycles, and what
+matters most is the stress range:
+
+12
+00:00:49,867 --> 00:00:54,844
+the difference between the highest and the
+lowest stress in a cycle, written Δσ.
+
+13
+00:00:55,464 --> 00:00:58,679
+In welded steel, cracks almost
+always start at a weld.
+
+14
+00:00:58,699 --> 00:01:02,094
+The weld toe is a sharp notch,
+welding leaves tiny flaws,
+
+15
+00:01:02,114 --> 00:01:04,310
+and residual stresses close to yield.
+
+16
+00:01:04,330 --> 00:01:09,282
+So a crack starts early, and most of the life is
+spent growing it through the wall.
+
+17
+00:01:09,903 --> 00:01:14,734
+To measure fatigue strength, we test welded
+specimens at a constant stress range
+
+18
+00:01:14,754 --> 00:01:16,675
+and count the cycles to failure.
+
+19
+00:01:16,695 --> 00:01:21,223
+Repeat that at several stress ranges, and
+plot the results on log-log axes.
+
+20
+00:01:21,243 --> 00:01:24,618
+They fall around a straight line,
+with a lot of scatter.
+
+21
+00:01:25,237 --> 00:01:32,593
+DNV-RP-C203 gives design S-N curves that sit two
+standard deviations below the mean
+
+22
+00:01:32,613 --> 00:01:34,104
+of the test data.
+
+23
+00:01:34,124 --> 00:01:38,102
+That's a survival probability
+of about 97.7%.
+
+24
+00:01:38,723 --> 00:01:40,353
+The curve is a power law:
+
+25
+00:01:40,373 --> 00:01:43,587
+the number of cycles to failure
+is a constant, ā,
+
+26
+00:01:43,607 --> 00:01:46,425
+divided by the stress range
+to the power m.
+
+27
+00:01:46,445 --> 00:01:47,943
+For most welds, m is 3.
+
+28
+00:01:47,963 --> 00:01:52,365
+So if you double the stress range, the
+life drops by a factor of 8.
+
+29
+00:01:52,385 --> 00:01:55,599
+Small errors in stress become
+big errors in life.
+
+30
+00:01:57,033 --> 00:02:00,773
+Real loading is nothing like a
+constant-amplitude test.
+
+31
+00:02:00,793 --> 00:02:04,053
+So C203 turns the problem into
+a chain of steps.
+
+32
+00:02:04,673 --> 00:02:07,303
+Describe the sea states the well will see.
+
+33
+00:02:07,323 --> 00:02:10,709
+Turn each one into a stress
+history at every hot spot.
+
+34
+00:02:10,729 --> 00:02:12,223
+Count the stress cycles.
+
+35
+00:02:12,243 --> 00:02:13,799
+Pick the right S-N curve.
+
+36
+00:02:13,819 --> 00:02:16,070
+Add up the damage with Miner's rule.
+
+37
+00:02:16,090 --> 00:02:19,476
+And finally, check it against a
+design fatigue factor.
+
+38
+00:02:20,096 --> 00:02:22,630
+Every link in that chain can
+change the answer,
+
+39
+00:02:22,650 --> 00:02:25,836
+so let's go through them one at a
+time, on a real wellhead.
+
+40
+00:02:27,667 --> 00:02:28,575
+Here's our well:
+
+41
+00:02:28,595 --> 00:02:33,275
+the same template, conductor and wellhead
+housings we modelled in our last video.
+
+42
+00:02:33,295 --> 00:02:36,293
+The riser pulls on the top of the
+blowout preventer,
+
+43
+00:02:36,313 --> 00:02:38,440
+and that force bends the whole stack.
+
+44
+00:02:39,060 --> 00:02:41,971
+The global beam model shows
+where the bending goes.
+
+45
+00:02:41,991 --> 00:02:44,558
+Most of the moment passes
+into the conductor,
+
+46
+00:02:44,578 --> 00:02:49,272
+and it keeps growing below the seabed, to a peak
+about 3 metres below the mudline.
+
+47
+00:02:49,893 --> 00:02:53,659
+Fatigue cracks start where a high stress
+range meets a weak detail.
+
+48
+00:02:53,679 --> 00:02:55,862
+We'll follow three candidate hot spots:
+
+49
+00:02:55,882 --> 00:02:59,592
+the weld between the high-pressure
+housing and the surface casing,
+
+50
+00:02:59,612 --> 00:03:02,813
+the weld between the conductor
+housing and the conductor,
+
+51
+00:03:02,833 --> 00:03:06,316
+and a girth weld in the conductor, 3
+metres below the mudline,
+
+52
+00:03:06,336 --> 00:03:07,955
+right where the moment peaks.
+
+53
+00:03:09,967 --> 00:03:10,407
+Step 1:
+
+54
+00:03:10,427 --> 00:03:10,932
+the sea.
+
+55
+00:03:10,952 --> 00:03:16,188
+A scatter diagram tells us how often each
+combination of significant wave height
+
+56
+00:03:16,208 --> 00:03:17,699
+and peak period occurs.
+
+57
+00:03:17,719 --> 00:03:19,342
+Each cell is a sea state:
+
+58
+00:03:19,362 --> 00:03:22,890
+a few hours of irregular waves
+with steady statistics.
+
+59
+00:03:23,510 --> 00:03:27,136
+At this site, half the time the
+waves are below 2 metres,
+
+60
+00:03:27,156 --> 00:03:30,654
+and seas above 6 metres occur less
+than 2% of the time.
+
+61
+00:03:31,274 --> 00:03:34,790
+Within a sea state, the surface is a
+sum of many sine waves,
+
+62
+00:03:34,810 --> 00:03:38,149
+with the energy spread over
+frequency by a wave spectrum.
+
+63
+00:03:38,769 --> 00:03:43,366
+A global riser analysis turns those waves
+into the force at the flex joint,
+
+64
+00:03:43,386 --> 00:03:45,336
+on top of the blowout preventer.
+
+65
+00:03:45,356 --> 00:03:48,784
+Here we stand in for it with a
+simple transfer function,
+
+66
+00:03:48,804 --> 00:03:51,000
+so the example stays self-contained.
+
+67
+00:03:51,020 --> 00:03:54,079
+The result is a force history
+for every sea state.
+
+68
+00:03:56,100 --> 00:03:56,505
+Step 2:
+
+69
+00:03:56,525 --> 00:03:57,779
+from force to stress.
+
+70
+00:03:57,799 --> 00:04:01,482
+We push the global model with an
+increasing flex-joint force,
+
+71
+00:04:01,502 --> 00:04:03,849
+and record the moment at each hot spot.
+
+72
+00:04:03,869 --> 00:04:07,187
+These load-to-moment curves are
+our transfer functions.
+
+73
+00:04:07,807 --> 00:04:09,390
+They aren't straight lines.
+
+74
+00:04:09,410 --> 00:04:14,021
+The soil springs soften, the radial clearance
+between the two housings closes,
+
+75
+00:04:14,041 --> 00:04:17,405
+and above about 50 kN the gap to
+the template closes too,
+
+76
+00:04:17,425 --> 00:04:20,374
+and the template starts to carry
+part of the load.
+
+77
+00:04:20,994 --> 00:04:23,902
+So the stress isn't simply
+proportional to the force.
+
+78
+00:04:23,922 --> 00:04:27,936
+We keep the full nonlinear curve, and run
+every force history through it.
+
+79
+00:04:29,767 --> 00:04:34,721
+The beam model gives moments, and a moment
+divided by the section modulus gives the
+
+80
+00:04:34,741 --> 00:04:35,620
+nominal stress.
+
+81
+00:04:35,640 --> 00:04:37,478
+But a weld sees more than that,
+
+82
+00:04:37,498 --> 00:04:40,775
+because the geometry around it
+concentrates the stress.
+
+83
+00:04:41,395 --> 00:04:44,649
+For the two housing welds, we use
+the hot spot method.
+
+84
+00:04:44,669 --> 00:04:49,560
+In the local solid model, read the surface
+stress at half a wall thickness and at
+
+85
+00:04:49,580 --> 00:04:52,592
+one and a half wall thicknesses
+from the weld toe,
+
+86
+00:04:52,612 --> 00:04:54,774
+and extrapolate linearly to the toe.
+
+87
+00:04:54,794 --> 00:04:59,807
+At the high-pressure housing weld, that gives a
+stress concentration factor of 1.6.
+
+88
+00:05:00,527 --> 00:05:05,432
+At the conductor housing weld, the outside is
+actually less stressed than the
+
+89
+00:05:05,452 --> 00:05:06,327
+nominal value.
+
+90
+00:05:06,347 --> 00:05:10,805
+The housing thickens inwards, so the
+wall's mid-surface steps inwards,
+
+91
+00:05:10,825 --> 00:05:13,363
+and the axial stress adds local bending.
+
+92
+00:05:13,383 --> 00:05:17,329
+The inside of the weld is the hot
+spot, with a factor of 1.15.
+
+93
+00:05:17,349 --> 00:05:19,056
+Always check both surfaces.
+
+94
+00:05:19,776 --> 00:05:25,254
+The conductor girth weld is a standard
+detail, so we use the nominal stress,
+
+95
+00:05:25,274 --> 00:05:28,509
+with a concentration factor
+for misalignment.
+
+96
+00:05:28,529 --> 00:05:32,705
+With 6 mm of hi-lo between the pipe
+ends, C203 gives 1.17.
+
+97
+00:05:32,725 --> 00:05:38,493
+The 0.1t in the formula is misalignment that is
+already included in the S-N test
+
+98
+00:05:38,513 --> 00:05:38,855
+data.
+
+99
+00:05:40,667 --> 00:05:41,118
+Step 3:
+
+100
+00:05:41,138 --> 00:05:42,195
+counting cycles.
+
+101
+00:05:42,215 --> 00:05:44,552
+A real stress history is irregular.
+
+102
+00:05:44,572 --> 00:05:50,140
+Small cycles ride on top of bigger ones, and
+it's not obvious what a cycle even is.
+
+103
+00:05:50,760 --> 00:05:53,205
+The standard answer is rainflow counting.
+
+104
+00:05:53,225 --> 00:05:57,654
+Reduce the history to its peaks and valleys,
+then read them one at a time,
+
+105
+00:05:57,674 --> 00:05:59,999
+and keep comparing the last two ranges.
+
+106
+00:06:00,519 --> 00:06:04,490
+Whenever the newest range is at least as
+large as the one before it,
+
+107
+00:06:04,510 --> 00:06:06,602
+the one before it is a closed cycle.
+
+108
+00:06:06,622 --> 00:06:09,302
+Count it, remove its two
+points, and carry on.
+
+109
+00:06:09,322 --> 00:06:11,767
+Each small cycle is paired off on its own,
+
+110
+00:06:11,787 --> 00:06:14,350
+without breaking up the big
+cycle around it.
+
+111
+00:06:14,970 --> 00:06:18,532
+Whatever is left at the end is
+counted as half cycles.
+
+112
+00:06:18,552 --> 00:06:21,850
+For a 3-hour sea state, we get
+about 1,400 cycles,
+
+113
+00:06:21,870 --> 00:06:24,570
+sorted into a histogram of stress ranges.
+
+114
+00:06:25,190 --> 00:06:28,036
+Notice that we count ranges,
+not mean stress.
+
+115
+00:06:28,056 --> 00:06:30,902
+Welds carry residual stresses
+close to yield,
+
+116
+00:06:30,922 --> 00:06:35,678
+so for as-welded joints C203 uses the full
+stress range, whatever the mean.
+
+117
+00:06:35,698 --> 00:06:40,455
+That's also why the lock ring preload and
+the weight of the stack drop out.
+
+118
+00:06:42,267 --> 00:06:42,733
+Step 4:
+
+119
+00:06:42,753 --> 00:06:43,706
+the S-N curve.
+
+120
+00:06:43,726 --> 00:06:48,500
+C203 has a whole family of curves, from
+B1 for plain, unwelded steel,
+
+121
+00:06:48,520 --> 00:06:52,113
+down to W3 for cracks through the
+weld metal itself.
+
+122
+00:06:52,133 --> 00:06:54,892
+Which one applies depends on the detail:
+
+123
+00:06:54,912 --> 00:07:00,103
+its geometry, how it's welded and inspected,
+and which way the stress acts.
+
+124
+00:07:00,723 --> 00:07:03,551
+Appendix A classifies a long
+list of details.
+
+125
+00:07:03,571 --> 00:07:07,981
+A girth weld made from both sides is a D
+curve detail at the weld toe.
+
+126
+00:07:08,001 --> 00:07:11,968
+And when the hot spot stress comes
+from a finite element model,
+
+127
+00:07:11,988 --> 00:07:14,373
+the D curve is the one to use as well.
+
+128
+00:07:14,993 --> 00:07:16,313
+Then the environment.
+
+129
+00:07:16,333 --> 00:07:20,910
+In air, the curve bends at 10 million
+cycles, to a shallower slope of 5.
+
+130
+00:07:20,930 --> 00:07:24,869
+In seawater with cathodic protection,
+the steep part is lower,
+
+131
+00:07:24,889 --> 00:07:27,359
+and the bend comes at 1 million cycles.
+
+132
+00:07:27,379 --> 00:07:30,104
+In free corrosion, there is
+no bend at all.
+
+133
+00:07:30,124 --> 00:07:33,361
+Our welds are in seawater with
+cathodic protection.
+
+134
+00:07:33,981 --> 00:07:36,405
+Thick walls are weaker in fatigue,
+
+135
+00:07:36,425 --> 00:07:41,724
+so the stress range is scaled by the
+thickness over 25 mm, to the power k.
+
+136
+00:07:41,744 --> 00:07:45,677
+For the 38 mm conductor, that's a
+9% penalty on stress.
+
+137
+00:07:45,697 --> 00:07:47,762
+The thinner casing gets none.
+
+138
+00:07:48,381 --> 00:07:49,267
+One more thing:
+
+139
+00:07:49,287 --> 00:07:52,891
+under variable amplitude loading,
+there is no fatigue limit.
+
+140
+00:07:52,911 --> 00:07:55,187
+Cycles below the bend still do damage.
+
+141
+00:07:55,207 --> 00:07:57,422
+They just follow the shallower slope.
+
+142
+00:07:59,233 --> 00:07:59,644
+Step 5:
+
+143
+00:07:59,664 --> 00:08:00,445
+adding it up.
+
+144
+00:08:00,465 --> 00:08:05,434
+Palmgren-Miner's rule says that each stress
+range uses up a fraction of the life:
+
+145
+00:08:05,454 --> 00:08:10,053
+the number of cycles it occurs, divided by
+the number the S-N curve allows.
+
+146
+00:08:10,073 --> 00:08:12,579
+The damage is the sum of those fractions,
+
+147
+00:08:12,599 --> 00:08:15,350
+and failure is predicted when
+it reaches one.
+
+148
+00:08:15,970 --> 00:08:20,174
+We do this for every sea state, weight
+each one by how often it occurs,
+
+149
+00:08:20,194 --> 00:08:22,553
+and get the damage per day of operation.
+
+150
+00:08:22,573 --> 00:08:25,111
+This map shows where the
+damage comes from.
+
+151
+00:08:25,731 --> 00:08:27,472
+The calm days hardly matter.
+
+152
+00:08:27,492 --> 00:08:32,755
+The waves are below 2 metres half of the time,
+and cause less than 1% of the damage.
+
+153
+00:08:32,775 --> 00:08:34,830
+The storms don't dominate either:
+
+154
+00:08:34,850 --> 00:08:39,043
+they are rare, and above 50 kN the
+template takes part of the load.
+
+155
+00:08:39,063 --> 00:08:43,948
+Three quarters of the damage comes from
+moderate seas, between 3 and 6 metres.
+
+156
+00:08:44,667 --> 00:08:46,512
+C203 also offers a shortcut.
+
+157
+00:08:46,532 --> 00:08:50,574
+If the long-term stress ranges follow
+a Weibull distribution,
+
+158
+00:08:50,594 --> 00:08:53,105
+the damage has a closed-form solution.
+
+159
+00:08:53,125 --> 00:08:57,566
+Fitted to our results, it lands within
+10% of the full calculation.
+
+160
+00:08:57,586 --> 00:09:02,960
+Ignore the bend in the S-N curve, though, and
+the life comes out a third shorter.
+
+161
+00:09:04,767 --> 00:09:05,208
+Step 6:
+
+162
+00:09:05,228 --> 00:09:06,327
+the design check.
+
+163
+00:09:06,347 --> 00:09:09,291
+Even with conservative S-N
+curves, the loads,
+
+164
+00:09:09,311 --> 00:09:12,123
+the soil and the fabrication
+are uncertain.
+
+165
+00:09:12,143 --> 00:09:15,547
+So the design standard adds a
+design fatigue factor:
+
+166
+00:09:15,567 --> 00:09:19,631
+the calculated damage, times that
+factor, must stay below one.
+
+167
+00:09:20,251 --> 00:09:24,287
+The factor depends on whether a crack
+could be found and repaired,
+
+168
+00:09:24,307 --> 00:09:26,254
+and on what happens if it isn't.
+
+169
+00:09:26,274 --> 00:09:28,221
+Typical values run from 1 to 10.
+
+170
+00:09:28,241 --> 00:09:31,786
+A conductor 3 metres under the mud
+can never be inspected,
+
+171
+00:09:31,806 --> 00:09:34,675
+and losing it threatens the
+well, so we use 10.
+
+172
+00:09:35,394 --> 00:09:39,653
+Here are the results, in days of
+riser-connected operation.
+
+173
+00:09:39,673 --> 00:09:43,424
+The high-pressure housing weld is
+far from critical.
+
+174
+00:09:43,444 --> 00:09:46,978
+The conductor housing weld
+allows about 330 days.
+
+175
+00:09:46,998 --> 00:09:51,910
+And the governing hot spot is the plain
+girth weld in the conductor:
+
+176
+00:09:51,930 --> 00:09:57,277
+1,660 days of calculated life, or 166 days
+with the design fatigue factor.
+
+177
+00:09:57,998 --> 00:10:03,479
+The drilling campaign needs 120 days with the
+riser connected, so the well passes,
+
+178
+00:10:03,499 --> 00:10:05,157
+at about 70% utilisation.
+
+179
+00:10:05,177 --> 00:10:07,169
+But notice which weld governs.
+
+180
+00:10:07,189 --> 00:10:12,537
+Not the big forgings, but an ordinary girth
+weld, out of sight below the seabed.
+
+181
+00:10:14,567 --> 00:10:17,372
+Before trusting that answer,
+ask what moves it.
+
+182
+00:10:17,392 --> 00:10:19,958
+Life scales with stress to
+the third power,
+
+183
+00:10:19,978 --> 00:10:23,024
+so 10% more stress costs about a
+third of the life.
+
+184
+00:10:23,644 --> 00:10:25,828
+Fabrication matters just as much.
+
+185
+00:10:25,848 --> 00:10:29,636
+If the girth weld had 10 mm of
+misalignment instead of 6,
+
+186
+00:10:29,656 --> 00:10:34,713
+the allowable time would drop to 68 days, and
+the well would fail the check.
+
+187
+00:10:34,733 --> 00:10:37,853
+Weld tolerances belong in the
+fatigue analysis.
+
+188
+00:10:38,473 --> 00:10:39,682
+And the environment:
+
+189
+00:10:39,702 --> 00:10:43,433
+the same weld in free corrosion,
+without cathodic protection,
+
+190
+00:10:43,453 --> 00:10:45,216
+has only about half the life.
+
+191
+00:10:45,836 --> 00:10:49,251
+So report the result together with the
+assumptions that drive it,
+
+192
+00:10:49,271 --> 00:10:52,422
+and check those assumptions against
+what was actually built.
+
+193
+00:10:54,233 --> 00:10:55,501
+So that's the method:
+
+194
+00:10:55,521 --> 00:11:00,161
+sea states, stress at the hot spots, rainflow
+counting, the right S-N curve,
+
+195
+00:11:00,181 --> 00:11:02,675
+Miner's sum, and a design fatigue factor.
+
+196
+00:11:03,495 --> 00:11:05,628
+Every wave leaves a little damage behind.
+
+197
+00:11:05,648 --> 00:11:09,041
+Count it carefully, and you'll know how
+long the steel will last.
+
