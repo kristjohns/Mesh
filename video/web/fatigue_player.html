@@ -102,6 +102,12 @@ h1 {
 .player:fullscreen { border: 0; border-radius: 0; display: flex; flex-direction: column; justify-content: center; }
 .player:fullscreen .stage { flex: 1; aspect-ratio: auto; }
 .player:fullscreen .now { display: none; }
+/* in-page full screen, for browsers without any fullscreen API */
+.player.pseudo { position: fixed; inset: 0; z-index: 50; border: 0; border-radius: 0; display: flex; flex-direction: column; justify-content: center;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+.player.pseudo .stage { flex: 1; aspect-ratio: auto; }
+.player.pseudo .now { display: none; }
+body.lock { overflow: hidden; }
 
 /* ---------- chapters ---------- */
 section { display: grid; gap: 16px; }
@@ -209,7 +215,7 @@ const M = /*MANIFEST*/null;
   const $ = (id) => document.getElementById(id);
   const vids = [$('va'), $('vb')];
   const P = M.parts, N = P.length, TOTAL = M.total;
-  let cur = 0, act = 0, playing = false, swapping = false, swapTok = 0, muted = false, blessed = false, dragT = null;
+  let cur = 0, act = 0, playing = false, swapping = false, swapTok = 0, muted = false, blessed = false, dragT = null, nativeFS = false;
   let showCC = true;
   try { const v = localStorage.getItem('mwp-cc'); if (v !== null) showCC = v === '1'; } catch (e) {}
 
@@ -220,8 +226,20 @@ const M = /*MANIFEST*/null;
   function load(el, i) {
     if (el.dataset.part === String(i)) return;
     el.dataset.part = String(i);
+    el.querySelectorAll('track').forEach((t) => t.remove());
+    if (P[i].vtt) {
+      // captions of this part as a real track: the iPhone's own full-screen player can only show those
+      const t = document.createElement('track');
+      t.kind = 'subtitles'; t.label = 'English'; t.srclang = 'en'; t.src = P[i].vtt;
+      el.appendChild(t);
+    }
     el.src = P[i].src;
     el.load();
+    trackMode(el);
+  }
+  // in the page the captions are drawn over the video; the native track shows only in the iPhone's full screen
+  function trackMode(el) {
+    for (const tt of el.textTracks) tt.mode = nativeFS && el === vids[act] && showCC ? 'showing' : 'hidden';
   }
   const gtime = () => dragT ?? (P[cur].start + (vids[act].currentTime || 0));
 
@@ -290,6 +308,7 @@ const M = /*MANIFEST*/null;
 
   // ---------- playback ----------
   function prepNext() {
+    if (nativeFS) return;  // the iPhone's full screen plays the parts one after the other in the same element
     const other = vids[1 - act];
     if (cur + 1 < N) { load(other, cur + 1); if (other.readyState >= 1 && other.currentTime > 0) other.currentTime = 0; }
   }
@@ -317,6 +336,16 @@ const M = /*MANIFEST*/null;
   function toggle() { playing ? pause() : play(); }
   function swap() {
     if (cur + 1 >= N) { finish(); return; }
+    if (nativeFS) {
+      const el = vids[act], other = vids[1 - act];
+      if (other.dataset.part === String(cur + 1)) { other.pause(); delete other.dataset.part; other.removeAttribute('src'); other.load(); }
+      cur += 1; swapping = true; swapTok++;
+      load(el, cur);
+      el.muted = muted;
+      const go = () => { swapping = false; if (playing) start(el); };
+      if (el.readyState >= 1) go(); else el.addEventListener('loadedmetadata', go, { once: true });
+      return;
+    }
     swapping = true;
     const old = vids[act], next = vids[1 - act];
     load(next, cur + 1);
@@ -353,6 +382,14 @@ const M = /*MANIFEST*/null;
 
   // ---------- events ----------
   vids.forEach((v) => {
+    v.addEventListener('webkitbeginfullscreen', () => { nativeFS = true; vids.forEach(trackMode); });
+    v.addEventListener('webkitendfullscreen', () => {
+      nativeFS = false; vids.forEach(trackMode);
+      playing = !v.paused && !v.ended; setPlayIcon(); prepNext();
+      if (playing) requestAnimationFrame(loop); else render();
+    });
+    v.addEventListener('pause', () => { if (nativeFS && v === vids[act] && !v.ended && !swapping && playing) { playing = false; setPlayIcon(); } });
+    v.addEventListener('play', () => { if (nativeFS && v === vids[act] && !playing) { playing = true; setPlayIcon(); requestAnimationFrame(loop); } });
     v.addEventListener('waiting', () => { if (v === vids[act]) $('spin').hidden = false; });
     v.addEventListener('playing', () => { if (v === vids[act]) $('spin').hidden = true; });
     v.addEventListener('canplay', () => { if (v === vids[act]) $('spin').hidden = true; });
@@ -370,7 +407,7 @@ const M = /*MANIFEST*/null;
   $('stage').addEventListener('click', () => toggle());
   $('play').addEventListener('click', () => toggle());
   $('cc').addEventListener('click', () => {
-    showCC = !showCC; $('cc').setAttribute('aria-pressed', String(showCC)); lastCap = null; render();
+    showCC = !showCC; $('cc').setAttribute('aria-pressed', String(showCC)); lastCap = null; vids.forEach(trackMode); render();
     try { localStorage.setItem('mwp-cc', showCC ? '1' : '0'); } catch (e) {}
   });
   $('cc').setAttribute('aria-pressed', String(showCC));
@@ -380,9 +417,27 @@ const M = /*MANIFEST*/null;
     $('muteWave').style.opacity = muted ? '0.15' : '1';
   });
   const player = $('player');
-  const fsOK = document.fullscreenEnabled || document.webkitFullscreenEnabled;
-  if (!fsOK) $('fs').hidden = true;
+  const fsAPI = !!(document.fullscreenEnabled || document.webkitFullscreenEnabled);
+  const iosFS = !fsAPI && typeof vids[0].webkitEnterFullscreen === 'function';
+  const fsOK = true;
+  function pseudo(on) {
+    player.classList.toggle('pseudo', on); document.body.classList.toggle('lock', on);
+    $('fs').setAttribute('aria-label', on ? 'Exit full screen' : 'Full screen');
+  }
   $('fs').addEventListener('click', () => {
+    if (!fsAPI) {
+      if (iosFS) {
+        const el = vids[act];
+        try {
+          if (el.readyState < 1) el.load();
+          el.webkitEnterFullscreen();
+          if (!playing) play();
+          return;
+        } catch (e) { /* not ready yet: fall back to the in-page full screen */ }
+      }
+      pseudo(!player.classList.contains('pseudo'));
+      return;
+    }
     const doc = document;
     if (doc.fullscreenElement || doc.webkitFullscreenElement) { (doc.exitFullscreen || doc.webkitExitFullscreen).call(doc); return; }
     const req = player.requestFullscreen || player.webkitRequestFullscreen;
@@ -427,6 +482,7 @@ const M = /*MANIFEST*/null;
     else if (e.key === 'c') $('cc').click();
     else if (e.key === 'm') $('mute').click();
     else if (e.key === 'f' && fsOK) $('fs').click();
+    else if (e.key === 'Escape' && player.classList.contains('pseudo')) pseudo(false);
   });
 
   // ---------- boot ----------
