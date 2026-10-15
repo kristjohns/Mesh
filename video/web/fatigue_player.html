@@ -109,7 +109,7 @@ h2 {
   font-family: var(--display); font-stretch: 112%; font-weight: 700; font-size: 22px; margin: 0; letter-spacing: .005em;
 }
 .chapters { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px 28px; grid-template-columns: 1fr; }
-@media (min-width: 820px) { .chapters { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(7, auto); grid-auto-flow: column; } }
+@media (min-width: 820px) { .chapters { grid-template-columns: 1fr 1fr; grid-template-rows: repeat(9, auto); grid-auto-flow: column; } }
 .ch button {
   width: 100%; display: grid; grid-template-columns: 6ch 2.2ch 1fr; align-items: baseline; gap: 10px; text-align: left;
   background: transparent; border: 0; border-bottom: 1px solid var(--line); color: var(--fg); padding: 11px 6px; cursor: pointer; font: inherit;
@@ -162,11 +162,11 @@ footer a { color: var(--accent); }
       <button class="btn" id="play" type="button" aria-label="Play">
         <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path id="playIcon" d="M7 4.5v15l12-7.5z"/></svg>
       </button>
-      <div class="scrub" id="scrub" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="690" aria-valuenow="0" aria-valuetext="0:00">
+      <div class="scrub" id="scrub" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="1415" aria-valuenow="0" aria-valuetext="0:00">
         <div class="track"></div><div class="fill" id="fill"></div><div class="knob" id="knob"></div>
         <div class="tip" id="tip" hidden></div>
       </div>
-      <div class="time" id="time"><b>0:00</b> / 11:30</div>
+      <div class="time" id="time"><b>0:00</b> / 23:35</div>
       <button class="btn txt" id="cc" type="button" aria-pressed="true" aria-label="Captions">CC</button>
       <button class="btn" id="mute" type="button" aria-pressed="false" aria-label="Mute">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" stroke="none"/><path id="muteWave" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
