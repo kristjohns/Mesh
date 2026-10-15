@@ -33,7 +33,7 @@ export default async function sncurve(ctx) {
         P.axes({ alpha: pA, xticks: [1e4, 1e5, 1e6, 1e7, 1e8, 1e9], yticks: [10, 20, 50, 100, 200, 500, 1000], fmtx: pow10, fmty: (v) => String(v),
           xlabel: 'number of cycles N', ylabel: 'stress range Δσ [MPa]', fs: 21, ylabelOff: 64 });
         // ------------------------------------------------ n1: the family in air
-        const famFade = 1 - 0.85 * seg(t, at('n2', 'D curve detail') - 0.4, 0.8);
+        const famFade = 1 - 0.85 * seg(t, at('n2', 'We assume') - 0.4, 0.8);
         const famOut = 1 - seg(t, n3 - 0.2, 0.8);
         classes.forEach((c, i) => {
           const q = seg(t, n1 + 1.0 + i * 0.32, 0.7);
@@ -131,28 +131,40 @@ export default async function sncurve(ctx) {
         d2.text('DNV-RP-C203 Appendix A', X0 + 30, 214, { size: 26, weight: 750, color: PAL.cyan, alpha: aA });
         d2.text('detail classification tables', X0 + 30, 248, { size: 21, color: PAL.ink2, alpha: aA });
         const q1 = seg(t, at('n2', 'girth weld') - 0.3, 0.6);
-        // girth weld welded from both sides
-        const gx = X0 + 40, gy = 330;
+        // circumferential butt weld
+        const gx = X0 + 40, gy = 290;
         d2.rect(gx, gy, 170, 46, { fill: 'rgba(130,160,185,0.4)', stroke: '#9fb3c4', width: 2, alpha: aA * q1 });
         d2.rect(gx + 190, gy, 170, 46, { fill: 'rgba(130,160,185,0.4)', stroke: '#9fb3c4', width: 2, alpha: aA * q1 });
         d2.poly([[gx + 160, gy], [gx + 180, gy - 12], [gx + 200, gy], [gx + 200, gy + 46], [gx + 180, gy + 58], [gx + 160, gy + 46]], { fill: 'rgba(176,152,108,0.75)', stroke: '#d1bd92', width: 1.5, alpha: aA * q1 });
-        d2.text('girth weld, both sides', gx, gy + 92, { size: 22, weight: 650, alpha: aA * q1 });
-        d2.text('weld toe', gx, gy + 120, { size: 19, color: PAL.ink2, alpha: aA * q1 });
-        d2.text('D', X0 + W0 - 50, gy + 50, { size: 54, weight: 800, color: PAL.cyan, align: 'right', alpha: aA * q1 });
+        d2.text('girth weld (Table A-9, [3.3.7])', gx, gy + 100, { size: 21, weight: 700, alpha: aA * q1 });
+        const gw = [
+          ['both sides, in the shop,', 'pipe rotated: weld toe', 'D', PAL.cyan, at('n2', 'in the shop')],
+          ['both sides, made on site', '', 'E', PAL.amber, at('n2', 'on site')],
+          ['one side only, no backing:', 'weld root', 'F3', PAL.red, at('n2', 'one side only')],
+        ];
+        const ours = seg(t, at('n2', 'We assume') - 0.2, 0.6);
+        gw.forEach(([a, b, c, col, tt], k) => {
+          const q = seg(t, tt - 0.3, 0.6);
+          const y = gy + 150 + k * 66;
+          if (k === 0 && ours > 0) d2.rect(gx - 14, y - 30, W0 - 52, 62, { fill: rgba(PAL.cyan, 0.12), stroke: PAL.cyan, width: 2, radius: 8, alpha: aA * ours });
+          d2.text(a, gx, y - 4, { size: 20, weight: 600, alpha: aA * q });
+          if (b) d2.text(b, gx, y + 20, { size: 18, color: PAL.ink2, alpha: aA * q });
+          d2.text(c, X0 + W0 - 50, y + 14, { size: 40, weight: 800, color: col, align: 'right', alpha: aA * q });
+        });
+        d2.line(X0 + 30, 600, X0 + W0 - 30, 600, { color: 'rgba(140,180,210,0.25)', width: 1, alpha: aA });
         const q2 = seg(t, at('n2', 'finite element') - 0.3, 0.6);
-        const hy = 560;
-        d2.text('hot-spot stress from FE', gx, hy, { size: 22, weight: 650, alpha: aA * q2 });
-        d2.text('read at 0.5t and 1.5t', gx, hy + 28, { size: 19, color: PAL.ink2, alpha: aA * q2 });
-        d2.text('D', X0 + W0 - 50, hy + 20, { size: 54, weight: 800, color: PAL.cyan, align: 'right', alpha: aA * q2 });
-        d2.line(X0 + 30, 470, X0 + W0 - 30, 470, { color: 'rgba(140,180,210,0.25)', width: 1, alpha: aA });
-        d2.text('one-sided welds: the root gets a lower curve', gx, 700, { size: 19, color: PAL.ink3, alpha: aA * q2 });
+        const hy = 650;
+        d2.text('hot-spot stress from FE ([4.3.5])', gx, hy, { size: 21, weight: 700, alpha: aA * q2 });
+        d2.text('read at 0.5t and 1.5t', gx, hy + 28, { size: 18, color: PAL.ink2, alpha: aA * q2 });
+        d2.text('D', X0 + W0 - 50, hy + 20, { size: 44, weight: 800, color: PAL.cyan, align: 'right', alpha: aA * q2 });
+        d2.text('misalignment beyond 0.05t: add an SCF', gx, 750, { size: 18, color: PAL.ink3, alpha: aA * q2 });
       }
       // n3: environment summary
       const vA = env(t, n3 + 0.4, n4 - 0.1, 0.6, 0.5);
       if (vA > 0) {
         d2.panel(X0, 160, W0, 440, { alpha: vA, accent: PAL.amber });
         d2.text('Environment', X0 + 30, 214, { size: 28, weight: 750, alpha: vA });
-        const rows = [['in air', 'bend at 10⁷ cycles', PAL.cyan, n3 + 0.4], ['seawater, cathodic protection', 'lower until 10⁶, then m = 5', PAL.amber, at('n3', 'cathodic protection') - 0.3],
+        const rows = [['in air', 'D curve: bend at 10⁷ cycles', PAL.cyan, n3 + 0.4], ['seawater, cathodic protection', 'lower until 10⁶, then m = 5', PAL.amber, at('n3', 'cathodic protection') - 0.3],
           ['free corrosion', 'one slope, no bend', PAL.red, at('n3', 'free corrosion') - 0.3]];
         rows.forEach(([a, b, col, tt], i) => {
           const q = seg(t, tt, 0.6);

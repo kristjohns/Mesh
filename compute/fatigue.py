@@ -25,19 +25,25 @@ np.random.seed(0)
 DATA = "/home/user/Mesh/video/data/"
 
 # ------------------------------------------------------------------------------------ S-N curves
-# DNV-RP-C203 S-N curves: (m1, log a1, m2, log a2, k).  In air the slope changes at 1e7 cycles,
-# in seawater with cathodic protection at 1e6; free corrosion has one slope.
+# DNV-RP-C203 (2024) S-N curves: (m1, log a1, m2, log a2, k).  In air the slope changes at 5e6 cycles
+# for B1-C2 and at 1e7 for D-W3, in seawater with cathodic protection at 1e6; free corrosion has one slope.
 SN_AIR = {
-    "B1": (4.0, 15.117, 5, 17.146, 0.00), "B2": (4.0, 14.885, 5, 16.856, 0.00),
-    "C": (3.0, 12.592, 5, 16.320, 0.05), "C1": (3.0, 12.449, 5, 16.081, 0.10),
-    "C2": (3.0, 12.301, 5, 15.835, 0.15), "D": (3.0, 12.164, 5, 15.606, 0.20),
+    "B1": (4.0, 15.117, 5, 17.222, 0.00), "B2": (4.0, 14.885, 5, 16.931, 0.00),
+    "C": (3.5, 13.640, 5, 16.615, 0.05), "C1": (3.5, 13.473, 5, 16.377, 0.10),
+    "C2": (3.5, 13.301, 5, 16.130, 0.15), "D": (3.0, 12.164, 5, 15.606, 0.20),
     "E": (3.0, 12.010, 5, 15.350, 0.20), "F": (3.0, 11.855, 5, 15.091, 0.25),
     "F1": (3.0, 11.699, 5, 14.832, 0.25), "F3": (3.0, 11.546, 5, 14.576, 0.25),
     "G": (3.0, 11.398, 5, 14.330, 0.25), "W1": (3.0, 11.261, 5, 14.101, 0.25),
     "W2": (3.0, 11.107, 5, 13.845, 0.25), "W3": (3.0, 10.970, 5, 13.617, 0.25),
 }
-SN_CP = {k: (m1, la1 - (0.2 if m1 == 4 else 0.4), m2, la2, kk) for k, (m1, la1, m2, la2, kk) in SN_AIR.items()}
-SN_FC = {k: (3.0, la1 - math.log10(3), None, None, kk) for k, (m1, la1, m2, la2, kk) in SN_AIR.items() if m1 == 3}
+SN_CP_LA1 = {"B1": 14.977, "B2": 14.745, "C": 13.431, "C1": 13.264, "C2": 13.091, "D": 11.764, "E": 11.610,
+             "F": 11.455, "F1": 11.299, "F3": 11.146, "G": 10.998, "W1": 10.861, "W2": 10.707, "W3": 10.570}
+SN_CP = {k: (m1, SN_CP_LA1[k], m2, la2, kk) for k, (m1, la1, m2, la2, kk) in SN_AIR.items()}
+SN_FC_LA = {"B1": (12.436, 0.0), "B2": (12.262, 0.0), "C": (12.115, 0.15), "C1": (11.972, 0.15),
+            "C2": (11.824, 0.15), "D": (11.687, 0.20), "E": (11.533, 0.20), "F": (11.378, 0.25),
+            "F1": (11.222, 0.25), "F3": (11.068, 0.25), "G": (10.921, 0.25), "W1": (10.784, 0.25),
+            "W2": (10.630, 0.25), "W3": (10.493, 0.25)}
+SN_FC = {k: (3.0, la, None, None, kk) for k, (la, kk) in SN_FC_LA.items()}
 T_REF = 0.025
 
 
@@ -198,6 +204,13 @@ HOTSPOTS = [
          D=0.9144, t=0.0381, method="nominal + SCF", cls="D", env="cp"),
 ]
 DELTA_M = 0.006   # girth weld misalignment (hi-lo) [m]
+L_WELD = 0.040    # width of the girth weld cap at the surface [m]
+
+
+def girth_scf(dm, t=0.0381, D=0.9144, L=L_WELD):
+    """C203 eq. (3.9), butt weld in a tubular, equal thickness; delta0 = 0.05t is in the S-N data (Table 3-1)"""
+    alpha = 0.91 * L / math.sqrt(D * t)
+    return max(1.0, 1 + 3 * (dm - 0.05 * t) / t * math.exp(-alpha))
 
 
 def transfer_curves(soil, template, H_max=250e3, n=26):
@@ -229,7 +242,7 @@ def main():
     # SCFs
     scf = {"hp": hot["welds"]["hpwhh"]["scf"], "lp": hot["welds"]["lpwh"]["scf"]}
     t_c = 0.0381
-    scf["cg"] = 1 + 3 * (DELTA_M - 0.1 * t_c) / t_c
+    scf["cg"] = girth_scf(DELTA_M, t_c)
     for hs in HOTSPOTS:
         D, t = hs["D"], hs["t"]
         I = np.pi / 64 * (D ** 4 - (D - 2 * t) ** 4)
@@ -410,7 +423,7 @@ def main():
     # misalignment of the girth weld
     sens["misalign"] = []
     for dm in (0.0, 0.002, 0.004, 0.006, 0.008, 0.010, 0.012):
-        s_new = max(1.0, 1 + 3 * (dm - 0.1 * t_c) / t_c)
+        s_new = girth_scf(dm, t_c)
         sens["misalign"].append([dm * 1e3, s_new, life_scaled("cg", s_new / scf["cg"])])
     # soil bounds: recompute transfer curves for LB and UB soils
     sens["soil"] = {}
@@ -424,10 +437,14 @@ def main():
             res[hs["id"]] = dict(ratio=r, life=life_scaled(hs["id"], r))
         sens["soil"][name] = res
         print("soil", name, {k: (round(v["ratio"], 3), round(v["life"])) for k, v in res.items()})
+    # the girth weld made on site instead of in the shop with the pipe rotated: S-N class E ([3.3.7.3])
+    sens["class_E"] = life_scaled("cg", 1.0, cls="E")
+    print("girth weld as class E:", round(sens["class_E"]))
     out["sens"] = sens
     out["hotspots"] = [{k: v for k, v in hs.items()} for hs in HOTSPOTS]
     out["scf"] = scf
-    out["girth"] = dict(delta_m=DELTA_M, t=t_c, D=0.9144, scf=scf["cg"])
+    out["girth"] = dict(delta_m=DELTA_M, t=t_c, D=0.9144, L=L_WELD, scf=scf["cg"],
+                        alpha=0.91 * L_WELD / math.sqrt(0.9144 * t_c))
     out["governing"] = gov["id"]
     out["dff"] = 10
     out["plan_days"] = 120

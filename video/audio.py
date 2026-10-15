@@ -332,7 +332,12 @@ DISPLAY = [("D N V, R P, C two-oh-three", "DNV-RP-C203"), ("P Y curve", "p-y cur
            ("a hundred and twenty days", "120 days"), ("seventy percent", "70%"), ("ten percent more", "10% more"),
            ("ten millimetres", "10 mm"), ("instead of six", "instead of 6"), ("sixty-eight days", "68 days"),
            ("m is three", "m is 3"), ("factor of eight", "factor of 8"), ("Step one", "Step 1"), ("Step two", "Step 2"),
-           ("Step three", "Step 3"), ("Step four", "Step 4"), ("Step five", "Step 5"), ("Step six", "Step 6")]
+           ("Step three", "Step 3"), ("Step four", "Step 4"), ("Step five", "Step 5"), ("Step six", "Step 6"),
+           ("one point two seven", "1.27"), ("Delta nought, five percent of the wall,", "δ0, 5% of the wall,"),
+           ("F three", "F3"), ("twelve hundred and thirty days", "1,230 days"), ("a hundred and twenty-three days", "123 days"),
+           ("ninety-seven percent", "97%"), ("power three, and five", "power 3, and 5"), ("thirty percent", "30%"),
+           ("three percent to spare", "3% to spare"), ("Eight millimetres", "8 mm"), ("eighty-six days", "86 days"),
+           ("seventy-nine days", "79 days")]
 
 
 def disp(s):

@@ -14,8 +14,8 @@ export default async function check(ctx) {
   const DFF = F.dff, PLAN = F.plan_days;
   const rows = [
     { id: 'hp', L: 'A', name: 'HP housing weld', sub: 'hot spot SCF 1.60 · casing 15.9 mm', tt: at('k3', 'high-pressure housing') },
-    { id: 'lp', L: 'B', name: 'Conductor housing weld', sub: 'hot spot SCF 1.15, inside · 38.1 mm', tt: at('k3', 'conductor housing weld') },
-    { id: 'cg', L: 'C', name: 'Conductor girth weld', sub: 'misalignment SCF 1.17 · 3 m below mudline', tt: at('k3', 'governing') },
+    { id: 'lp', L: 'B', name: 'Conductor housing weld', sub: `hot spot SCF ${F.scf.lp.toFixed(2)}, inside · 38.1 mm`, tt: at('k3', 'conductor housing weld') },
+    { id: 'cg', L: 'C', name: 'Conductor girth weld', sub: `misalignment SCF ${F.scf.cg.toFixed(2)} · S-N class D · 3 m below mudline`, tt: at('k3', 'governing') },
   ].map((r) => ({ ...r, life: F.damage[r.id].life_days }));
   const gov = rows[2];
   const springZ = [];
@@ -146,7 +146,7 @@ export default async function check(ctx) {
           d2.panel(px, py, 280, 92, { alpha: rA * clamp(vq), accent: PAL.green, fill: 'rgba(10,40,30,0.92)' });
           d2.check(px + 46, py + 46, 24, { progress: vq, alpha: rA });
           d2.text('PASS', px + 86, py + 42, { size: 32, weight: 800, color: PAL.green, alpha: rA * clamp(vq) });
-          d2.text(`utilisation ${Math.round(u * 100)} %`, px + 86, py + 74, { size: 22, weight: 650, color: PAL.ink, alpha: rA * clamp(vq) });
+          d2.text(`utilisation ${Math.round(u * 100)} %`, px + 86, py + 74, { size: 22, weight: 700, color: u > 0.9 ? PAL.amber : PAL.ink, alpha: rA * clamp(vq) });
         }
       }
       chainBar(d2, 6, { alpha: seg(t, 1.6, 0.6) });

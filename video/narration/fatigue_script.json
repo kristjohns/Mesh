@@ -176,7 +176,7 @@
         },
         {
           "id": "l4",
-          "text": "The conductor girth weld is a standard detail, so we use the nominal stress, with a concentration factor for misalignment. With six millimetres of high-low between the pipe ends, C two-oh-three gives one point one seven. The point one t in the formula is misalignment that is already included in the S N test data.",
+          "text": "The conductor girth weld is a standard detail, so we use the nominal stress, with a concentration factor for misalignment. With six millimetres of high-low between the pipe ends, C two-oh-three gives one point two seven. Delta nought, five percent of the wall, is misalignment that is already included in the S N test data. And the exponential term spreads the bending over the width of the weld.",
           "pause": 0.4
         }
       ]
@@ -225,12 +225,12 @@
         },
         {
           "id": "n2",
-          "text": "Appendix A classifies a long list of details. A girth weld made from both sides is a D curve detail at the weld toe. And when the hot spot stress comes from a finite element model, the D curve is the one to use as well.",
+          "text": "Appendix A classifies a long list of details. For a girth weld, it depends on how it's made. Welded from both sides, in the shop, with the pipe rotated, the weld toe is a D detail. Welded on site, it drops to E. And welded from one side only, the root is an F three. We assume shop welds, so our girth weld is a D. And when the hot spot stress comes from a finite element model, C two-oh-three links it to the D curve as well.",
           "pause": 0.6
         },
         {
           "id": "n3",
-          "text": "Then the environment. In air, the curve bends at ten million cycles, to a shallower slope of five. In seawater with cathodic protection, the steep part is lower, and the bend comes at one million cycles. In free corrosion, there is no bend at all. Our welds are in seawater with cathodic protection.",
+          "text": "Then the environment. For the D curve in air, the slope changes at ten million cycles, to a shallower slope of five. In seawater with cathodic protection, the steep part is lower, and the bend comes at one million cycles. In free corrosion, there is no bend at all. Our welds are in seawater with cathodic protection.",
           "pause": 0.6
         },
         {
@@ -267,7 +267,7 @@
         },
         {
           "id": "m4",
-          "text": "C two-oh-three also offers a shortcut. If the long-term stress ranges follow a Weibull distribution, the damage has a closed-form solution. Fitted to our results, it lands within ten percent of the full calculation. Ignore the bend in the S N curve, though, and the life comes out a third shorter.",
+          "text": "C two-oh-three also offers a shortcut. If the long-term stress ranges follow a Weibull distribution, the damage has a closed-form solution. Fitted to our results, it lands within ten percent of the full calculation. Ignore the bend in the S N curve, though, and the life comes out more than a quarter shorter.",
           "pause": 0.4
         }
       ]
@@ -289,12 +289,12 @@
         },
         {
           "id": "k3",
-          "text": "Here are the results, in days of riser-connected operation. The high-pressure housing weld is far from critical. The conductor housing weld allows about three hundred and thirty days. And the governing hot spot is the plain girth weld in the conductor: sixteen hundred and sixty days of calculated life, or a hundred and sixty-six days with the design fatigue factor.",
+          "text": "Here are the results, in days of riser-connected operation. The high-pressure housing weld is far from critical. The conductor housing weld allows about three hundred and thirty days. And the governing hot spot is the plain girth weld in the conductor: about twelve hundred and thirty days of calculated life, or a hundred and twenty-three days with the design fatigue factor.",
           "pause": 0.7
         },
         {
           "id": "k4",
-          "text": "The drilling campaign needs a hundred and twenty days with the riser connected, so the well passes, at about seventy percent utilisation. But notice which weld governs. Not the big forgings, but an ordinary girth weld, out of sight below the seabed.",
+          "text": "The drilling campaign needs a hundred and twenty days with the riser connected, so the well passes, but only just, at ninety-seven percent utilisation. And notice which weld governs. Not the big forgings, but an ordinary girth weld, out of sight below the seabed.",
           "pause": 0.4
         }
       ]
@@ -306,17 +306,17 @@
       "lines": [
         {
           "id": "x1",
-          "text": "Before trusting that answer, ask what moves it. Life scales with stress to the third power, so ten percent more stress costs about a third of the life.",
+          "text": "Before trusting that answer, ask what moves it. Life scales with stress to the power three, and five for the small cycles, so ten percent more stress costs thirty percent of the life.",
           "pause": 0.6
         },
         {
           "id": "x2",
-          "text": "Fabrication matters just as much. If the girth weld had ten millimetres of misalignment instead of six, the allowable time would drop to sixty-eight days, and the well would fail the check. Weld tolerances belong in the fatigue analysis.",
+          "text": "With three percent to spare, fabrication matters. Eight millimetres of misalignment instead of six, and the allowable time drops to eighty-six days: the well would fail the check. Weld the same joint on site, and it becomes an E detail, with only seventy-nine days. Welding and tolerances belong in the fatigue analysis.",
           "pause": 0.6
         },
         {
           "id": "x3",
-          "text": "And the environment: the same weld in free corrosion, without cathodic protection, has only about half the life.",
+          "text": "And the environment: the same weld in free corrosion, without cathodic protection, has only a little over half the life.",
           "pause": 0.6
         },
         {

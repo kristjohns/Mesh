@@ -196,13 +196,18 @@ export default async function hotspot(ctx) {
         d2.dim(cx - 300, cy - T / 2, cx - 300, cy + T / 2, '', { color: PAL.ink2, alpha: cA });
         d2.text('t = 38.1 mm', cx - 290, cy + 8, { size: 22, weight: 700, color: PAL.ink2, alpha: cA });
         d2.text('hi-lo misalignment bends the wall locally', cx, cy + T / 2 + dm + 90, { size: 22, color: PAL.ink2, align: 'center', alpha: cA });
-        // formula
+        // formula: C203 eq. (3.9), delta0 from Table 3-1
         const fq = seg(t, at('l4', 'C two-oh-three gives') - 0.5, 0.7);
+        const G = F.girth;
         d2.panel(80, 750, 820, 260, { alpha: cA * fq, accent: PAL.amber });
-        tex.show('f07mis', 'SCF = 1 + \\dfrac{3\\,(\\delta_m - \\delta_0)}{t}, \\quad \\delta_0 = 0.1\\,t', 110, 780, { size: 38, alpha: cA * fq });
-        tex.show('f07mis2', '= 1 + \\dfrac{3\\,(6 - 3.8)}{38.1} = 1.17', 110, 890, { size: 38, alpha: cA * seg(t, at('l4', 'one point one seven') - 0.3, 0.6), color: PAL.amber });
-        const d0 = seg(t, at('l4', 'point one t') - 0.3, 0.6);
-        d2.tag('δ0 = 0.1t is already in the S-N test data', 490, 1040, { size: 19, color: PAL.ink2, align: 'center', alpha: cA * d0, fill: 'rgba(5,14,26,0.92)' });
+        tex.show('f07mis', 'SCF = 1 + \\dfrac{3\\,(\\delta_m - \\delta_0)}{t}\\, e^{-\\alpha}', 110, 772, { size: 36, alpha: cA * fq });
+        tex.show('f07mis3', '\\alpha = \\dfrac{0.91\\,L}{\\sqrt{D\\,t}}', 600, 772, { size: 30, alpha: cA * fq, color: PAL.ink2 });
+        tex.show('f07mis2', `= 1 + \\dfrac{3\\,(6 - ${(0.05 * G.t * 1e3).toFixed(1)})}{${(G.t * 1e3).toFixed(1)}} \\cdot ${Math.exp(-G.alpha).toFixed(2)} = ${G.scf.toFixed(2)}`, 110, 880, { size: 36, alpha: cA * seg(t, at('l4', 'one point two seven') - 0.3, 0.6), color: PAL.amber });
+        const lq = cA * seg(t, at('l4', 'exponential') - 0.3, 0.6);
+        d2.text(`L = ${Math.round(G.L * 1e3)} mm weld width`, 625, 912, { size: 18, color: PAL.ink3, alpha: lq });
+        d2.text(`D = ${(G.D * 1e3).toFixed(0)} mm outer diameter`, 625, 938, { size: 18, color: PAL.ink3, alpha: lq });
+        const d0 = seg(t, at('l4', 'five percent') - 0.3, 0.6);
+        d2.tag('δ0 = 0.05t is already in the S-N test data (C203 Table 3-1)', 490, 1040, { size: 19, color: PAL.ink2, align: 'center', alpha: cA * d0, fill: 'rgba(5,14,26,0.92)' });
         // summary table (right)
         const sq = seg(t, l4 + 1.0, 0.7);
         const rows = [
@@ -219,7 +224,7 @@ export default async function hotspot(ctx) {
           d2.text(L, 1022, y, { size: 22, weight: 800, color: col, align: 'center', alpha: cA * q });
           d2.text(n, 1062, y - 6, { size: 26, weight: 700, alpha: cA * q });
           d2.text(`${m} · ${side}`, 1062, y + 26, { size: 20, color: PAL.ink2, alpha: cA * q });
-          const lit = k === 2 ? seg(t, at('l4', 'one point one seven'), 0.5) : 1;
+          const lit = k === 2 ? seg(t, at('l4', 'one point two seven'), 0.5) : 1;
           d2.text(v.toFixed(2), 1790, y + 8, { size: 44, weight: 800, color: col, align: 'right', alpha: cA * q * lit });
         });
       }

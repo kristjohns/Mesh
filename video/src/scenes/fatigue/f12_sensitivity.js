@@ -24,7 +24,7 @@ export default async function sensitivity(ctx) {
       if (a1 > 0) {
         d2.panel(80, 190, 570, 720, { alpha: a1, accent: PAL.amber });
         d2.text('Stress level', 110, 240, { size: 28, weight: 750, alpha: a1 });
-        d2.text('life ∝ 1 / Δσ³', 110, 274, { size: 21, color: PAL.ink2, alpha: a1 });
+        d2.text('life ∝ 1 / Δσ³, and 1 / Δσ⁵ for small cycles', 110, 274, { size: 21, color: PAL.ink2, alpha: a1 });
         const P = new Plot(d2, { x: 190, y: 330, w: 420, h: 440, xr: [0.8, 1.3], yr: [0, 4500] });
         P.axes({ alpha: a1, xticks: [0.8, 0.9, 1.0, 1.1, 1.2, 1.3], yticks: [0, 1000, 2000, 3000, 4000], fs: 17, fmtx: (v) => `${Math.round((v - 1) * 100) > 0 ? '+' : ''}${Math.round((v - 1) * 100)} %`, fmty: (v) => fmtInt(v), xlabel: 'change in stress', ylabel: 'life [days]', ylabelOff: 62 });
         const q = seg(t, x1, 2.0);
@@ -54,13 +54,18 @@ export default async function sensitivity(ctx) {
         P.clipEnd();
         d2.line(P.X(0), P.Y(PLAN), P.X(12), P.Y(PLAN), { color: PAL.ink, width: 2, dash: [9, 6], alpha: a2 });
         d2.text(`planned ${PLAN} days`, P.X(0) + 6, P.Y(PLAN) - 10, { size: 18, weight: 700, color: PAL.ink, alpha: a2 });
-        const p6 = pts.find((p) => p[0] === 6), p10 = pts.find((p) => p[0] === 10);
+        const p6 = pts.find((p) => p[0] === 6), p10 = pts.find((p) => p[0] === 8);
         d2.circle(P.X(6), P.Y(p6[1]), 9, { fill: PAL.green, alpha: a2 * q });
         d2.text(`6 mm: ${Math.round(p6[1])} d`, P.X(6) + 14, P.Y(p6[1]) - 12, { size: 20, weight: 800, color: PAL.green, alpha: a2 * q });
-        const fq = seg(t, at('x2', 'ten millimetres') - 0.2, 0.8);
+        const fq = seg(t, at('x2', 'Eight millimetres') - 0.2, 0.8);
         if (fq > 0) {
-          d2.circle(P.X(10), P.Y(p10[1]), 9, { fill: PAL.red, alpha: a2 * fq, glow: PAL.red });
-          d2.text(`10 mm: ${Math.round(p10[1])} d`, P.X(10) - 14, P.Y(p10[1]) + 34, { size: 20, weight: 800, color: PAL.red, align: 'right', alpha: a2 * fq });
+          d2.circle(P.X(8), P.Y(p10[1]), 9, { fill: PAL.red, alpha: a2 * fq, glow: PAL.red });
+          d2.text(`8 mm: ${Math.round(p10[1])} d`, P.X(8) + 12, P.Y(p10[1]) - 16, { size: 20, weight: 800, color: PAL.red, alpha: a2 * fq });
+          // the same joint welded on site: S-N class E instead of D
+          const eq = seg(t, at('x2', 'E detail') - 0.3, 0.8);
+          const lE = S.class_E / DFF;
+          d2.poly([[P.X(6), P.Y(lE) - 11], [P.X(6) + 11, P.Y(lE)], [P.X(6), P.Y(lE) + 11], [P.X(6) - 11, P.Y(lE)]], { fill: PAL.orange, alpha: a2 * eq });
+          d2.text(`site weld, class E: ${Math.round(lE)} d`, P.X(6) + 20, P.Y(lE) + 44, { size: 20, weight: 800, color: PAL.orange, align: 'center', alpha: a2 * eq });
           const fl = seg(t, at('x2', 'fail the check') - 0.2, 0.6);
           d2.cross(735, 856, 18, { progress: fl, alpha: a2 });
           d2.text('fails the check', 765, 866, { size: 26, weight: 800, color: PAL.red, alpha: a2 * fl });
