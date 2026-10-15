@@ -15,7 +15,10 @@ from projects import project  # noqa: E402
 
 P = project()
 BUILD = P["build_dir"]
-pos = [a for i, a in enumerate(sys.argv[1:], 1) if a != "--video" and sys.argv[i - 1] != "--video"]
+FLAGS = ("--video", "--prefix")
+pos = [a for i, a in enumerate(sys.argv[1:], 1) if a not in FLAGS and sys.argv[i - 1] not in FLAGS]
+# folder of the parts inside the page; a new folder lets a new version upload next to the live one
+PREFIX = sys.argv[sys.argv.index("--prefix") + 1] if "--prefix" in sys.argv else "v"
 master = pos[0] if len(pos) > 0 else P["out_path"]
 outdir = pos[1] if len(pos) > 1 else os.path.join(BUILD, "web")
 PLAYER = os.path.join(ROOT, "web", "player.html" if P["id"] == "fea" else f"{P['id']}_player.html")
@@ -48,7 +51,7 @@ def srt_cues(path):
 
 
 def main():
-    os.makedirs(os.path.join(outdir, "v"), exist_ok=True)
+    os.makedirs(os.path.join(outdir, PREFIX), exist_ok=True)
     tmp = os.path.join(BUILD, "webtmp")
     os.makedirs(tmp, exist_ok=True)
     edl = json.load(open(os.path.join(BUILD, "edl.json")))
@@ -71,7 +74,7 @@ def main():
         apath = os.path.join(tmp, f"a{i:02d}.m4a")
         run("ffmpeg", "-loglevel", "error", "-y", "-ss", f"{start:.6f}", "-t", f"{dur:.6f}", "-i", mix,
             "-c:a", "aac", "-b:a", "160k", apath)
-        name = f"v/part{i:02d}.mp4"
+        name = f"{PREFIX}/part{i:02d}.mp4"
         dst = os.path.join(outdir, name)
         run("ffmpeg", "-loglevel", "error", "-y", "-i", vpath, "-i", apath, "-map", "0:v", "-map", "1:a",
             "-c", "copy", "-movflags", "+faststart", dst)
