@@ -13,12 +13,13 @@ export function mobColor(m) {
 //      springs: bool, mob(z) -> 0..1, nodes: [z...], alpha, p (draw progress), bop, template, soil, labels }
 export function drawGlobal(d2, o) {
   const a = o.alpha ?? 1;
-  if (a <= 0.001) return;
   const sy = o.sy ?? 14;
   const Y = (z) => o.y0 - z * sy * (z > 0 ? (o.syUp ?? 1) : 1);
   const u = o.u ?? (() => 0);
   const ux = o.ux ?? 0;
   const X = (z) => o.x + u(z) * ux;
+  // callers place labels with X/Y even while the diagram fades out
+  if (a <= 0.001) return { X, Y };
   const zTop = o.zTop ?? 17, zBot = o.zBot ?? -30;
   const p = clamp(o.p ?? 1);
   // soil block
