@@ -33,6 +33,48 @@ COMP = [C_X, C_Y, C_Z]
 
 config.background_color = BG
 
+
+class Arrow3DLite(VGroup):
+    """Low-poly 3D arrow (n-sided prism shaft + n-sided cone), ~10x cheaper than manim.Arrow3D in Cairo."""
+
+    def __init__(self, start=LEFT, end=RIGHT, thickness=0.02, height=0.3, base_radius=0.08, color=WHITE,
+                 resolution=6, **kwargs):
+        super().__init__()
+        start, end = np.array(start, dtype=float), np.array(end, dtype=float)
+        v = end - start
+        L = float(np.linalg.norm(v))
+        self._start, self._end = start, end
+        if L < 1e-6:
+            return
+        d = v / L
+        tip = min(height, 0.6 * L)
+        ref = np.array([0.0, 0.0, 1.0]) if abs(d[2]) < 0.9 else np.array([0.0, 1.0, 0.0])
+        a = np.cross(d, ref); a /= np.linalg.norm(a)
+        b = np.cross(d, a)
+        n = int(np.clip(resolution, 4, 8))
+        ang = np.linspace(0, TAU, n, endpoint=False)
+        ring = lambda c, r: [c + r * (np.cos(t) * a + np.sin(t) * b) for t in ang]
+        p1 = end - d * tip
+        r0, r1, rb = ring(start, thickness), ring(p1, thickness), ring(p1, base_radius)
+        for i in range(n):
+            j = (i + 1) % n
+            self.add(Polygon(r0[i], r0[j], r1[j], r1[i]))
+            self.add(Polygon(rb[i], rb[j], end))
+        self.add(Polygon(*rb))
+        for f in self:
+            f.set_fill(color, opacity=1.0)
+            f.set_stroke(width=0)
+            f.shade_in_3d = True
+
+    def get_start(self):
+        return self._start.copy()
+
+    def get_end(self):
+        return self._end.copy()
+
+
+Arrow3D = Arrow3DLite          # every scene uses the light version
+
 _DUR_PATH = os.path.join(BUILD, "audio", "durations.json")
 DUR = json.load(open(_DUR_PATH)) if os.path.exists(_DUR_PATH) else {}
 

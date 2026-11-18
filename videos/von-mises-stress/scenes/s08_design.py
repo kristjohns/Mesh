@@ -210,19 +210,26 @@ class S09_Conclusion(N3DScene):
         lh = VGroup(T("hydrostatic", size=30, color=C_HYD, weight=SEMIBOLD), T("changes volume", size=24, color=DIM))
         ld = VGroup(T("deviatoric", size=30, color=C_DEV, weight=SEMIBOLD), T("changes shape → slip → yield", size=24,
                                                                               color=DIM))
-        for g, x in ((lh, -3.6), (ld, 3.6)):
-            g.arrange(DOWN, buff=0.12).move_to([x, -2.6, 0])
+        for g, x in ((lh, -3.25), (ld, 3.25)):
+            g.arrange(DOWN, buff=0.12).move_to([x, -2.45, 0])
             self.add_fixed_in_frame_mobjects(g); self.remove(g)
         with self.say("z1") as d:
             self.play(FadeIn(full), run_time=1.0)
-            self.begin_ambient_camera_rotation(rate=0.08)
+            full.add_updater(lambda m, dt: m.rotate(0.12 * dt, axis=OUT, about_point=m.get_center()))
             self.until("z1", "Every stress state")
-            self.play(TransformFromCopy(full, hydc), TransformFromCopy(full, devc), FadeOut(full), run_time=1.8)
+            c1, c2 = full.cube.copy(), full.cube.copy()
+            self.add(c1, c2)
+            self.play(c1.animate.move_to(hydc.get_center()), c2.animate.move_to(devc.get_center()), FadeOut(full),
+                      run_time=1.2)
+            self.play(FadeOut(c1), FadeOut(c2), FadeIn(hydc), FadeIn(devc), run_time=0.8)
+            for cb_ in (hydc, devc):
+                cb_.add_updater(lambda m, dt: m.rotate(0.12 * dt, axis=OUT, about_point=m.get_center()))
             self.play(FadeIn(lh), FadeIn(ld), run_time=0.8)
             self.until("z1", "In ductile metals")
             self.play(hydc.animate.set_opacity(0.25), FadeOut(lh), devc.animate.scale(1.15), run_time=1.2)
         with self.say("z2") as d:
-            self.stop_ambient_camera_rotation()
+            for cb_ in (hydc, devc):
+                cb_.clear_updaters()
             self.play(FadeOut(VGroup(hydc, devc, ld)), run_time=0.6)
             eq = M(r"\sigma_{vm}=\sqrt{\tfrac12\left[(\sigma_1-\sigma_2)^2+(\sigma_2-\sigma_3)^2+(\sigma_3-\sigma_1)^2\right]}",
                    size=50)

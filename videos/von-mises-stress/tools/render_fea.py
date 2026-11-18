@@ -97,7 +97,7 @@ def load_glyphs():
     return g
 
 
-ANCHORS = {"N": (0, 0, L + 330), "M": (0, 150, L + 95), "T": (Ro2 + 70, 0, L - 30), "peak": tuple(PEAK),
+ANCHORS = {"N": (0, 0, L + 330), "M": (Ro1 + 60, 0, -95.0), "T": (-(Ro2 + 70), 0, L - 30), "peak": tuple(PEAK),
            "pipe": (Ro1, 0, 250.0)}
 
 
@@ -268,6 +268,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--shots", default="open_a,open_b,fea_model,fea_mesh,fea_vm,components")
     ap.add_argument("--preview", action="store_true", help="render 3 stills per shot only")
+    ap.add_argument("--anchors-only", action="store_true", help="recompute anchors.json without rendering")
     a = ap.parse_args()
     for s in a.shots.split(","):
         if s == "components":
@@ -276,6 +277,14 @@ if __name__ == "__main__":
         fn, dur, anc = SHOTS[s]
         setup, update = fn(0)
         nf = int(round(dur() * FPS))
+        if a.anchors_only:
+            pl = new_plotter(); st = setup(pl); anc = {k: [] for k in anc}
+            for i in range(nf):
+                update(pl, st, i / max(1, nf - 1), i)
+                for k in anc:
+                    anc[k].append(to_manim(pl, ANCHORS[k]))
+            json.dump(anc, open(os.path.join(FR, s, "anchors.json"), "w")); pl.close(); print("anchors", s, nf)
+            continue
         if a.preview:
             out = os.path.join(FR, "preview"); os.makedirs(out, exist_ok=True)
             pl = new_plotter(size=(960, 540)); st = setup(pl)

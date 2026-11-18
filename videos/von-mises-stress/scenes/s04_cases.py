@@ -279,8 +279,8 @@ class S04c_CaseE(N3DScene):
         self.set_camera_orientation(phi=70 * DEGREES, theta=-62 * DEGREES, zoom=0.9)
         tit = fixed(self, case_title("E", "Axial force + torque"))
         r, Ls = 0.85, 5.0
-        shaft = Cylinder(radius=r, height=Ls, direction=RIGHT, resolution=(28, 6), fill_color=C_STEEL,
-                         fill_opacity=1.0, stroke_width=0.3, stroke_color="#5A6578", checkerboard_colors=False)
+        shaft = Cylinder(radius=r, height=Ls, direction=RIGHT, resolution=(40, 2), fill_color=C_STEEL,
+                         fill_opacity=1.0, stroke_width=0.0, checkerboard_colors=False)
         shaft.move_to(ORIGIN)
         ends = VGroup()
         for sgn in (1, -1):
@@ -315,7 +315,7 @@ class S04c_CaseE(N3DScene):
         fixed(self, mE)
         with self.say("e1") as d:
             self.play(FadeIn(tit), FadeIn(shaft), run_time=1.0)
-            self.begin_ambient_camera_rotation(rate=0.07)
+            self.begin_ambient_camera_rotation(rate=0.022)
             self.play(*[GrowFromPoint(a, a.get_start()) for a in ends], run_time=0.8)
             self.play(*[Create(t_) for t_ in tor], run_time=1.0)
             self.until("e1", "At the surface")
@@ -350,7 +350,7 @@ class S04c_CaseE(N3DScene):
                         T("thin-walled tubes in tension + torsion", size=22, color=DIM),
                         T("Cu, Al, mild steel: closer to von Mises", size=22, color=DIM)).arrange(DOWN, aligned_edge=LEFT,
                                                                                             buff=0.12)
-            tq.to_corner(DR).shift(UP * 0.2 + LEFT * 0.1)
+            tq.to_corner(UR).shift(DOWN * 0.35 + LEFT * 0.1)
             fixed(self, tq)
             self.play(FadeIn(tq), run_time=0.8)
             self.until("e2", "than to the maximum")

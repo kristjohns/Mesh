@@ -17,4 +17,4 @@ if [ "$Q" = "h" ]; then FLAGS="-r 1920,1080 --fps 30"; else FLAGS="-ql"; fi
 mkdir -p "$HERE/build/logs"
 cd "$HERE/scenes"
 for s in "$@"; do echo "$s"; done | xargs -P "$P" -I{} bash -c \
-  "$MANIM $FLAGS ${FILE[S01_Opening]:+} \$(python3 -c \"import sys; d=dict(x.split('=') for x in sys.argv[2:]); print(d[sys.argv[1]])\" {} $(for k in "${!FILE[@]}"; do printf '%s=%s ' "$k" "${FILE[$k]}"; done)) {} > $HERE/build/logs/{}_$Q.log 2>&1; echo \"{} exit=\$?\""
+  "$MANIM $FLAGS ${FILE[S01_Opening]:+} \$(python3 -c \"import sys; d=dict(x.split('=') for x in sys.argv[2:]); print(d[sys.argv[1]])\" {} $(for k in "${!FILE[@]}"; do printf '%s=%s ' "$k" "${FILE[$k]}"; done)) {} > $HERE/build/logs/{}_$Q.log 2>&1 || $MANIM $FLAGS \$(python3 -c \"import sys; d=dict(x.split('=') for x in sys.argv[2:]); print(d[sys.argv[1]])\" {} $(for k in "${!FILE[@]}"; do printf '%s=%s ' "$k" "${FILE[$k]}"; done)) {} > $HERE/build/logs/{}_$Q.log 2>&1; echo \"{} exit=\$?\""

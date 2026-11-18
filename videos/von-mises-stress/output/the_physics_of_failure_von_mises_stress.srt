@@ -1,0 +1,1049 @@
+1
+00:00:00,000 --> 00:00:03,012
+A drive shaft. A riser
+joint. A subsea connector.
+
+2
+00:00:03,062 --> 00:00:06,324
+In service, steel is rarely
+loaded one way at a time:
+
+3
+00:00:06,374 --> 00:00:09,074
+it is pulled, bent and twisted, all at once.
+
+4
+00:00:09,400 --> 00:00:14,136
+Inside, the loads build up a stress field.
+Zoom in to a single material point, and
+
+5
+00:00:14,186 --> 00:00:18,805
+on the faces of an infinitesimal cube,
+three normal stresses pull or push, while
+
+6
+00:00:18,855 --> 00:00:21,956
+three shear stresses slide
+the faces past one another.
+
+7
+00:00:22,006 --> 00:00:26,392
+Together they form the Cauchy stress
+tensor: symmetric, with six independent
+
+8
+00:00:26,442 --> 00:00:27,034
+components.
+
+9
+00:00:27,333 --> 00:00:31,593
+But the strength we measure comes from a
+uniaxial tension test, as a single number:
+
+10
+00:00:31,643 --> 00:00:35,694
+the yield strength. So how do we decide
+whether a full three-dimensional stress
+
+11
+00:00:35,744 --> 00:00:37,511
+state will make the material yield?
+
+12
+00:00:37,800 --> 00:00:41,484
+Checking each component against the
+yield strength fails immediately.
+
+13
+00:00:41,534 --> 00:00:45,975
+A shaft in pure torsion yields when its
+shear stress reaches only about fifty-eight
+
+14
+00:00:46,025 --> 00:00:50,358
+percent of the tensile yield strength.
+And a solid specimen squeezed equally from
+
+15
+00:00:50,408 --> 00:00:53,551
+all sides, far beyond that
+strength, does not yield at all.
+
+16
+00:00:53,833 --> 00:00:58,024
+We need one equivalent stress, built from
+the whole tensor, comparable with the
+
+17
+00:00:58,074 --> 00:01:02,264
+tension test. To find it, we must first
+understand what yielding physically is.
+
+18
+00:01:09,800 --> 00:01:14,557
+Structural steel is a polycrystal: an
+aggregate of grains, each a nearly perfect
+
+19
+00:01:14,607 --> 00:01:17,501
+lattice of iron atoms,
+each oriented differently.
+
+20
+00:01:17,800 --> 00:01:20,932
+Inside a grain, plastic
+deformation happens by slip:
+
+21
+00:01:20,982 --> 00:01:26,073
+planes of atoms shearing past one another
+along close-packed directions, leaving the
+
+22
+00:01:26,123 --> 00:01:28,521
+lattice intact and the volume unchanged.
+
+23
+00:01:28,800 --> 00:01:33,828
+Sliding a whole plane at once would break
+every bond across it simultaneously,
+
+24
+00:01:33,878 --> 00:01:37,408
+needing roughly the shear
+modulus over 2π: gigapascals.
+
+25
+00:01:37,458 --> 00:01:40,272
+Real metals yield orders of magnitude lower.
+
+26
+00:01:40,567 --> 00:01:45,462
+The reason is the dislocation: a line
+defect, here an extra half-plane of atoms.
+
+27
+00:01:45,512 --> 00:01:48,862
+Under shear it glides,
+re-forming bonds₁ row at a time.
+
+28
+00:01:48,912 --> 00:01:52,633
+When it exits, the crystal has
+slipped by one atomic spacing.
+
+29
+00:01:52,900 --> 00:01:57,200
+What drives it is the shear stress
+resolved onto the slip plane, in the slip
+
+30
+00:01:57,250 --> 00:02:02,007
+direction: Schmid's law. Even a crystal in
+pure tension yields by shear, on inclined
+
+31
+00:02:02,057 --> 00:02:02,408
+planes.
+
+32
+00:02:02,733 --> 00:02:07,483
+Now press equally from all sides. The
+traction on every plane is purely normal:
+
+33
+00:02:07,533 --> 00:02:12,282
+no plane carries shear. No resolved shear,
+no glide, no yielding, as Bridgman's
+
+34
+00:02:12,332 --> 00:02:14,469
+high-pressure experiments confirmed.
+
+35
+00:02:14,767 --> 00:02:20,148
+So we split the stress tensor in two. The
+mean stress, σ_m, one third of the trace,
+
+36
+00:02:20,198 --> 00:02:23,485
+defines a hydrostatic part:
+σ_m times the identity.
+
+37
+00:02:23,535 --> 00:02:27,280
+What remains is the deviatoric
+stress, s, with zero trace.
+
+38
+00:02:28,367 --> 00:02:33,177
+In an isotropic material, hydrostatic
+stress makes a cube grow or shrink, but it
+
+39
+00:02:33,227 --> 00:02:35,911
+stays a cube: volume
+changes, shape does not.
+
+40
+00:02:36,200 --> 00:02:39,135
+Under pure shear, it
+distorts at constant volume:
+
+41
+00:02:39,185 --> 00:02:41,024
+shape changes, volume does not.
+
+42
+00:02:41,300 --> 00:02:45,662
+Under combined loading, it does both, and
+only the distortion is linked to slip.
+
+43
+00:02:45,933 --> 00:02:50,392
+That is why the criterion we want is based
+on distortion energy, rather than the
+
+44
+00:02:50,442 --> 00:02:55,127
+total strain energy that Beltrami proposed.
+Total energy includes volume change, and
+
+45
+00:02:55,177 --> 00:02:57,550
+would predict yielding under pure pressure.
+
+46
+00:03:00,100 --> 00:03:05,520
+Start with the principal stresses. In one
+particular orientation, every shear stress
+
+47
+00:03:05,570 --> 00:03:10,991
+vanishes. The normal stresses that remain,
+σ₁, σ₂ and σ₃, are the eigenvalues of the
+
+48
+00:03:11,041 --> 00:03:14,182
+tensor: the roots of its
+characteristic equation.
+
+49
+00:03:14,467 --> 00:03:19,983
+Its coefficients, I₁, I₂ and I₃, are
+invariants, independent of our choice of axes.
+
+50
+00:03:20,033 --> 00:03:24,677
+For an isotropic material, a yield
+criterion can depend only on these.
+
+51
+00:03:24,967 --> 00:03:30,283
+The mean stress is₁ third of I₁. Subtracting
+it gives the principal deviators, s₁,
+
+52
+00:03:30,333 --> 00:03:35,780
+s₂ and s₃, which always sum to zero, and
+do not change when all three stresses shift
+
+53
+00:03:35,830 --> 00:03:36,369
+together.
+
+54
+00:03:37,600 --> 00:03:41,190
+Now the energy: one half of
+stress, double-dotted with strain.
+
+55
+00:03:41,240 --> 00:03:45,946
+In Hooke's law, the mean stress drives
+volume change through the bulk modulus, K,
+
+56
+00:03:45,996 --> 00:03:49,703
+and the deviator drives distortion
+through the shear modulus, G.
+
+57
+00:03:50,000 --> 00:03:55,557
+Multiply out, and the cross terms vanish,
+because the identity double-dotted with s
+
+58
+00:03:55,607 --> 00:04:01,163
+is the trace of s: zero. The energy separates
+exactly, into a volumetric part and a
+
+59
+00:04:01,213 --> 00:04:03,595
+distortional part: s:s, over four G.
+
+60
+00:04:03,867 --> 00:04:08,333
+Half of s:s is the second
+deviatoric invariant, J₂.
+
+61
+00:04:08,383 --> 00:04:11,345
+So the distortion energy is J₂/2G.
+
+62
+00:04:11,633 --> 00:04:16,277
+Now the key step. Because the deviators sum
+to zero, the sum of their squares can be
+
+63
+00:04:16,327 --> 00:04:20,916
+written using only their differences. And
+a difference of deviators is a difference
+
+64
+00:04:20,966 --> 00:04:25,498
+of principal stresses: the mean cancels.
+So J₂ is₁ sixth of the sum of the squared
+
+65
+00:04:25,548 --> 00:04:27,118
+principal stress differences.
+
+66
+00:04:27,400 --> 00:04:32,760
+Huber, von Mises and Hencky proposed that
+yielding begins when the distortion energy
+
+67
+00:04:32,810 --> 00:04:37,720
+reaches its value at yield in a tension
+test: σ₁ equal to the yield strength,
+
+68
+00:04:37,770 --> 00:04:42,679
+written σ_Y to distinguish it from the
+component σ_y, and the other two zero.
+
+69
+00:04:43,100 --> 00:04:46,225
+Equate the two energies.
+The shear modulus cancels:
+
+70
+00:04:46,275 --> 00:04:49,649
+the criterion does not depend
+on the elastic constants.
+
+71
+00:04:49,699 --> 00:04:52,948
+What remains defines the
+von Mises equivalent stress:
+
+72
+00:04:52,998 --> 00:04:57,928
+the square root of one half the sum of
+the squared principal stress differences.
+
+73
+00:04:57,978 --> 00:04:59,235
+Equivalently, √(3J₂).
+
+74
+00:04:59,633 --> 00:05:04,353
+There is a physical reading, too. Average
+the squared shear stress over every plane
+
+75
+00:05:04,403 --> 00:05:08,720
+through the point: the root-mean-square
+shear stress is proportional to √J₂.
+
+76
+00:05:08,770 --> 00:05:13,144
+For a polycrystal, with slip systems in
+every direction, the von Mises stress
+
+77
+00:05:13,194 --> 00:05:15,615
+measures the shear available to drive slip.
+
+78
+00:05:15,900 --> 00:05:22,237
+Solvers report Cartesian components. In x,
+y and z, each shear stress appears twice
+
+79
+00:05:22,287 --> 00:05:28,547
+in s:s, since τ_xy equals τ_yx. So it
+contributes its full square to J₂, and three
+
+80
+00:05:28,597 --> 00:05:30,548
+times its square to σ_vm².
+
+81
+00:05:30,833 --> 00:05:35,170
+The normal stresses enter as squares
+minus cross products, which depend only on
+
+82
+00:05:35,220 --> 00:05:36,169
+their differences.
+
+83
+00:05:36,467 --> 00:05:39,445
+Yielding begins when σ_vm
+reaches σ_Y. Precisely:
+
+84
+00:05:39,495 --> 00:05:44,203
+the onset of yield at a point, in an
+isotropic, ductile, pressure-insensitive
+
+85
+00:05:44,253 --> 00:05:47,540
+material, with equal yield
+in tension and compression.
+
+86
+00:05:47,590 --> 00:05:52,299
+It says nothing about ultimate failure.
+Necking and fracture come much later,
+
+87
+00:05:52,349 --> 00:05:54,153
+governed by different physics.
+
+88
+00:05:56,633 --> 00:06:00,233
+Let's test the criterion
+on five loading cases.
+
+89
+00:06:00,283 --> 00:06:04,815
+Case A, uniaxial tension: σ₁
+equals σ, the others are zero.
+
+90
+00:06:04,865 --> 00:06:09,863
+Two differences equal σ, one is
+zero, and σ_vm equals σ, exactly.
+
+91
+00:06:10,133 --> 00:06:14,119
+By construction: the criterion
+was calibrated on this test.
+
+92
+00:06:14,169 --> 00:06:17,813
+Yet even here, a hydrostatic
+part, σ/3, plays no role.
+
+93
+00:06:19,100 --> 00:06:27,307
+Case B, pure shear: only τ_xy is non-zero.
+The Cartesian form leaves₃ τ squared, so
+
+94
+00:06:27,357 --> 00:06:32,281
+σ_vm is √3 τ, and yield
+in shear occurs at σ_Y/√3:
+
+95
+00:06:32,331 --> 00:06:37,155
+0.577 σ_Y. For S355 steel,
+about 205 megapascals.
+
+96
+00:06:37,433 --> 00:06:40,767
+Why √3? Rotate the element
+by forty-five degrees:
+
+97
+00:06:40,817 --> 00:06:45,186
+pure shear is a tension τ and a
+compression −τ, at right angles.
+
+98
+00:06:45,236 --> 00:06:50,848
+Its principal differences are τ, τ and two
+τ: a sum of squares of 6τ², against 2σ²
+
+99
+00:06:50,898 --> 00:06:56,440
+for tension. So shear reaches the critical
+distortion at a stress √3 times lower.
+
+100
+00:06:56,733 --> 00:07:01,298
+Case C, equal biaxial tension,
+as in a thin spherical shell.
+
+101
+00:07:01,348 --> 00:07:05,605
+The differences are zero, σ
+and σ: again, σ_vm equals σ.
+
+102
+00:07:05,900 --> 00:07:11,366
+Why? Equal biaxial tension is a hydrostatic
+tension σ, plus a uniaxial compression,
+
+103
+00:07:11,416 --> 00:07:16,883
+−σ, in the third direction. The hydrostatic
+part is invisible, so despite two equal
+
+104
+00:07:16,933 --> 00:07:21,269
+stresses, the state carries a full
+uniaxial measure of distortion.
+
+105
+00:07:21,567 --> 00:07:25,869
+Case D, hydrostatic stress: all
+three principal stresses equal p.
+
+106
+00:07:25,919 --> 00:07:29,886
+Every difference vanishes, so
+σ_vm is zero, at any pressure.
+
+107
+00:07:30,167 --> 00:07:34,438
+A solid steel part at three thousand
+metres carries thirty megapascals of
+
+108
+00:07:34,488 --> 00:07:37,458
+hydrostatic compression,
+and zero von Mises stress.
+
+109
+00:07:37,508 --> 00:07:42,194
+A sealed pipe beside it, with one atmosphere
+inside, carries a large compressive
+
+110
+00:07:42,244 --> 00:07:47,167
+hoop stress, and can yield or collapse. It
+is the pressure difference that distorts.
+
+111
+00:07:47,467 --> 00:07:52,491
+Here the classical theory has limits:
+soils, concrete, polymers and porous metals
+
+112
+00:07:52,541 --> 00:07:57,002
+are pressure-sensitive, and need
+criteria like Drucker–Prager or Gurson.
+
+113
+00:07:57,052 --> 00:08:02,014
+And in steel, hydrostatic tension causes
+no yield, yet it drives void growth and
+
+114
+00:08:02,064 --> 00:08:03,142
+reduces ductility.
+
+115
+00:08:03,433 --> 00:08:08,915
+Case E: a shaft under axial force and
+torque. At the surface, the axial force gives
+
+116
+00:08:08,965 --> 00:08:12,314
+a normal stress σ, and the
+torque a shear stress τ.
+
+117
+00:08:12,364 --> 00:08:16,446
+The von Mises stress is the
+square root of σ² plus₃ τ squared.
+
+118
+00:08:16,767 --> 00:08:20,814
+In the σ–τ plane, that is an
+ellipse through σ_Y and σ_Y/√3.
+
+119
+00:08:20,864 --> 00:08:26,346
+In 1931, Taylor and Quinney tested
+thin-walled tubes in exactly this combination;
+
+120
+00:08:26,396 --> 00:08:32,015
+their yield points lay closer to this
+ellipse than to the maximum shear prediction.
+
+121
+00:08:36,100 --> 00:08:40,686
+Now see it all at once. With the principal
+stresses as coordinates, every stress
+
+122
+00:08:40,736 --> 00:08:45,149
+state is a point. The line where all
+three are equal is the hydrostatic axis.
+
+123
+00:08:45,199 --> 00:08:49,785
+Perpendicular to it lie the deviatoric
+planes; the one through the origin is the
+
+124
+00:08:49,835 --> 00:08:50,249
+π-plane.
+
+125
+00:08:50,567 --> 00:08:55,873
+A stress point splits into a component along
+the axis, set by the mean stress, and a
+
+126
+00:08:55,923 --> 00:09:01,039
+component in the deviatoric plane: the
+deviator itself, at a distance √(2J₂) from
+
+127
+00:09:01,089 --> 00:09:01,613
+the axis.
+
+128
+00:09:01,933 --> 00:09:05,904
+The von Mises condition fixes
+J₂, so it fixes that distance:
+
+129
+00:09:05,954 --> 00:09:10,193
+√(2/3) σ_Y, everywhere along the
+axis and all the way around it.
+
+130
+00:09:10,243 --> 00:09:12,940
+The yield surface is a circular cylinder.
+
+131
+00:09:13,267 --> 00:09:17,792
+Circular, because the criterion ignores
+the Lode angle around the axis, which
+
+132
+00:09:17,842 --> 00:09:22,725
+carries the third invariant. Infinitely
+long, because moving along the axis is pure
+
+133
+00:09:22,775 --> 00:09:23,854
+hydrostatic stress.
+
+134
+00:09:24,133 --> 00:09:28,829
+Slice it with the plane σ₃ equals zero,
+and out comes the plane-stress yield
+
+135
+00:09:28,879 --> 00:09:33,949
+ellipse, with uniaxial tension, pure shear
+and equal biaxial tension exactly where
+
+136
+00:09:33,999 --> 00:09:35,010
+we computed them.
+
+137
+00:09:35,300 --> 00:09:40,408
+Now increase the loads proportionally.
+The point moves out along a ray, and meets
+
+138
+00:09:40,458 --> 00:09:43,593
+the cylinder when the load
+factor equals σ_Y/σ_vm:
+
+139
+00:09:43,643 --> 00:09:48,369
+the safety factor against first yield.
+A hydrostatic path never reaches it.
+
+140
+00:09:50,867 --> 00:09:54,375
+The other classical criterion
+is Tresca's, from 1864:
+
+141
+00:09:54,425 --> 00:09:59,745
+yielding begins when the maximum shear
+stress, half the largest principal stress
+
+142
+00:09:59,795 --> 00:10:05,250
+difference, reaches σ_Y/2. Tresca pictures
+slip on the single most stressed plane;
+
+143
+00:10:05,300 --> 00:10:08,003
+von Mises averages shear over all planes.
+
+144
+00:10:08,300 --> 00:10:11,456
+Its surface is a hexagonal
+prism around the same axis.
+
+145
+00:10:11,506 --> 00:10:15,315
+In the π-plane, the hexagon is
+inscribed in the von Mises circle:
+
+146
+00:10:15,365 --> 00:10:20,125
+they agree at the six vertices, the uniaxial
+and equal-biaxial states, and differ
+
+147
+00:10:20,175 --> 00:10:23,509
+most at the midpoints of the
+sides, which are pure shear.
+
+148
+00:10:23,800 --> 00:10:27,324
+So Tresca is always equal
+or more conservative.
+
+149
+00:10:27,374 --> 00:10:32,874
+In pure shear, it predicts yield at
+0.5 σ_Y, against 0.577 for von Mises:
+
+150
+00:10:32,924 --> 00:10:38,501
+about fifteen percent apart. Most
+ductile metals fall closer to von Mises.
+
+151
+00:10:38,800 --> 00:10:43,610
+And von Mises is smooth: its normal,
+the direction of plastic flow, is unique
+
+152
+00:10:43,660 --> 00:10:48,281
+everywhere. That enables the robust
+radial return algorithm used for metal
+
+153
+00:10:48,331 --> 00:10:51,563
+plasticity in essentially
+every finite element code.
+
+154
+00:10:51,613 --> 00:10:54,908
+At Tresca's corners, the
+flow direction is ambiguous.
+
+155
+00:10:57,467 --> 00:11:02,496
+Now a real analysis: a forged steel transition
+for a subsea tubular, where the wall
+
+156
+00:11:02,546 --> 00:11:07,453
+steps up to a thick hub through a shoulder
+fillet, under axial force, bending and
+
+157
+00:11:07,503 --> 00:11:07,882
+torque.
+
+158
+00:11:08,200 --> 00:11:12,486
+It is meshed with quadratic tetrahedra,
+refined toward the fillet, where the stress
+
+159
+00:11:12,536 --> 00:11:13,531
+gradients are steep.
+
+160
+00:11:13,833 --> 00:11:18,526
+The solver finds the nodal displacements.
+In each element, it differentiates them at
+
+161
+00:11:18,576 --> 00:11:23,156
+the integration points to get strain, and
+Hooke's law gives the full stress tensor
+
+162
+00:11:23,206 --> 00:11:27,730
+at every Gauss point; then principal
+stresses from its eigenvalues, and von Mises
+
+163
+00:11:27,780 --> 00:11:29,254
+stress from its invariants.
+
+164
+00:11:29,533 --> 00:11:33,357
+For plotting, results are extrapolated
+to the nodes and averaged.
+
+165
+00:11:33,407 --> 00:11:38,125
+Averaging components, then computing von
+Mises, differs from averaging von Mises
+
+166
+00:11:38,175 --> 00:11:42,952
+values; and large jumps between unaveraged
+values flag a mesh that is too coarse.
+
+167
+00:11:43,233 --> 00:11:45,974
+Here is the raw tensor in
+cylindrical coordinates:
+
+168
+00:11:46,024 --> 00:11:50,495
+axial stress from tension and bending,
+shear from the torque, and hoop and radial
+
+169
+00:11:50,545 --> 00:11:55,015
+stresses only at the step. None of them
+alone tells you whether the steel yields.
+
+170
+00:11:55,300 --> 00:11:59,815
+Combined point by point, they give
+one field: the von Mises stress.
+
+171
+00:11:59,865 --> 00:12:05,266
+About 147 megapascals in the pipe wall,
+rising to 300 at the root of the fillet.
+
+172
+00:12:05,567 --> 00:12:08,359
+Why the peak? Picture the
+load flowing through the wall:
+
+173
+00:12:08,409 --> 00:12:12,622
+at the shoulder, the flow lines turn into
+the hub, and crowd together at the fillet.
+
+174
+00:12:12,672 --> 00:12:14,855
+The tighter the radius, the higher the peak.
+
+175
+00:12:15,129 --> 00:12:19,135
+At a real fillet, refining the
+mesh makes the peak converge.
+
+176
+00:12:19,185 --> 00:12:24,206
+Model the corner as perfectly sharp,
+and elasticity predicts a singularity:
+
+177
+00:12:24,256 --> 00:12:29,682
+stress rising like r^−0.46. Each refinement
+reports a higher peak, without limit:
+
+178
+00:12:29,732 --> 00:12:33,332
+a number set by your element
+size, not by your design.
+
+179
+00:12:33,629 --> 00:12:38,250
+So never take the maximum at face value.
+Check convergence, and model real radii.
+
+180
+00:12:38,300 --> 00:12:42,749
+Where codes require it, linearize the
+stresses through the wall into membrane,
+
+181
+00:12:42,799 --> 00:12:46,382
+bending and peak components, and
+apply the right limit to each.
+
+182
+00:12:46,662 --> 00:12:51,531
+And remember the material model. A linear
+elastic analysis reports stresses above
+
+183
+00:12:51,581 --> 00:12:55,539
+yield, while real steel yields
+locally and redistributes the load.
+
+184
+00:12:55,589 --> 00:13:00,518
+A local elastic peak above σ_Y calls for
+an elastic-plastic or fatigue assessment;
+
+185
+00:13:00,568 --> 00:13:02,157
+it is not proof of failure.
+
+186
+00:13:04,696 --> 00:13:09,293
+Let's finish with numbers. The
+yield strength is 355 megapascals.
+
+187
+00:13:09,343 --> 00:13:15,228
+At the critical point, the principal stresses
+are 240, 80 and minus 40 megapascals.
+
+188
+00:13:15,496 --> 00:13:20,578
+The mean stress is 280 over
+three: 93.3 megapascals.
+
+189
+00:13:20,628 --> 00:13:28,769
+Subtracting it gives the deviators: 146.7,
+minus 13.3 and minus 133.3, which sum to
+
+190
+00:13:28,819 --> 00:13:29,263
+zero.
+
+191
+00:13:29,562 --> 00:13:36,312
+The principal differences
+are 160, 120 and minus 280.
+
+192
+00:13:36,362 --> 00:13:43,625
+Their squares, 25,600, 14,400
+and 78,400, sum to 118,400.
+
+193
+00:13:43,675 --> 00:13:46,576
+Half of that is 59,200.
+
+194
+00:13:46,862 --> 00:13:53,342
+The square root gives the von Mises stress:
+243.3 megapascals, confirmed by three J₂
+
+195
+00:13:53,392 --> 00:13:54,818
+from the deviators.
+
+196
+00:13:55,096 --> 00:13:59,450
+The safety factor against
+first yield is 355 over 243.3:
+
+197
+00:13:59,500 --> 00:14:03,617
+1.46, a utilization of 69
+percent. Tresca gives 1.27:
+
+198
+00:14:03,667 --> 00:14:09,122
+more conservative. The largest
+principal stress alone would give 1.48:
+
+199
+00:14:09,172 --> 00:14:14,863
+slightly unconservative, because it
+ignores the compressive third stress.
+
+200
+00:14:15,162 --> 00:14:18,777
+Keep the terms distinct. Yield
+strength is a material property.
+
+201
+00:14:18,827 --> 00:14:22,034
+Equivalent stress describes
+the stress state at a point.
+
+202
+00:14:22,084 --> 00:14:26,804
+The safety factor is their ratio. And the
+design allowable is what a code permits:
+
+203
+00:14:26,854 --> 00:14:31,108
+the yield strength reduced by partial
+or usage factors for uncertainty and
+
+204
+00:14:31,158 --> 00:14:31,806
+consequence.
+
+205
+00:14:32,096 --> 00:14:35,123
+And staying below yield is
+necessary, not sufficient.
+
+206
+00:14:35,173 --> 00:14:38,490
+Welded joints fail in fatigue
+at stresses far below yield.
+
+207
+00:14:38,540 --> 00:14:43,134
+Slender members and shells buckle. Cracks
+cause fracture, governed by toughness.
+
+208
+00:14:43,184 --> 00:14:47,778
+And excessive deformation can make a
+connector leak long before anything yields.
+
+209
+00:14:48,062 --> 00:14:52,515
+So here is the central insight. A
+material does not yield because one stress
+
+210
+00:14:52,565 --> 00:14:57,314
+component becomes large. Every stress
+state has a hydrostatic part, which changes
+
+211
+00:14:57,364 --> 00:15:00,336
+volume, and a deviatoric
+part, which changes shape.
+
+212
+00:15:00,386 --> 00:15:04,779
+In ductile metals, distortion drives
+slip, and distortion governs yielding.
+
+213
+00:15:05,096 --> 00:15:09,330
+The von Mises stress measures exactly that:
+the square root of one half the sum of
+
+214
+00:15:09,380 --> 00:15:11,472
+the squared principal stress differences.
+
+215
+00:15:11,762 --> 00:15:15,999
+Von Mises stress transforms a complex
+three-dimensional stress state into one
+
+216
+00:15:16,049 --> 00:15:20,620
+physically meaningful quantity that can be
+compared against the material's uniaxial
+
+217
+00:15:20,670 --> 00:15:21,455
+yield strength.
+

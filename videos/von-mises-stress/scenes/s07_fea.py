@@ -26,10 +26,10 @@ def model_tree():
             ("Analysis", "linear elastic, static", INK)]
     items = VGroup()
     for k, v, c in rows:
-        items.add(VGroup(T(k, size=18, color=DIM), T(v, size=18, color=c)).arrange(DOWN, aligned_edge=LEFT, buff=0.06))
-    items.arrange(DOWN, aligned_edge=LEFT, buff=0.18)
-    box = panel_box(items.width + 0.5, items.height + 0.75, "MODEL TREE")
-    items.move_to(box[0]).shift(DOWN * 0.15)
+        items.add(VGroup(T(k, size=15, color=DIM), T(v, size=16, color=c)).arrange(DOWN, aligned_edge=LEFT, buff=0.04))
+    items.arrange(DOWN, aligned_edge=LEFT, buff=0.11)
+    box = panel_box(items.width + 0.45, items.height + 0.85, "MODEL TREE")
+    items.move_to(box[0]).shift(DOWN * 0.2)
     return VGroup(box, items).to_corner(UL, buff=0.25)
 
 
@@ -91,7 +91,7 @@ class S07b_FEAMethod(NScene):
                 M(r"(\sigma_x,\sigma_y,\sigma_z,\tau_{xy},\tau_{yz},\tau_{zx})", size=34),
                 M(r"\det(\boldsymbol\sigma-\lambda\mathbf I)=0\ \Rightarrow\ \sigma_1,\sigma_2,\sigma_3", size=34),
                 M(r"\sigma_{vm}=\sqrt{3J_2}", size=40, color=C_VM)).arrange(DOWN, buff=0.42)
-            chain.move_to([2.4, 0.1, 0])
+            chain.move_to([0.75, 0.1, 0])
             arrows = VGroup(*[Arrow(chain[i].get_bottom(), chain[i + 1].get_top(), buff=0.06, color=DIM, stroke_width=3,
                                     max_tip_length_to_length_ratio=0.3) for i in range(4)])
             notes = VGroup(T("strain at each Gauss point", size=20, color=DIM).next_to(chain[0], RIGHT, 0.35),
@@ -118,7 +118,7 @@ class S07b_FEAMethod(NScene):
                         stroke_color=INK, stroke_width=2)
             node = Dot([-3.6, 1.4, 0], radius=0.11, color=C_YIELD)
             la = M(r"\text{A: }\sigma_x=100", size=30).move_to([-4.3, -0.55, 0])
-            lb = M(r"\text{B: }\sigma_y=100", size=30).move_to([-5.45, 0.9, 0])
+            lb = M(r"\text{B: }\sigma_y=100", size=30).move_to([-5.15, 0.95, 0])
             self.play(FadeIn(A), FadeIn(B), FadeIn(node), FadeIn(la), FadeIn(lb), run_time=1.0)
             nd = T("shared node", size=22, color=C_YIELD).next_to(node, UR, 0.1)
             self.play(FadeIn(nd), run_time=0.4)
@@ -207,7 +207,7 @@ class S07c_FEAResults(NScene):
             bg.move_to(ORIGIN)
             # image extent (z: 430..770, r: Ri-40..Ro2+30) -> Manim coordinates
             g = AXI["geometry"]
-            z0, z1, r0, r1 = 430.0, 770.0, g["Ri"] - 40.0, g["Ro2"] + 30.0
+            z0, z1, r0, r1 = AXI["flow_win"]
             sx = bg.width / (z1 - z0); sy = bg.height / (r1 - r0)
             org = bg.get_corner(DL)
             P = lambda z, r: org + np.array([(z - z0) * sx, (r - r0) * sy, 0])
@@ -215,7 +215,7 @@ class S07c_FEAResults(NScene):
             self.play(FadeIn(bg), run_time=0.8)
             lines = VGroup()
             for ln in AXI["trajectories"]:
-                pts = [P(z, r) for z, r in ln if z0 < z < z1]
+                pts = [P(z, r) for z, r in ln if z0 + 1 < z < z1 - 1]
                 if len(pts) > 2:
                     lines.add(VMobject(stroke_color=WHITE, stroke_width=2.6, stroke_opacity=0.9).set_points_smoothly(pts[::2]))
             ttl = VGroup(T("principal stress trajectories", size=26, color=INK),
@@ -241,24 +241,25 @@ class S07d_FEAPitfalls(NScene):
         ser = AXI["series"]
         # ---------------------------------------------------------------- f8 convergence vs singularity
         with self.say("f8") as d:
-            ax = Axes(x_range=[-5.2, 2.2, 1], y_range=[0, 15, 3], x_length=6.6, y_length=4.4, tips=False,
+            U0 = 5.3                                                   # x = log2(h) + U0 keeps the y axis at the left
+            ax = Axes(x_range=[0, 7.6, 1], y_range=[0, 15, 3], x_length=6.6, y_length=4.4, tips=False,
                       axis_config=dict(color=DIM, stroke_width=2, include_ticks=True, tick_size=0.05),
                       y_axis_config=dict(include_numbers=True, font_size=22)).move_to([-2.9, -0.35, 0])
             xt = VGroup()
             for e in (-5, -4, -3, -2, -1, 0, 1, 2):
                 v = 2.0 ** e
-                xt.add(T(f"{v:g}", size=16, color=DIM).next_to(ax.c2p(e, 0), DOWN, 0.15))
+                xt.add(T(f"{v:g}", size=16, color=DIM).next_to(ax.c2p(e + U0, 0), DOWN, 0.15))
             xl = T("element size at the corner  h  [mm]  (log scale)", size=20, color=DIM).next_to(ax, DOWN, 0.45)
             yl = M(r"K_t=\sigma_{vm,\max}/\sigma_{\text{nom}}", size=28, color=DIM).next_to(ax, UP, 0.15).align_to(ax, LEFT)
             self.play(Create(ax), FadeIn(xt), FadeIn(xl), FadeIn(yl), run_time=1.0)
-            pf = [ax.c2p(np.log2(r["h"]), r["kt_nodal"]) for r in ser["fillet"]]
-            ps = [ax.c2p(np.log2(r["h"]), r["kt_nodal"]) for r in ser["sharp"]]
+            pf = [ax.c2p(np.log2(r["h"]) + U0, r["kt_nodal"]) for r in ser["fillet"]]
+            ps = [ax.c2p(np.log2(r["h"]) + U0, r["kt_nodal"]) for r in ser["sharp"]]
             fil = VGroup(*[Dot(p, color=C_GOOD, radius=0.07) for p in pf])
             fl = VMobject(stroke_color=C_GOOD, stroke_width=3).set_points_as_corners(pf[::-1])
             shp = VGroup(*[Dot(p, color=C_BAD, radius=0.07) for p in ps])
             sl = VMobject(stroke_color=C_BAD, stroke_width=3).set_points_as_corners(ps[::-1])
-            lf = T("R8 fillet: converges", size=22, color=C_GOOD).next_to(pf[0], UP, 0.25).shift(LEFT * 0.4)
-            ls = T("sharp corner: no limit", size=22, color=C_BAD).next_to(ps[-1], RIGHT, 0.15).shift(DOWN * 0.1)
+            lf = T("R8 fillet: converges to 2.19", size=22, color=C_GOOD).next_to(pf[0], UP, 0.3).shift(LEFT * 0.2)
+            ls = T("sharp corner: no limit", size=22, color=C_BAD).next_to(ps[-1], RIGHT, 0.2)
             # inset images of the sharp-corner mesh at three refinements
             ins = Group()
             for h in (2, 0.5, 0.03125):
@@ -338,8 +339,8 @@ class S07d_FEAPitfalls(NScene):
             sy = DashedLine(ax.c2p(0, 1), ax.c2p(1, 1), color=C_YIELD, stroke_width=2)
             syl = M(r"\sigma_Y", size=32, color=C_YIELD).next_to(sy, LEFT, 0.1)
             pkd = Dot(ax.c2p(0.36, 0.36 / ey), color=C_Z, radius=0.08)
-            pkl = T("linear elastic FE: peak above σ_Y", size=22, color=C_Z).next_to(pkd, RIGHT, 0.2)
-            real = T("real steel: yields locally, load redistributes", size=22, color=INK).next_to(ax.c2p(0.62, 1.2), UP, 0.25)
+            pkl = T("linear elastic FE: peak above σ_Y", size=22, color=C_Z).next_to(pkd, LEFT, 0.2).shift(UP * 0.25)
+            real = T("real steel: yields locally, load redistributes", size=22, color=INK).next_to(ax.c2p(0.62, 1.0), DOWN, 0.35)
             self.play(Create(ax), FadeIn(xl), FadeIn(yl), Create(sy), FadeIn(syl), run_time=1.0)
             self.play(Create(elastic), run_time=1.2)
             self.play(FadeIn(pkd), FadeIn(pkl), run_time=0.6)
@@ -348,7 +349,10 @@ class S07d_FEAPitfalls(NScene):
             self.until("f10", "A local elastic")
             nxt = VGroup(T("a local elastic peak above σ_Y is a signal, not a verdict", size=26, color=C_YIELD),
                          T("→ elastic–plastic analysis (e.g. DNV-RP-C208), strain or fatigue checks", size=22,
-                           color=INK)).arrange(DOWN, aligned_edge=LEFT, buff=0.15).move_to([2.6, 2.4, 0])
+                           color=INK)).arrange(DOWN, aligned_edge=LEFT, buff=0.15)
+            if nxt.width > 7.4:
+                nxt.scale_to_fit_width(7.4)
+            nxt.move_to([3.1, 2.6, 0])
             self.play(FadeIn(nxt, shift=0.1 * DOWN), run_time=1.0)
             self.wait(self.left(0.6))
             self.play(FadeOut(Group(*self.mobjects)), run_time=0.6)

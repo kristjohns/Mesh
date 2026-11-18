@@ -246,10 +246,10 @@ WIN = (ZS - 14.0, ZS + 10.0, Ro1 - 12.0, Ro1 + 12.0)            # 24 mm window a
 for (name, hc), R in keep.items():
     draw(R, f"axi_{name}_h{hc:g}.png", WIN, vmax=3.0)
 draw(keep[("sharp", levels[-1])], "axi_sharp_zoom_tiny.png", (ZS - 0.6, ZS + 0.4, Ro1 - 0.5, Ro1 + 0.5), vmax=3.0)
-draw(keep[("fillet", levels[-1])], "axi_flow_bg.png", (430.0, 770.0, Ri - 40.0, Ro2 + 30.0), vmax=3.0,
-     show_mesh=False, size=(16, 9), dpi=160)
+FLOW_WIN = (490.0, 710.0, Ri - 40.05, Ri - 40.05 + 220.0 * 9 / 16)     # exactly 16:9 so the image maps linearly
+draw(keep[("fillet", levels[-1])], "axi_flow_bg.png", FLOW_WIN, vmax=3.0, show_mesh=False, size=(16, 9), dpi=160)
 
-json.dump(dict(sig_nom=SIG_NOM, levels=levels, series=series, scl=scl, trajectories=lines,
+json.dump(dict(sig_nom=SIG_NOM, levels=levels, series=series, scl=scl, trajectories=lines, flow_win=FLOW_WIN,
                geometry=dict(Ri=Ri, Ro1=Ro1, Ro2=Ro2, rho=RHO, zs=ZS, L=L)),
           open(os.path.join(OUT, "axi.json"), "w"))
 print(f"done ({time.time() - t0:.0f}s)")

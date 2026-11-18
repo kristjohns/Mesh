@@ -142,7 +142,7 @@ class S05_YieldSurface(N3DScene):
         # ---------------------------------------------------------------- y5 why circular: look down the axis
         with self.say("y5") as d:
             self.stop_ambient_camera_rotation()
-            self.play(FadeOut(pi_lab), FadeOut(hyd_lab), run_time=0.4)
+            self.play(FadeOut(pi_lab), FadeOut(hyd_lab), FadeOut(rho), run_time=0.4)
             self.move_camera(phi=PHI_AX, theta=TH_AX, run_time=2.2)
             ea, eb = pi_basis()
             sd = dev(P) / np.linalg.norm(dev(P))
@@ -161,12 +161,12 @@ class S05_YieldSurface(N3DScene):
             self.play(FadeIn(note), run_time=0.7)
             self.until("y5", "Infinitely long")
             self.move_camera(phi=PHI0, theta=TH0 + 8 * DEGREES, run_time=2.2)
-            note2 = T("moving along the axis = adding pure pressure", size=24, color=C_HYD).next_to(note, UP, 0.2)
-            note2.align_to(note, LEFT)
+            note2 = T("moving along the axis = adding pure pressure", size=22, color=C_HYD).next_to(note, UP, 0.2)
+            note2.align_to(note, RIGHT)
             self.add_fixed_in_frame_mobjects(note2); self.remove(note2)
             self.play(FadeIn(note2), run_time=0.6)
             self.wait(self.left(0.5))
-            self.play(FadeOut(VGroup(note, note2, arc, proj, th_l, rho, vh, vd, vP)), run_time=0.5)
+            self.play(FadeOut(VGroup(note, note2, arc, proj, th_l, vh, vd, vP)), run_time=0.5)
         # ---------------------------------------------------------------- y6 plane-stress slice
         with self.say("y6") as d:
             sq = Square(side_length=3.2 * U, fill_color=INK, fill_opacity=0.06, stroke_color=DIM, stroke_width=1.2)

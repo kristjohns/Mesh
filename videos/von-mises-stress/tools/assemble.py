@@ -47,13 +47,20 @@ def caption(text):
     t = fill(text)
     for a, b in CAPTION_SUBS:
         t = t.replace(a, b)
+    t = re.sub(r"\bsigma\b", "σ", t)
+    t = re.sub(r"\btau\b", "τ", t)
     return t
 
 
 # ------------------------------------------------------------------ music
-def ambient_score(n, beats_mask, seed=3):
-    """Slow minor-key pad (Dm - Bb - F - C), chorus-detuned additive voices, long reverb, ducked under speech."""
+def ambient_score(n_out, beats_mask, seed=3, sr=12000):
+    """Slow minor-key pad (Dm - Bb - F - C), chorus-detuned additive voices, long reverb, ducked under speech.
+
+    Synthesised at 12 kHz (content < 1.5 kHz) and upsampled to the output rate.
+    """
     rng = np.random.default_rng(seed)
+    SR = sr
+    n = int(np.ceil(n_out * sr / 48000)) + 8
     t = np.arange(n) / SR
     hz = lambda m: 440.0 * 2 ** ((m - 69) / 12)
     chords = [[38, 45, 53, 60, 64], [34, 41, 50, 57, 62], [41, 48, 57, 60, 64], [36, 43, 52, 55, 62]]  # MIDI
@@ -74,7 +81,7 @@ def ambient_score(n, beats_mask, seed=3):
         for j, m in enumerate(notes):
             f = hz(m)
             amp = (0.9 if j == 0 else 0.55) / len(notes)
-            for det in (-0.0016, 0.0, 0.0019):
+            for det in (-0.0017, 0.0018):
                 ph = rng.uniform(0, 2 * np.pi)
                 lfo = 1 + 0.25 * np.sin(2 * np.pi * (0.05 + 0.03 * j) * tt + ph)
                 block += amp * lfo * (np.sin(2 * np.pi * f * (1 + det) * tt + ph) +
@@ -91,6 +98,9 @@ def ambient_score(n, beats_mask, seed=3):
     wet = fftconvolve(out, ir)[:n]
     mix = 0.55 * out + 0.75 * wet
     mix /= np.max(np.abs(mix)) + 1e-9
+    mix = resample_poly(mix, 48000 // sr, 1)[:n_out]
+    n = n_out
+    SR = 48000
     # ducking envelope from the narration mask (attack 0.25 s, release 0.8 s)
     duck = np.where(beats_mask, 0.42, 1.0)
     k_ = int(0.5 * SR)
@@ -194,10 +204,11 @@ def main():
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "concat", "-safe", "0", "-i", lst, "-c", "copy", vid], check=True)
     subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", vid, "-i", wav, "-i", srt,
                     "-map", "0:v", "-map", "1:a", "-map", "2:s",
-                    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-af", "loudnorm=I=-16:TP=-1.5:LRA=11",
+                    "-c:v", "copy", "-c:a", "aac", "-b:a", "192k", "-ac", "2",
+                    "-af", "loudnorm=I=-16:TP=-1.5:LRA=11,aresample=48000",
                     "-c:s", "mov_text", "-metadata:s:s:0", "language=eng",
                     "-metadata", "title=The Physics of Failure - Understanding von Mises Stress",
-                    "-movflags", "+faststart", "-shortest", a.out], check=True)
+                    "-movflags", "+faststart", a.out], check=True)
     print("wrote", a.out, f"({os.path.getsize(a.out) / 1e6:.1f} MB)")
 
 

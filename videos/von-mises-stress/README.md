@@ -1,6 +1,10 @@
 # The Physics of Failure – Understanding von Mises Stress
 
-A ~15-minute engineering documentary built from the brief in [`TOPIC.md`](TOPIC.md).
+A 15:30 engineering documentary built from the brief in [`TOPIC.md`](TOPIC.md).
+
+**Watch:** [`output/the_physics_of_failure_von_mises_stress.mp4`](output/the_physics_of_failure_von_mises_stress.mp4)
+(1920×1080, 30 fps, H.264 + AAC stereo, −16 LUFS, 70 MB; English soft subtitles embedded and also as
+[`.srt`](output/the_physics_of_failure_von_mises_stress.srt)).
 Everything in it is generated from code in this folder: animation (Manim), narration
 (Kokoro TTS), the finite element analyses (gmsh + scikit-fem) and their renders (PyVista).
 
