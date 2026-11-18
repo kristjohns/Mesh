@@ -1,0 +1,61 @@
+{
+ "geometry": {
+  "Ri": 116.55,
+  "Ro1": 136.55,
+  "Ro2": 170.0,
+  "fillet": 8.0,
+  "L1": 600.0,
+  "L2": 420.0
+ },
+ "loads": {
+  "N_MN": 1.0,
+  "M_kNm": 60.0,
+  "T_kNm": 80.0
+ },
+ "mesh": {
+  "tets": 135753,
+  "vertices": 34594,
+  "dofs": 685632,
+  "h_fillet": 1.3
+ },
+ "nominal": {
+  "sigma": 126.8,
+  "tau": 42.6,
+  "vm": 146.7
+ },
+ "vm_pipe_far_FE": 146.8,
+ "vm_peak_nodal": 302.5,
+ "vm_peak_nodal_avg_invariant": 300.9,
+ "vm_peak_gauss": 289.0,
+ "peak_xyz": [
+  136.5,
+  -9.37,
+  594.07
+ ],
+ "Kt_vm": 2.061,
+ "narr_pipe_vm": 147,
+ "narr_peak_vm": 300,
+ "convergence_3d": [
+  {
+   "h": 3.5,
+   "tets": 43052,
+   "dofs": 227766,
+   "gauss": 269.7,
+   "nodal": 298.9
+  },
+  {
+   "h": 2.0,
+   "tets": 77874,
+   "dofs": 400521,
+   "gauss": 284.2,
+   "nodal": 314.2
+  },
+  {
+   "h": 1.3,
+   "tets": 135753,
+   "dofs": 685632,
+   "gauss": 289.0,
+   "nodal": 302.5
+  }
+ ]
+}
