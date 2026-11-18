@@ -1,0 +1,682 @@
+1
+00:00:00,000 --> 00:00:05,160
+In the last film, our subsea transition
+piece reached its highest stress at the
+
+2
+00:00:05,210 --> 00:00:08,721
+fillet root. Now increase
+the load by seventy percent.
+
+3
+00:00:08,771 --> 00:00:13,931
+The linear elastic answer at the fillet
+is 558 megapascals, far above the yield
+
+4
+00:00:13,981 --> 00:00:14,986
+strength of 355.
+
+5
+00:00:15,267 --> 00:00:19,481
+But that number is fiction. Steel
+cannot carry stress far beyond yield;
+
+6
+00:00:19,531 --> 00:00:24,106
+it deforms plastically, and the extra
+load flows into the material around it.
+
+7
+00:00:24,156 --> 00:00:28,971
+The elastic-plastic analysis shows a
+plastic zone a few millimetres across, and a
+
+8
+00:00:29,021 --> 00:00:31,133
+peak plastic strain of 0.18 percent.
+
+9
+00:00:31,400 --> 00:00:35,943
+So the steel has yielded. Has anything
+failed? Answering that takes a different
+
+10
+00:00:35,993 --> 00:00:40,711
+analysis, and different criteria. Here are
+five finite element cases that show how
+
+11
+00:00:40,761 --> 00:00:41,699
+engineers decide.
+
+12
+00:00:43,767 --> 00:00:48,462
+Start with the material. Structural steel
+yields at a strain of about 0.17 percent,
+
+13
+00:00:48,512 --> 00:00:53,264
+but it can stretch fifteen percent or more
+before it necks, and further still before
+
+14
+00:00:53,314 --> 00:00:58,009
+it fractures. Yield is the start of the
+plastic range, not the end of the material.
+
+15
+00:00:58,300 --> 00:01:02,728
+And plasticity redistributes stress. In
+a beam, the outer fibres yield first.
+
+16
+00:01:02,778 --> 00:01:07,440
+They stop taking extra stress, so further
+moment is carried by the fibres further
+
+17
+00:01:07,490 --> 00:01:12,151
+in. The stress profile flattens from a
+triangle towards a rectangle, and the beam
+
+18
+00:01:12,201 --> 00:01:13,314
+keeps carrying load.
+
+19
+00:01:13,600 --> 00:01:17,438
+Once yield is allowed, the failure
+modes that matter are different.
+
+20
+00:01:17,488 --> 00:01:20,745
+Plastic collapse: unbounded
+deformation at constant load.
+
+21
+00:01:20,795 --> 00:01:24,807
+Local failure: ductile fracture where
+strain and triaxiality are high.
+
+22
+00:01:24,857 --> 00:01:27,767
+Ratcheting: strain that
+grows every cycle. Fatigue.
+
+23
+00:01:27,817 --> 00:01:30,436
+And buckling. Yield
+itself is not on the list.
+
+24
+00:01:30,733 --> 00:01:35,180
+Each needs its own analysis and
+its own acceptance criterion.
+
+25
+00:01:35,230 --> 00:01:41,224
+Design-by-analysis rules define them: ASME
+Section Eight Division Two and EN 13445
+
+26
+00:01:41,274 --> 00:01:45,941
+for pressure equipment, and
+DNV-RP-C208 for offshore structures.
+
+27
+00:01:47,633 --> 00:01:50,795
+The tool is elastic-plastic
+finite element analysis.
+
+28
+00:01:50,845 --> 00:01:54,872
+At every Gauss point, the solver
+predicts an elastic trial stress.
+
+29
+00:01:54,922 --> 00:01:59,813
+If it lies outside the von Mises yield
+surface, it is returned radially onto the
+
+30
+00:01:59,863 --> 00:02:02,963
+surface, and plastic strain
+grows along the normal.
+
+31
+00:02:03,233 --> 00:02:08,014
+The load is applied in increments, each
+solved by Newton-Raphson iteration with the
+
+32
+00:02:08,064 --> 00:02:12,903
+consistent tangent. When the structure can
+no longer carry more load, the iterations
+
+33
+00:02:12,953 --> 00:02:16,453
+stop converging: the numerical
+signature of plastic collapse.
+
+34
+00:02:16,733 --> 00:02:21,431
+Two material models are used: elastic,
+perfectly plastic for limit-load analysis,
+
+35
+00:02:21,481 --> 00:02:26,003
+and the true stress-strain curve, with
+its yield plateau and strain hardening.
+
+36
+00:02:26,300 --> 00:02:32,232
+The solver used here was written for this
+film and checked against Hill's exact
+
+37
+00:02:32,282 --> 00:02:36,624
+solution for a thick cylinder
+under pressure. First yield:
+
+38
+00:02:36,674 --> 00:02:40,941
+224 megapascals, against 224.
+Collapse: 413, against 414.
+
+39
+00:02:41,233 --> 00:02:45,172
+These methods move the safety
+margin from the stress to the load.
+
+40
+00:02:45,222 --> 00:02:50,205
+Instead of asking whether a stress is below
+an allowable, they multiply the design
+
+41
+00:02:50,255 --> 00:02:53,949
+loads by a factor and ask whether
+the structure still stands:
+
+42
+00:02:53,999 --> 00:02:59,043
+1.5 for a limit-load analysis, 2.4 for a
+full elastic-plastic analysis, and 1.7 for
+
+43
+00:02:59,093 --> 00:02:59,841
+local strain.
+
+44
+00:03:03,633 --> 00:03:09,333
+Case one: a 20-millimetre S355 plate, 200
+millimetres wide, with a 60-millimetre
+
+45
+00:03:09,383 --> 00:03:15,371
+hole, in tension. The stress concentration
+factor on the net section is 2.36, so the
+
+46
+00:03:15,421 --> 00:03:18,894
+edge of the hole yields
+at about 420 kilonewtons.
+
+47
+00:03:19,166 --> 00:03:24,131
+Keep loading. Plasticity spreads from the
+hole in inclined bands, and the load keeps
+
+48
+00:03:24,181 --> 00:03:29,026
+rising. Only when the bands reach the edges
+of the plate does the curve level off:
+
+49
+00:03:29,076 --> 00:03:33,325
+the limit load, 996 kilonewtons,
+matching yield strength times net area.
+
+50
+00:03:33,599 --> 00:03:37,298
+First yield occurred at 42
+percent of the collapse load.
+
+51
+00:03:37,348 --> 00:03:42,587
+The criterion is a limit-load analysis.
+ASME uses an elastic, perfectly plastic
+
+52
+00:03:42,637 --> 00:03:47,608
+model with a yield stress of 1.5 times
+the allowable stress, and requires a
+
+53
+00:03:47,658 --> 00:03:50,888
+converged solution at 1.5
+times the design loads.
+
+54
+00:03:51,166 --> 00:03:56,125
+Here, that permits a design load of about
+550 kilonewtons, where the elastic peak at
+
+55
+00:03:56,175 --> 00:04:00,716
+the hole is 460 megapascals: well above
+yield, and acceptable against plastic
+
+56
+00:04:00,766 --> 00:04:05,725
+collapse. It is the same answer as the
+classical rule that the average stress on the
+
+57
+00:04:05,775 --> 00:04:10,317
+net section must not exceed the allowable.
+The peak at the hole never enters.
+
+58
+00:04:14,197 --> 00:04:19,745
+Case two: the constant-moment region of a
+steel beam, 100 by 50 millimetres, bent by
+
+59
+00:04:19,795 --> 00:04:24,810
+a controlled end rotation. The outer
+fibres yield at 29.6 kilonewton metres.
+
+60
+00:04:24,860 --> 00:04:30,141
+Plasticity then spreads inward from both
+faces, around a shrinking elastic core.
+
+61
+00:04:30,431 --> 00:04:34,731
+The moment approaches the fully
+plastic moment, 44.4 kilonewton metres:
+
+62
+00:04:34,781 --> 00:04:38,774
+one and a half times first yield,
+the shape factor of a rectangle.
+
+63
+00:04:38,824 --> 00:04:43,860
+The finite element curve follows the
+closed-form solution to within a fraction of a
+
+64
+00:04:43,910 --> 00:04:44,350
+percent.
+
+65
+00:04:44,631 --> 00:04:49,419
+With the real stress-strain curve, hardening
+means the curve never quite flattens.
+
+66
+00:04:49,469 --> 00:04:52,546
+So where is collapse? The
+twice-elastic-slope method:
+
+67
+00:04:52,596 --> 00:04:56,086
+draw a line from the origin
+with half the elastic stiffness.
+
+68
+00:04:56,136 --> 00:05:00,984
+It cuts the curve at 43.0 kilonewton metres,
+the collapse moment, and the allowable
+
+69
+00:05:01,034 --> 00:05:02,282
+is two-thirds of that.
+
+70
+00:05:02,564 --> 00:05:07,657
+That two-thirds is no accident. For a
+rectangle, two-thirds of the plastic moment is
+
+71
+00:05:07,707 --> 00:05:12,738
+first yield. It is also why elastic stress
+rules allow membrane plus bending stress
+
+72
+00:05:12,788 --> 00:05:16,595
+up to 1.5 times the allowable:
+the shape factor of a rectangle.
+
+73
+00:05:16,645 --> 00:05:19,962
+Redistribution is already
+built into the elastic rules.
+
+74
+00:05:23,831 --> 00:05:29,393
+Case three: a high-pressure subsea body,
+modelled as a thick cylinder with a
+
+75
+00:05:29,443 --> 00:05:35,227
+100-millimetre bore and a 200-millimetre
+outside diameter, in a 75 ksi forging,
+
+76
+00:05:35,277 --> 00:05:39,141
+rated for 20,000 psi. At
+that pressure it is elastic:
+
+77
+00:05:39,191 --> 00:05:41,578
+the bore reaches 319 megapascals.
+
+78
+00:05:41,864 --> 00:05:45,394
+The elastic-plastic design
+check asks a harder question:
+
+79
+00:05:45,444 --> 00:05:48,590
+does it still carry 2.4
+times the design pressure?
+
+80
+00:05:48,640 --> 00:05:53,129
+At 48,000 psi, the elastic answer at
+the bore would be 766 megapascals.
+
+81
+00:05:53,179 --> 00:05:58,243
+The elastic-plastic analysis shows the
+inner 31 percent of the wall yielded, the
+
+82
+00:05:58,293 --> 00:06:03,230
+plastic front exactly where Hill's
+solution puts it, and a converged solution.
+
+83
+00:06:03,280 --> 00:06:03,869
+It passes.
+
+84
+00:06:04,164 --> 00:06:08,300
+Collapse only comes at 413
+megapascals, three times the rating.
+
+85
+00:06:08,350 --> 00:06:13,881
+And when the pressure is released, the
+elastic outer wall squeezes the yielded bore,
+
+86
+00:06:13,931 --> 00:06:18,996
+leaving a residual hoop stress of minus
+284 megapascals, the principle behind
+
+87
+00:06:19,046 --> 00:06:19,860
+autofrettage.
+
+88
+00:06:20,131 --> 00:06:25,304
+Because the overpressure stayed below twice
+the first-yield pressure, unloading is
+
+89
+00:06:25,354 --> 00:06:28,616
+elastic, and later pressure
+cycles stay elastic too.
+
+90
+00:06:28,666 --> 00:06:33,902
+API 17TR8, for high-pressure subsea equipment,
+builds on these same elastic-plastic
+
+91
+00:06:33,952 --> 00:06:34,412
+methods.
+
+92
+00:06:38,297 --> 00:06:44,380
+Case four returns to our transition piece,
+under an axial stress of 150 megapascals
+
+93
+00:06:44,430 --> 00:06:50,440
+in the pipe wall. The fillet's stress
+concentration factor is 2.19, so the elastic
+
+94
+00:06:50,490 --> 00:06:56,351
+peak is 329 megapascals, just below yield.
+Yield begins at 1.08 times the design
+
+95
+00:06:56,401 --> 00:06:56,720
+load.
+
+96
+00:06:56,997 --> 00:07:02,087
+Protection against local failure is checked
+by an elastic-plastic analysis at 1.7
+
+97
+00:07:02,137 --> 00:07:05,767
+times the design loads, with
+the true stress-strain curve.
+
+98
+00:07:05,817 --> 00:07:11,097
+The plastic zone stays at the fillet root,
+and the peak equivalent plastic strain is
+
+99
+00:07:11,147 --> 00:07:11,921
+0.18 percent.
+
+100
+00:07:12,197 --> 00:07:17,175
+The limit is a strain, adjusted for
+triaxiality, because ductility falls as
+
+101
+00:07:17,225 --> 00:07:22,739
+hydrostatic tension rises. For S355, the
+uniaxial strain limit is about 40 percent.
+
+102
+00:07:22,789 --> 00:07:26,760
+At the fillet's triaxiality of
+0.56, it falls to 26 percent.
+
+103
+00:07:26,810 --> 00:07:30,849
+The demand, plus any strain from
+forming, must stay below it.
+
+104
+00:07:30,899 --> 00:07:34,804
+Here it is 0.18 percent: under
+one percent of the capacity.
+
+105
+00:07:35,097 --> 00:07:38,992
+Neuber's rule, the classic hand
+estimate, gives 0.24 percent:
+
+106
+00:07:39,042 --> 00:07:44,424
+conservative, as expected. At a smooth notch
+in ductile steel, local yield is rarely
+
+107
+00:07:44,474 --> 00:07:47,140
+the problem. Fatigue at that notch can be.
+
+108
+00:07:51,031 --> 00:07:55,527
+Case five adds time: a thin cylinder under
+constant pressure, with a temperature
+
+109
+00:07:55,577 --> 00:07:58,425
+difference through the wall
+that cycles on and off.
+
+110
+00:07:58,475 --> 00:08:02,574
+This is the classic Bree problem. The
+first heat-up yields both surfaces.
+
+111
+00:08:02,624 --> 00:08:04,677
+What happens next decides everything.
+
+112
+00:08:04,964 --> 00:08:09,448
+Bree mapped the outcomes on one diagram:
+the pressure stress on one axis, the
+
+113
+00:08:09,498 --> 00:08:12,450
+thermal stress on the other,
+both divided by yield.
+
+114
+00:08:12,500 --> 00:08:16,042
+Below the line where they sum
+to one, every cycle is elastic.
+
+115
+00:08:16,092 --> 00:08:18,986
+Our three analyses sit in
+three different regions.
+
+116
+00:08:19,264 --> 00:08:24,456
+At moderate pressure and thermal load, the
+first cycle leaves residual stresses that
+
+117
+00:08:24,506 --> 00:08:29,510
+keep every later cycle elastic. The plastic
+strain stops at 0.14 percent, and the
+
+118
+00:08:29,560 --> 00:08:32,693
+diameter stays fixed. The
+cylinder has shaken down.
+
+119
+00:08:32,964 --> 00:08:37,773
+With a lower pressure but a larger thermal
+range, the surfaces yield in tension and
+
+120
+00:08:37,823 --> 00:08:41,109
+compression every cycle, but
+the diameter stops changing.
+
+121
+00:08:41,159 --> 00:08:45,968
+That is alternating plasticity: no ratcheting,
+but a plastic strain range that must
+
+122
+00:08:46,018 --> 00:08:47,958
+be assessed for low-cycle fatigue.
+
+123
+00:08:48,231 --> 00:08:52,703
+Raise the pressure, and the strain steps
+forward every cycle, without limit.
+
+124
+00:08:52,753 --> 00:08:55,500
+That is ratcheting, and
+it does end in failure.
+
+125
+00:08:55,550 --> 00:08:58,535
+The criterion is a cyclic
+elastic-plastic analysis:
+
+126
+00:08:58,585 --> 00:09:03,236
+after a few cycles, there must be shakedown,
+an elastic core, or no progressive
+
+127
+00:09:03,286 --> 00:09:04,486
+change in dimensions.
+
+128
+00:09:06,164 --> 00:09:09,674
+So here are the criteria.
+Against plastic collapse:
+
+129
+00:09:09,724 --> 00:09:15,049
+a converged limit-load analysis at 1.5
+times the loads, or an elastic-plastic
+
+130
+00:09:15,099 --> 00:09:20,493
+analysis at 2.4 times, or a collapse
+load from the twice-elastic-slope method.
+
+131
+00:09:20,543 --> 00:09:25,100
+EN 13445 adds a five percent limit
+on principal structural strain.
+
+132
+00:09:25,397 --> 00:09:30,233
+Against local failure: plastic strain below
+the triaxial strain limit, at 1.7 times
+
+133
+00:09:30,283 --> 00:09:34,825
+the loads. Against ratcheting: shakedown,
+or an elastic core, under the cyclic
+
+134
+00:09:34,875 --> 00:09:39,534
+loads. Fatigue, buckling and fracture
+keep their own checks, and serviceability,
+
+135
+00:09:39,584 --> 00:09:43,595
+such as a flange that must stay
+tight, can limit deformation further.
+
+136
+00:09:43,864 --> 00:09:48,399
+Notice what is not on the list: the peak
+von Mises stress from a linear elastic
+
+137
+00:09:48,449 --> 00:09:53,100
+analysis. Yielding is allowed. Collapse,
+rupture, ratcheting and fatigue are not.
+
+138
+00:09:53,397 --> 00:09:56,733
+When the elastic contour turns
+red, the analysis is not over.
+
+139
+00:09:56,783 --> 00:10:01,395
+Ask which failure mode you are protecting
+against, and run the analysis that can see
+
+140
+00:10:01,445 --> 00:10:01,561
+it.
+
