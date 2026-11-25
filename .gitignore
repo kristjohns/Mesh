@@ -1,0 +1,9 @@
+# large / regenerable outputs
+fatigue_fea/results/*.npz
+fatigue_fea/results/logs/
+fatigue_fea/results/weld_mesh/
+fatigue_fea/verification/ccx_run/
+video/build/
+video/audio/
+__pycache__/
+*.pyc

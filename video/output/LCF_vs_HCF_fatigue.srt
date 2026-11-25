@@ -1,0 +1,1327 @@
+1
+00:00:00,600 --> 00:00:03,075
+Every structure that vibrates, rotates,
+
+2
+00:00:03,125 --> 00:00:06,637
+heats up or cools down is quietly counting
+load cycles.
+
+3
+00:00:07,137 --> 00:00:11,400
+Fatigue, failure under repeated loads well
+below the static strength,
+
+4
+00:00:11,450 --> 00:00:16,525
+is behind a large share of the mechanical
+and structural failures seen in service.
+
+5
+00:00:17,024 --> 00:00:22,107
+And fatigue has two very different faces. In
+high-cycle fatigue the material
+
+6
+00:00:22,157 --> 00:00:27,308
+stays elastic and survives millions of
+cycles. In low-cycle fatigue it yields
+
+7
+00:00:27,358 --> 00:00:31,495
+on every cycle, and may fail after only
+hundreds or thousands.
+
+8
+00:00:31,995 --> 00:00:34,872
+In this video we look at what separates the
+two,
+
+9
+00:00:34,922 --> 00:00:38,286
+the methods used to predict fatigue life in
+each regime,
+
+10
+00:00:38,336 --> 00:00:42,249
+and a question that confuses many analysts:
+what does accumulated
+
+11
+00:00:42,299 --> 00:00:47,310
+plastic strain in a finite element model
+really tell you, and when is it a problem?
+
+12
+00:00:47,810 --> 00:00:51,630
+Everything is backed by nonlinear finite
+element simulations,
+
+13
+00:00:51,680 --> 00:00:57,910
+run with a cyclic plasticity solver written
+for this study and checked against an
+independent code.
+
+14
+00:00:59,460 --> 00:01:03,839
+Fatigue damage starts at the scale of the
+grains. Under cyclic shear,
+
+15
+00:01:03,889 --> 00:01:09,039
+dislocations organise into persistent slip
+bands. Where these bands meet the free
+
+16
+00:01:09,089 --> 00:01:14,238
+surface they push out tiny extrusions and
+intrusions, which act as micro-notches.
+
+17
+00:01:14,738 --> 00:01:18,488
+A crack then grows a few grains deep along
+the slip planes.
+
+18
+00:01:18,538 --> 00:01:23,060
+That is stage one. It then turns
+perpendicular to the largest principal
+
+19
+00:01:23,110 --> 00:01:26,925
+stress and advances a little every cycle.
+That is stage two,
+
+20
+00:01:26,975 --> 00:01:32,399
+and it leaves striations and, on a larger
+scale, beach marks on the fracture surface.
+
+21
+00:01:32,899 --> 00:01:35,894
+Finally the remaining ligament can no longer
+carry the
+
+22
+00:01:35,944 --> 00:01:38,770
+peak load, and it breaks in a single fast
+fracture.
+
+23
+00:01:39,270 --> 00:01:42,779
+So fatigue life is crack initiation plus
+crack growth.
+
+24
+00:01:42,829 --> 00:01:47,984
+Smooth parts in high-cycle fatigue spend
+most of their life initiating a crack.
+
+25
+00:01:48,034 --> 00:01:54,113
+At sharp notches, at welds, and in low-cycle
+fatigue, crack growth takes a much larger
+share.
+
+26
+00:01:54,613 --> 00:01:58,758
+To describe a load cycle we use the maximum
+and minimum stress,
+
+27
+00:01:58,808 --> 00:02:03,885
+the stress range delta sigma, the amplitude
+sigma a, which is half the range,
+
+28
+00:02:03,935 --> 00:02:09,079
+the mean stress sigma m, and the stress
+ratio R, the minimum over the maximum.
+
+29
+00:02:09,129 --> 00:02:14,473
+R equals minus one is fully reversed
+loading. R equals zero is pulsating tension.
+
+30
+00:02:16,023 --> 00:02:19,726
+So what really separates low-cycle from
+high-cycle fatigue?
+
+31
+00:02:19,776 --> 00:02:23,097
+It is not a magic number of cycles. It is
+plasticity.
+
+32
+00:02:23,597 --> 00:02:29,387
+Plot stress against strain over one cycle.
+At a small amplitude the response is a
+straight
+
+33
+00:02:29,437 --> 00:02:34,708
+line: elastic, with no energy dissipated.
+Push the amplitude past the cyclic yield
+
+34
+00:02:34,758 --> 00:02:40,353
+point and the line opens into a hysteresis
+loop. Its width is the plastic strain range,
+
+35
+00:02:40,403 --> 00:02:44,506
+and its area is the plastic work dissipated,
+every single cycle.
+
+36
+00:02:45,006 --> 00:02:49,099
+When the plastic strain is large compared
+with the elastic strain,
+
+37
+00:02:49,149 --> 00:02:54,057
+we are in low-cycle fatigue, with lives up
+to roughly ten thousand to a hundred
+
+38
+00:02:54,107 --> 00:02:58,137
+thousand cycles, and strain is the variable
+that controls damage.
+
+39
+00:02:58,187 --> 00:03:04,414
+When plastic strain is negligible, we are in
+high-cycle fatigue, and stress is the
+natural variable.
+
+40
+00:03:04,914 --> 00:03:09,404
+You can see this on the strain–life curve.
+On log–log axes the elastic
+
+41
+00:03:09,454 --> 00:03:12,842
+strain amplitude falls along a shallow
+straight line,
+
+42
+00:03:12,892 --> 00:03:17,123
+Basquin's law, and the plastic strain
+amplitude along a steep one,
+
+43
+00:03:17,173 --> 00:03:21,274
+the Coffin–Manson law. Their sum is the
+total strain–life curve.
+
+44
+00:03:21,774 --> 00:03:24,911
+Where the two lines cross is the transition
+life.
+
+45
+00:03:24,961 --> 00:03:29,334
+To its left, plasticity dominates and life
+is governed by ductility.
+
+46
+00:03:29,384 --> 00:03:34,017
+To its right, elastic strain dominates and
+life is governed by strength.
+
+47
+00:03:34,067 --> 00:03:38,505
+For the S355-type steel used in this video
+the transition is at about
+
+48
+00:03:38,555 --> 00:03:43,709
+three thousand three hundred cycles. High-
+strength steels reach it much earlier.
+
+49
+00:03:44,209 --> 00:03:48,312
+Beyond about ten million cycles lies the
+very-high-cycle regime,
+
+50
+00:03:48,362 --> 00:03:52,011
+where cracks often start below the surface
+at inclusions,
+
+51
+00:03:52,061 --> 00:03:59,084
+leaving a characteristic fish-eye. That is
+why many modern standards no longer assume a
+true endurance limit.
+
+52
+00:03:59,584 --> 00:04:04,416
+And remember: in a real component, the bulk
+can stay elastic while a notch
+
+53
+00:04:04,466 --> 00:04:09,232
+root yields. The surrounding elastic
+material then imposes a strain cycle
+
+54
+00:04:09,282 --> 00:04:13,190
+on the notch. That is why local strain
+methods work so well,
+
+55
+00:04:13,240 --> 00:04:17,610
+and why finite element analysis sits at the
+centre of both regimes.
+
+56
+00:04:19,160 --> 00:04:22,437
+High-cycle fatigue first: the world of
+stress and life.
+
+57
+00:04:22,937 --> 00:04:26,952
+Since Wöhler's railway axle experiments in
+the eighteen-sixties,
+
+58
+00:04:27,002 --> 00:04:31,588
+the basic tool has been the S–N curve:
+stress amplitude against cycles to
+
+59
+00:04:31,638 --> 00:04:35,081
+failure on logarithmic axes. In the finite-
+life region,
+
+60
+00:04:35,131 --> 00:04:39,654
+Basquin's equation makes it a straight line:
+the stress amplitude equals
+
+61
+00:04:39,704 --> 00:04:45,179
+the fatigue strength coefficient times two N
+to the power b, a small negative exponent.
+
+62
+00:04:45,679 --> 00:04:50,232
+Many steels show a knee and a fatigue limit,
+for smooth polished specimens
+
+63
+00:04:50,282 --> 00:04:54,649
+typically around half the tensile strength,
+reached between one and ten
+
+64
+00:04:54,699 --> 00:04:58,381
+million cycles. Aluminium alloys show no
+clear limit at all.
+
+65
+00:04:58,431 --> 00:05:03,047
+Test data from small polished specimens is
+then reduced for surface finish,
+
+66
+00:05:03,097 --> 00:05:06,655
+size, load type, temperature and the
+reliability you need.
+
+67
+00:05:07,155 --> 00:05:10,704
+Next, mean stress. Tension opens cracks and
+shortens life,
+
+68
+00:05:10,754 --> 00:05:15,854
+compression helps. The Haigh diagram plots
+the allowable amplitude against the mean
+
+69
+00:05:15,904 --> 00:05:20,322
+stress. Goodman's line joins the fatigue
+limit to the ultimate strength,
+
+70
+00:05:20,372 --> 00:05:25,410
+Gerber uses a parabola, and Soderberg's line
+ends at the yield strength and is the
+
+71
+00:05:25,460 --> 00:05:32,050
+most conservative. Smith, Watson and Topper
+combine maximum stress and amplitude into
+one damage parameter.
+
+72
+00:05:32,550 --> 00:05:36,284
+Then notches. The elastic stress
+concentration factor, K t,
+
+73
+00:05:36,334 --> 00:05:41,671
+multiplies the nominal stress at the notch
+root. Our plate with a central hole gives
+
+74
+00:05:41,721 --> 00:05:46,866
+K t equal to three point two five on the
+gross section, or two point four four on
+
+75
+00:05:46,916 --> 00:05:52,574
+the net section, matching the classical
+Peterson value to within a fraction of a
+percent.
+
+76
+00:05:53,074 --> 00:05:56,846
+The fatigue strength is reduced by less than
+K t suggests,
+
+77
+00:05:56,896 --> 00:06:01,524
+because a steep stress gradient affects only
+a tiny volume of material.
+
+78
+00:06:01,574 --> 00:06:06,598
+The fatigue notch factor, K f, and
+Peterson's notch sensitivity capture this.
+
+79
+00:06:06,648 --> 00:06:13,385
+For a twenty millimetre hole in steel the
+notch sensitivity is close to one, so K f is
+practically K t.
+
+80
+00:06:13,885 --> 00:06:18,350
+Welded joints need their own toolbox. The
+weld toe is a sharp notch
+
+81
+00:06:18,400 --> 00:06:21,449
+with tensile residual stresses close to
+yield,
+
+82
+00:06:21,499 --> 00:06:26,368
+which is also why weld S–N curves largely
+ignore the applied mean stress.
+
+83
+00:06:26,868 --> 00:06:31,534
+With the nominal stress method you find your
+detail in a catalogue of detail
+
+84
+00:06:31,584 --> 00:06:35,505
+categories, such as FAT 80, and use a simple
+beam-theory stress.
+
+85
+00:06:35,555 --> 00:06:39,601
+It only works if your joint and loading
+match a catalogued detail.
+
+86
+00:06:40,100 --> 00:06:44,054
+The structural hot-spot method uses a finite
+element model.
+
+87
+00:06:44,104 --> 00:06:49,618
+Here is a fillet-welded attachment in
+bending. The surface stress rises toward the
+
+88
+00:06:49,668 --> 00:06:54,368
+weld toe: a linear structural part plus a
+sharp, nonlinear notch peak.
+
+89
+00:06:54,418 --> 00:07:00,204
+We read the surface stress at half a plate
+thickness and at one and a half thicknesses
+
+90
+00:07:00,254 --> 00:07:05,430
+from the toe, and extrapolate linearly to
+the toe, as DNV-RP-C203 recommends.
+
+91
+00:07:05,480 --> 00:07:13,030
+The result, ninety-nine megapascals, is the
+hot-spot stress, used with a hot-spot S–N
+curve such as DNV curve D.
+
+92
+00:07:13,531 --> 00:07:17,087
+The effective notch stress method goes one
+step further.
+
+93
+00:07:17,137 --> 00:07:20,886
+The toe is rounded with a fictitious one
+millimetre radius,
+
+94
+00:07:20,936 --> 00:07:28,612
+the peak stress is computed directly, here
+two hundred and seventy-one megapascals, and
+compared with the FAT 225 curve.
+
+95
+00:07:29,112 --> 00:07:34,046
+For this joint the routes agree: about one
+point one to one point five million
+
+96
+00:07:34,096 --> 00:07:37,433
+cycles for a hundred megapascal nominal
+stress range.
+
+97
+00:07:37,483 --> 00:07:43,440
+But each method has its own rules for
+meshing and read-out, and they must be
+followed exactly.
+
+98
+00:07:43,940 --> 00:07:48,807
+Real loads are rarely constant. Rainflow
+counting breaks an irregular history
+
+99
+00:07:48,857 --> 00:07:52,191
+into closed cycles, each with its own range
+and mean.
+
+100
+00:07:52,241 --> 00:07:56,341
+Each cycle uses up a fraction n over N of
+the life at that range,
+
+101
+00:07:56,391 --> 00:08:01,002
+and the Palmgren–Miner rule adds the
+fractions. Failure is predicted when
+
+102
+00:08:01,052 --> 00:08:05,919
+the sum reaches one, and design codes add
+margin with design fatigue factors.
+
+103
+00:08:06,419 --> 00:08:11,447
+Miner's rule ignores load-sequence effects,
+and multiaxial stresses need
+
+104
+00:08:11,497 --> 00:08:15,185
+more: invariant criteria such as Sines and
+Crossland,
+
+105
+00:08:15,235 --> 00:08:20,686
+the mesoscopic Dang Van criterion, or
+critical-plane criteria such as Findley.
+
+106
+00:08:22,236 --> 00:08:25,044
+Now low-cycle fatigue, where strain takes
+over.
+
+107
+00:08:25,544 --> 00:08:30,307
+Under strain-controlled cycling, metals
+evolve. Soft, annealed materials harden
+
+108
+00:08:30,357 --> 00:08:34,754
+cyclically, while cold-worked and high-
+strength materials tend to soften.
+
+109
+00:08:34,804 --> 00:08:39,506
+After a while the loops stabilise, and the
+tips of the stable loops define the
+
+110
+00:08:39,556 --> 00:08:44,380
+cyclic stress–strain curve, usually written
+in Ramberg–Osgood form with a cyclic
+
+111
+00:08:44,430 --> 00:08:48,340
+strength coefficient, K prime, and a
+hardening exponent, n prime.
+
+112
+00:08:48,840 --> 00:08:53,715
+Many steels show Masing behaviour: each
+hysteresis branch is the cyclic curve
+
+113
+00:08:53,765 --> 00:08:58,001
+scaled by a factor of two, so any loop can
+be built from one curve.
+
+114
+00:08:58,501 --> 00:09:01,860
+Life follows the Coffin–Manson–Basquin
+relation.
+
+115
+00:09:01,910 --> 00:09:05,198
+The total strain amplitude is the elastic
+part,
+
+116
+00:09:05,248 --> 00:09:12,513
+sigma f prime over E times two N to the b,
+plus the plastic part, epsilon f prime times
+two N to the c.
+
+117
+00:09:13,013 --> 00:09:17,277
+Mean stress enters through Morrow's
+correction, which subtracts the mean
+
+118
+00:09:17,327 --> 00:09:22,070
+stress from the fatigue strength
+coefficient, or through the
+Smith–Watson–Topper
+
+119
+00:09:22,120 --> 00:09:25,485
+parameter: the maximum stress times the
+strain amplitude.
+
+120
+00:09:25,985 --> 00:09:30,821
+How do we find the strain at a notch root?
+Neuber's rule says the local stress
+
+121
+00:09:30,871 --> 00:09:35,708
+times the local strain equals the elastic
+value, K t times the nominal stress,
+
+122
+00:09:35,758 --> 00:09:40,594
+squared, divided by E. That is a hyperbola,
+which we intersect with the cyclic
+
+123
+00:09:40,644 --> 00:09:44,415
+curve. Glinka's rule equates strain energy
+densities instead.
+
+124
+00:09:44,465 --> 00:09:48,675
+Neuber tends to overestimate the strain,
+Glinka to underestimate it.
+
+125
+00:09:49,175 --> 00:09:54,145
+Or we run an elastic-plastic finite element
+analysis with a cyclic material model.
+
+126
+00:09:54,195 --> 00:09:58,614
+In our notched plate at plus or minus one
+hundred and eighty megapascals,
+
+127
+00:09:58,664 --> 00:10:03,267
+the computed strain amplitude at the hole is
+zero point three eight percent,
+
+128
+00:10:03,317 --> 00:10:08,288
+neatly between Glinka at zero point three
+two and Neuber at zero point four three.
+
+129
+00:10:08,338 --> 00:10:11,961
+The strain–life curve then gives about four
+thousand cycles.
+
+130
+00:10:12,461 --> 00:10:15,898
+Other approaches use the hysteresis energy
+per cycle,
+
+131
+00:10:15,948 --> 00:10:19,845
+or critical-plane strain parameters such as
+Brown–Miller and
+
+132
+00:10:19,895 --> 00:10:23,595
+Fatemi–Socie for multiaxial and non-
+proportional loading.
+
+133
+00:10:24,096 --> 00:10:28,171
+Design codes package this. ASME Section
+eight, Division two,
+
+134
+00:10:28,221 --> 00:10:34,153
+offers an elastic route, where the stress
+range is amplified by a plasticity
+correction
+
+135
+00:10:34,203 --> 00:10:39,585
+factor, K e, once it exceeds the shakedown
+limit, and an elastic-plastic route,
+
+136
+00:10:39,635 --> 00:10:45,360
+where an effective strain range, the elastic
+stress range over E plus the equivalent
+
+137
+00:10:45,410 --> 00:10:50,173
+plastic strain range from a cyclic analysis,
+enters the fatigue curve.
+
+138
+00:10:50,223 --> 00:10:55,880
+DNV-RP-C203 likewise corrects elastic hot-
+spot stresses for plasticity in low-cycle
+
+139
+00:10:55,930 --> 00:11:00,280
+fatigue, and adds the low-cycle damage to
+the high-cycle damage.
+
+140
+00:11:01,830 --> 00:11:06,401
+Let's put this into a finite element model:
+a steel plate eighty millimetres
+
+141
+00:11:06,451 --> 00:11:10,779
+wide with a twenty millimetre hole, modelled
+as a quarter with symmetry,
+
+142
+00:11:10,829 --> 00:11:15,278
+in plane stress, with nine-node quadratic
+elements graded toward the hole.
+
+143
+00:11:15,778 --> 00:11:20,545
+The material is an S355-type steel with a
+cyclic proportional limit of two
+
+144
+00:11:20,595 --> 00:11:25,947
+hundred and fifty megapascals and three
+Chaboche nonlinear kinematic back-stresses,
+
+145
+00:11:25,997 --> 00:11:29,592
+calibrated to the stabilised cyclic
+stress–strain curve.
+
+146
+00:11:29,642 --> 00:11:33,888
+The solver uses implicit return mapping with
+a consistent tangent,
+
+147
+00:11:33,938 --> 00:11:39,030
+and on the same cyclic problem it matches
+CalculiX to within about two percent.
+
+148
+00:11:39,530 --> 00:11:41,559
+Four load cases tell the whole story.
+
+149
+00:11:42,059 --> 00:11:47,585
+Case one: plus or minus seventy megapascals.
+The peak stress at the hole is two hundred
+
+150
+00:11:47,635 --> 00:11:51,366
+and twenty-seven megapascals, below the
+proportional limit,
+
+151
+00:11:51,416 --> 00:11:56,814
+so everything is elastic. The loop is a
+line, the accumulated plastic strain is
+zero,
+
+152
+00:11:56,864 --> 00:12:02,326
+and the strain–life curve gives about five
+million cycles. This is high-cycle fatigue.
+
+153
+00:12:02,826 --> 00:12:08,194
+Case two: zero to one hundred and forty
+megapascals. Elastically the hole would see
+four
+
+154
+00:12:08,244 --> 00:12:12,751
+hundred and fifty-five megapascals, so the
+first loading yields the notch.
+
+155
+00:12:12,801 --> 00:12:17,984
+On unloading, the elastic surroundings push
+the yielded material into compression and
+
+156
+00:12:18,034 --> 00:12:23,033
+leave a residual stress. From the second
+cycle on, the response is purely elastic.
+
+157
+00:12:23,083 --> 00:12:28,328
+This is elastic shakedown: the accumulated
+plastic strain jumps once, then stays flat.
+
+158
+00:12:28,828 --> 00:12:33,436
+But look at the local mean stress: plus one
+hundred and fifteen megapascals.
+
+159
+00:12:33,486 --> 00:12:37,788
+With a mean stress correction, the predicted
+life drops from five point
+
+160
+00:12:37,838 --> 00:12:42,017
+six million to between six hundred thousand
+and one point six million
+
+161
+00:12:42,067 --> 00:12:45,388
+cycles. Shakedown removes plastic cycling,
+not fatigue.
+
+162
+00:12:45,888 --> 00:12:49,576
+Case three: plus or minus one hundred and
+eighty megapascals.
+
+163
+00:12:49,626 --> 00:12:54,233
+Now the elastic stress range at the hole,
+nearly twelve hundred megapascals,
+
+164
+00:12:54,283 --> 00:12:58,952
+is far above twice the yield strength, so
+yielding reverses every half cycle.
+
+165
+00:12:59,002 --> 00:13:02,506
+The notch root settles into a closed, fat
+hysteresis loop.
+
+166
+00:13:02,556 --> 00:13:10,901
+This is alternating plasticity, also called
+plastic shakedown, and it is the home of
+low-cycle fatigue. Life: about four thousand
+cycles.
+
+167
+00:13:11,401 --> 00:13:15,083
+Case four: zero to two hundred and eighty-
+five megapascals.
+
+168
+00:13:15,133 --> 00:13:19,195
+Now the net section yields, and the load
+keeps a high mean value.
+
+169
+00:13:19,245 --> 00:13:26,596
+The loop no longer closes; it walks to the
+right, and the plate gets a little longer
+every cycle. This is ratcheting.
+
+170
+00:13:27,096 --> 00:13:31,139
+Now compare the accumulated plastic strain
+at the notch root.
+
+171
+00:13:31,189 --> 00:13:34,829
+Zero for the elastic case. A single step for
+shakedown.
+
+172
+00:13:34,879 --> 00:13:40,734
+A steadily rising line for alternating
+plasticity, and a rising line for ratcheting
+too.
+
+173
+00:13:41,234 --> 00:13:46,052
+And that is the catch. Cases three and four
+look alike in accumulated plastic
+
+174
+00:13:46,102 --> 00:13:51,110
+strain, but they are completely different
+problems. One is a closed strain cycle
+
+175
+00:13:51,160 --> 00:13:56,358
+that slowly initiates a fatigue crack. The
+other is a net strain that keeps growing
+
+176
+00:13:56,408 --> 00:14:00,278
+until ductility is exhausted or the part
+deforms unacceptably.
+
+177
+00:14:01,828 --> 00:14:06,567
+So what is accumulated plastic strain? In
+most finite element codes it is the
+
+178
+00:14:06,617 --> 00:14:11,170
+equivalent plastic strain, PEEQ in Abaqus:
+the time integral of the square
+
+179
+00:14:11,220 --> 00:14:15,462
+root of two thirds of the plastic strain
+rate contracted with itself.
+
+180
+00:14:15,962 --> 00:14:20,499
+Because it integrates the magnitude of
+plastic flow, it can only increase.
+
+181
+00:14:20,549 --> 00:14:25,210
+Every reversal adds to it, in whatever
+direction. Under uniaxial alternating
+
+182
+00:14:25,260 --> 00:14:29,302
+plasticity it grows by twice the plastic
+strain range every cycle.
+
+183
+00:14:29,352 --> 00:14:33,331
+At our notch root that is zero point eight
+two percent per cycle,
+
+184
+00:14:33,381 --> 00:14:39,158
+while the strain itself just oscillates
+between plus and minus zero point three
+eight percent.
+
+185
+00:14:39,658 --> 00:14:43,500
+So a large PEEQ alone does not tell you
+whether you have a fatigue
+
+186
+00:14:43,550 --> 00:14:47,392
+problem, a ratcheting problem, or neither.
+You have to look at how
+
+187
+00:14:47,442 --> 00:14:50,694
+the plastic strain tensor changes over a
+complete cycle.
+
+188
+00:14:51,194 --> 00:14:55,671
+Under repeated loading, a structure settles
+into one of four responses.
+
+189
+00:14:55,721 --> 00:15:01,028
+Elastic, with no yielding at all. Elastic
+shakedown, with yielding only in the first
+
+190
+00:15:01,078 --> 00:15:05,364
+cycles. Alternating plasticity, a closed
+plastic cycle that repeats.
+
+191
+00:15:05,414 --> 00:15:11,804
+And ratcheting, also called incremental
+collapse, with a net plastic strain
+increment in every cycle.
+
+192
+00:15:12,304 --> 00:15:15,823
+Melan's theorem gives the condition for
+elastic shakedown:
+
+193
+00:15:15,873 --> 00:15:20,499
+if some constant, self-equilibrating
+residual stress field exists that keeps
+
+194
+00:15:20,549 --> 00:15:25,052
+the elastic stresses plus the residual
+stresses within yield at all times,
+
+195
+00:15:25,102 --> 00:15:29,605
+the structure will shake down. For a
+perfectly plastic material that means
+
+196
+00:15:29,655 --> 00:15:33,543
+the elastic stress range cannot exceed twice
+the yield strength,
+
+197
+00:15:33,593 --> 00:15:38,465
+which is the basis of the ASME limit on the
+primary-plus-secondary stress range.
+
+198
+00:15:38,964 --> 00:15:42,478
+Ratcheting needs two ingredients: a
+sustained primary load,
+
+199
+00:15:42,528 --> 00:15:46,707
+like pressure, and a cyclic secondary
+stress, like a thermal gradient.
+
+200
+00:15:46,757 --> 00:15:54,016
+The classic case is the Bree problem: a
+pressurised thin cylinder with a cycling
+temperature difference through the wall.
+
+201
+00:15:54,516 --> 00:15:58,722
+Here Bree's diagram is computed numerically
+with a through-wall model:
+
+202
+00:15:58,772 --> 00:16:02,674
+sixty-five hundred load combinations,
+primary stress on one axis,
+
+203
+00:16:02,724 --> 00:16:06,626
+thermal stress range on the other, each
+cycled twenty-four times.
+
+204
+00:16:06,676 --> 00:16:11,307
+Watch the regimes appear: elastic,
+shakedown, alternating plasticity once the
+
+205
+00:16:11,357 --> 00:16:15,016
+thermal range passes twice yield, and two
+ratcheting regions.
+
+206
+00:16:15,066 --> 00:16:21,765
+The computed map matches Bree's analytical
+boundaries at every point but one, which
+lies exactly on a boundary.
+
+207
+00:16:22,266 --> 00:16:26,765
+The same physics appears in our notched
+plate. We apply a constant tension,
+
+208
+00:16:26,815 --> 00:16:31,557
+then cycle a temperature field that is hot
+in the centre and cool at the edges.
+
+209
+00:16:31,607 --> 00:16:34,954
+With a low tension, the hole edge yields
+back and forth,
+
+210
+00:16:35,004 --> 00:16:39,018
+but the length of the plate stops changing:
+alternating plasticity.
+
+211
+00:16:39,068 --> 00:16:45,145
+Double the tension, and the plate grows by
+twenty-two micrometres every cycle:
+structural ratcheting.
+
+212
+00:16:45,645 --> 00:16:48,874
+The difference is the elastic core. In the
+safe case,
+
+213
+00:16:48,924 --> 00:16:53,019
+part of the ligament never yields during a
+cycle and keeps carrying
+
+214
+00:16:53,069 --> 00:16:57,102
+the primary load. In the ratcheting case, no
+elastic core is left.
+
+215
+00:16:57,602 --> 00:17:02,201
+Material ratcheting is a separate effect,
+and it depends strongly on the hardening
+
+216
+00:17:02,251 --> 00:17:06,906
+model. Under stress control with a mean
+stress, linear kinematic hardening predicts
+
+217
+00:17:06,956 --> 00:17:11,385
+closed loops and no ratcheting at all. A
+single Armstrong–Frederick back-stress
+
+218
+00:17:11,435 --> 00:17:15,069
+predicts strong ratcheting, almost two
+percent in fifteen cycles.
+
+219
+00:17:15,119 --> 00:17:19,208
+A multi-component Chaboche model lands in
+between. If ratcheting matters,
+
+220
+00:17:19,258 --> 00:17:23,573
+calibrate the model against ratcheting
+tests, not just a stress–strain curve.
+
+221
+00:17:24,073 --> 00:17:27,972
+So how do you assess accumulated plastic
+strain in practice?
+
+222
+00:17:28,022 --> 00:17:31,592
+First, run enough cycles. ASME requires at
+least three,
+
+223
+00:17:31,642 --> 00:17:35,870
+and Eurocode 3 Part 1-6 uses the increment
+after the third cycle.
+
+224
+00:17:35,920 --> 00:17:40,609
+Second, separate the response: extract the
+plastic strain increment over
+
+225
+00:17:40,659 --> 00:17:46,861
+the last cycle, the plastic strain range,
+and the change in key dimensions from cycle
+to cycle.
+
+226
+00:17:47,361 --> 00:17:51,392
+Third, apply the acceptance criteria. ASME
+Section eight,
+
+227
+00:17:51,442 --> 00:17:57,190
+Division two, accepts the elastic-plastic
+ratcheting check if there is no plastic
+
+228
+00:17:57,240 --> 00:18:01,772
+action, or an elastic core in the primary
+load-bearing boundary,
+
+229
+00:18:01,822 --> 00:18:07,284
+or no permanent change in the overall
+dimensions. EN 13445 requires shakedown
+
+230
+00:18:07,334 --> 00:18:12,796
+to be shown, for example with Melan's
+theorem. Eurocode 3 Part 1-6 limits the
+
+231
+00:18:12,846 --> 00:18:18,452
+total accumulated equivalent plastic strain
+over the design life to twenty-five
+
+232
+00:18:18,502 --> 00:18:22,890
+times the yield strain, about four point two
+percent for S355.
+
+233
+00:18:22,940 --> 00:18:28,403
+And ASME's local strain criterion compares
+the accumulated equivalent plastic
+
+234
+00:18:28,453 --> 00:18:35,490
+strain with a limit strain that falls with
+stress triaxiality, adding up damage for
+load sequences.
+
+235
+00:18:35,990 --> 00:18:40,612
+Fourth, if the response is alternating
+plasticity, compute fatigue damage from
+
+236
+00:18:40,662 --> 00:18:45,523
+the stabilised strain range with a
+strain–life method and add it to the high-
+cycle
+
+237
+00:18:45,573 --> 00:18:50,075
+damage. If it ratchets, the net strain
+consumes ductility on top of fatigue.
+
+238
+00:18:50,125 --> 00:18:53,849
+A simple engineering estimate adds a
+ductility exhaustion term,
+
+239
+00:18:53,899 --> 00:18:57,862
+the ratchet strain over the fracture strain,
+to the fatigue damage.
+
+240
+00:18:57,912 --> 00:19:02,474
+But in design codes, continued ratcheting is
+generally simply not acceptable.
+
+241
+00:19:02,974 --> 00:19:06,809
+So, is accumulated plastic strain a problem?
+If it stops growing,
+
+242
+00:19:06,859 --> 00:19:10,992
+the structure has shaken down, and you are
+back in high-cycle fatigue,
+
+243
+00:19:11,042 --> 00:19:15,295
+with the right local mean stress. If it
+grows because of a closed cycle,
+
+244
+00:19:15,345 --> 00:19:19,000
+it is low-cycle fatigue, governed by the
+plastic strain range,
+
+245
+00:19:19,050 --> 00:19:23,243
+not by the accumulated total. And if it
+grows because the strain itself
+
+246
+00:19:23,293 --> 00:19:27,845
+keeps drifting, that is ratcheting, and that
+is the case you must design out.
+
+247
+00:19:29,395 --> 00:19:30,743
+Let's put it all together.
+
+248
+00:19:31,243 --> 00:19:35,415
+Start with a linear-elastic analysis. If the
+equivalent stress range
+
+249
+00:19:35,465 --> 00:19:38,396
+stays below twice the yield strength
+everywhere,
+
+250
+00:19:38,446 --> 00:19:41,500
+the structure shakes down. Use high-cycle
+methods:
+
+251
+00:19:41,550 --> 00:19:47,834
+local, hot-spot or notch stresses, corrected
+for mean stress, with rainflow counting and
+Miner's rule.
+
+252
+00:19:48,334 --> 00:19:53,408
+If not, run an elastic-plastic analysis with
+a cyclic material model for several
+
+253
+00:19:53,458 --> 00:19:58,147
+cycles. Check ratcheting: no growth of
+strains or dimensions from cycle to
+
+254
+00:19:58,197 --> 00:20:01,797
+cycle, or an elastic core. Then take the
+stabilised loop,
+
+255
+00:20:01,847 --> 00:20:05,448
+compute the low-cycle fatigue life from its
+strain range,
+
+256
+00:20:05,498 --> 00:20:11,468
+check accumulated strain against local
+failure limits, and add the low- and high-
+cycle damage.
+
+257
+00:20:11,967 --> 00:20:15,558
+High-cycle fatigue is about stress amplitude
+and strength.
+
+258
+00:20:15,608 --> 00:20:19,451
+Low-cycle fatigue is about plastic strain
+range and ductility.
+
+259
+00:20:19,501 --> 00:20:26,985
+And accumulated plastic strain only means
+something once you know which of the two, or
+whether ratcheting, is behind it.
+
+260
+00:20:27,485 --> 00:20:28,566
+Thanks for watching.
+
