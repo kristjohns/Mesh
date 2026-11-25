@@ -7,3 +7,10 @@ video/build/
 video/audio/
 __pycache__/
 *.pyc
+# report build artefacts
+report/*.aux
+report/*.log
+report/*.out
+report/report.pdf
+report/pages/
+report/figs/*.png
